@@ -1,18 +1,18 @@
-out_dir=$1
+if [ $# -lt 1 ]; then
+	echo "Usage: `basename "$0"` <dir1> [dir2] [dir3] ..."
+fi
 
-#set -e 
+dirs=("$@")
 
 module load cdo
 
-cd ${out_dir}
-
-for d in ????????; do
+for d in ${dirs[@]}; do
+	
 	cd $d
 	echo $PWD
 	
 	# check if there is something to do
-	if [ `ls -d * | grep -w out?? | wc -l` -eq 0 ]; then
-		cd ..
+	if [ `ls -d * | grep "out[0-9][0-9]" | wc -l` -eq 0 ]; then
 		continue
 	fi
 	
@@ -22,7 +22,7 @@ for d in ????????; do
 		echo $PWD
 		
 		# merge all output files wrt time
-		if [ `find ./ -type f -name 'lffd*[0-9].nc' | wc -l` -gt 0 ]; then
+		if [ `find ./ -type f -or -type l -name 'lffd*[0-9].nc' | wc -l` -gt 0 ]; then
 			cdo mergetime 'lffd*[0-9].nc' ${o}.nc && rm lffd*.nc
 		fi
 		# create individual files for the variables
@@ -59,5 +59,4 @@ for d in ????????; do
 			rm -r $o
 		fi
 	done
-	cd ..
 done
