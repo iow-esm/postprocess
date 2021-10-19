@@ -8,6 +8,6 @@ dependencies=()
 source ../../auxiliary/get_all_dirs_from_to.sh ${out_dir} $from $to
 echo "$dirs"
 
-./process_raw_output/process_raw_output.sh "${dirs}"
+./process_raw_output.sh "${dirs}"
 
 
