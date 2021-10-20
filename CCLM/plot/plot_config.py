@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 class PlotConfig:
     def __init__(self, variable, title = None, min_value = None, max_value = None, delta_value = None, color_map = None, contour = False, transform_variable = None, task_name = "seasonal_mean", path = None):
         self.variable = variable
@@ -10,3 +12,16 @@ class PlotConfig:
         self.transform_variable = transform_variable
         self.task_name = task_name
         self.path = path
+        
+    def reconfigure(self, variable = None, title = None, min_value = None, max_value = None, delta_value = None, color_map = None, contour = None, transform_variable = None, task_name = None, path = None):
+
+        args = locals()
+        for arg in args.keys():
+            if arg is not "self":
+                if args[arg] is not None:
+                    setattr(self, arg, args[arg]) 
+                    
+    def clone(self, variable = None, title = None, min_value = None, max_value = None, delta_value = None, color_map = None, contour = None, transform_variable = None, task_name = None, path = None):
+        c = deepcopy(self)
+        c.reconfigure(variable, title, min_value, max_value, delta_value, color_map, contour, transform_variable, task_name, path)
+        return c
