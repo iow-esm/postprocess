@@ -26,14 +26,23 @@ for dir in dirs:
         levels = fh.variables[variables[var]["level_name"]][:]
         fh.close()
         
-        #TODO loop over levels
+        # loop over levels
+        for i, level in enumerate(variables[var]["levels"]):
         
-        level = min(levels, key=lambda x:abs(x-variables[var]["levels"][0]))
+            level = min(levels, key=lambda x:abs(x-level))
         
-        command = "cd " + dir + "; "
-        command += "cdo  -sellevel," + str(level) + " " + nc_file + " " + variables[var]["output_names"][0] + ".nc"
-        #TODO rename the variable
-        os.system(command)
+            command = "cd " + dir + "; "
+            output_file = variables[var]["output_names"][i] + ".nc"
+            command += "cdo  -sellevel," + str(level) + " " + nc_file + " " + output_file
+            os.system(command)
+            
+            # rename the variable
+            command = "cd " + dir + "; "
+            command += "cdo chname," + var + "," + variables[var]["output_names"][i] + " " + output_file + " tmp.nc; "
+            command += "mv tmp.nc " + output_file
+            os.system(command)
+            
+            
         
         
         
