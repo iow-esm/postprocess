@@ -4,20 +4,31 @@ from mpl_toolkits.basemap import Basemap
 
 import matplotlib.pyplot as plt
         
-def build_basemap(lons, lats):
+def build_basemap(lons, lats, width = None, height = None):
     # Get some parameters for the Stereographic Projection
     lon_0 = lons.mean()
     lat_0 = lats.mean()
-
-    m = Basemap(width=7000000,height=5000000,
-                resolution='l',projection='stere',\
-                lat_ts=40,lat_0=lat_0,lon_0=lon_0)
-
+    
     # If lon and lat variables are 1D,
     # use meshgrid to create 2D arrays
     # Not necessary if coordinates are already in 2D arrays.
     if lons.ndim == 1 and lats.ndim == 1:
         lons, lats = np.meshgrid(lons, lats)
+      
+    if width is None and height is None:
+
+        llcrnrlon = lons[0][0]
+        urcrnrlon = lons[-1][-1]
+        llcrnrlat = lats[0][0]
+        urcrnrlat = lats[-1][-1]
+    
+        m = Basemap(llcrnrlon = llcrnrlon, urcrnrlon = urcrnrlon, llcrnrlat = llcrnrlat, urcrnrlat = urcrnrlat, 
+                    resolution='l',projection='stere', lat_0=lat_0, lon_0=lon_0)
+        
+    else:
+        m = Basemap(width=width, height=height, resolution='l',projection='stere', 
+                    lat_0=lat_0, lon_0=lon_0)
+        
     xi, yi = m(lons, lats)
     
         # Add Grid Lines
@@ -30,10 +41,13 @@ def build_basemap(lons, lats):
     
     return m, xi, yi
 
-def read_data(plot_config, nc_file, lon_name = 'lon', lat_name = 'lat'):
+def read_data(plot_config, nc_file):
     
     fh = Dataset(nc_file, mode='r')
-
+    
+    lon_name = plot_config.lon_name
+    lat_name = plot_config.lat_name
+    
     lons = fh.variables[lon_name][:]
     lats = fh.variables[lat_name][:]
     variable = fh.variables[plot_config.variable][:]
@@ -108,7 +122,7 @@ def plot_on_map(plot_configs, results_dir):
             title, variable, units, vmin, vmax, delta, nlevels, color_map, contour = process_config(plot_config, variable, units, add_info = add_info)
 
             # build the base map
-            m, xi, yi = build_basemap(lons, lats)
+            m, xi, yi = build_basemap(lons = lons, lats = lats, width = plot_config.width, height = plot_config.height)
 
             # create color map
             cmap = plt.get_cmap(color_map, nlevels)

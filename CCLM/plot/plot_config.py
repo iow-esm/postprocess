@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 class PlotConfig:
-    def __init__(self, variable, title = None, min_value = None, max_value = None, delta_value = None, color_map = None, contour = False, transform_variable = None, task_name = "seasonal_mean", path = None):
+    def __init__(self, variable, title = None, min_value = None, max_value = None, delta_value = None, color_map = None, contour = False, transform_variable = None, task_name = "seasonal_mean", path = None, lon_name = "lon", lat_name = "lat", width = None, height = None):
         self.variable = variable
         self.title = title
         self.min_value = min_value
@@ -12,6 +12,10 @@ class PlotConfig:
         self.transform_variable = transform_variable
         self.task_name = task_name
         self.path = path
+        self.lon_name = lon_name
+        self.lat_name = lat_name
+        self.width = width
+        self.height = height
         
     def reconfigure(self, variable = None, title = None, min_value = None, max_value = None, delta_value = None, color_map = None, contour = None, transform_variable = None, task_name = None, path = None):
 
