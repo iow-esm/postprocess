@@ -37,8 +37,8 @@ for dir in dirs:
 # where should the output be stored (you need write permissions there)
 parameters.path_to_output = results_dir
 
-# create an instance of a concrete vaildator preparator (in this case MOM5)
-# instantiate it with the parameters object
+# create an instance of a vaildator preparator
+# instantiate it with the parameters
 preparator = validator_preparator.ValidatorPreparator(parameters=parameters, 
                                                       variable_names=config.variable_names, 
                                                       station_names=config.station_names, 
