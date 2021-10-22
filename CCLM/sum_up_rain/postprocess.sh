@@ -7,4 +7,4 @@ dependencies=("process_raw_output")
 module load cdo
 module load anaconda3
 
-python3 sum_up_rain.py "${out_dir}" ${from_date} ${to_date}
+python3 ../../auxiliary/apply_arithmetics.py "${out_dir}" ${from_date} ${to_date} "$PWD"
