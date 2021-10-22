@@ -10,9 +10,11 @@ def convert_K2C(variable, units):
 reference_dir = "../process_reference/results/_scratch_usr_mvkkarst_obs_E-OBS-19790901_20091130"
 reference_title = "E-OBS-19790901_20091130"
 
+cclm_template = PlotConfig("", width=7000000, height=5000000)
+
 # templates for temperatur and rain
-t2m = PlotConfig("T_2M", contour = True, color_map = 'YlOrRd', transform_variable = convert_K2C, task_name="seasonal_mean")
-rain = PlotConfig("RAIN_TOT", min_value = 0.0, max_value = 4.0, delta_value = 0.5, color_map = 'YlGnBu', task_name="seasonal_mean")
+t2m = cclm_template.clone("T_2M", contour = True, color_map = 'YlOrRd', transform_variable = convert_K2C, task_name="seasonal_mean")
+rain = cclm_template.clone("RAIN_TOT", min_value = 0.0, max_value = 4.0, delta_value = 0.5, color_map = 'YlGnBu', task_name="seasonal_mean")
 
 seasons = ["JJA", "MAM", "SON", "DJF"]
 
@@ -33,8 +35,8 @@ for season in seasons:
                             rain.clone(path=reference_dir + "/RAIN_TOT-" + season + ".nc", title = "RAIN_TOT-" + season + "-" + reference_title)]
 
 # templates for temperatur and rain
-t2m = PlotConfig("T_2M", contour = True, color_map = 'YlOrRd', transform_variable = convert_K2C, task_name="seasonal_percentile")
-rain = PlotConfig("RAIN_TOT", min_value = 0.0, max_value = 4.0, delta_value = 0.5, color_map = 'YlGnBu', task_name="seasonal_percentile")
+t2m = cclm_template.clone("T_2M", contour = True, color_map = 'YlOrRd', transform_variable = convert_K2C, task_name="seasonal_percentile")
+rain = cclm_template.clone("RAIN_TOT", min_value = 0.0, max_value = 4.0, delta_value = 0.5, color_map = 'YlGnBu', task_name="seasonal_percentile")
     
 seasons = ["JJA", "DJF"]
 percentiles = ["95", "5"]
