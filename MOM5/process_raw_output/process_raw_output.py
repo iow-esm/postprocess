@@ -52,7 +52,11 @@ for dir in dirs:
         command += "cdo -selname,$var " + output_file + " $var.nc 2> /dev/null; done; "
         command += "rm " + output_file
         os.system(command)
-        
-        
+     
+    # save station data
+    os.system("mv " + dir + "/out_raw/" + "rregion_* " + dir + "/")
+    
+    # check if any real files (no links) are left in raw output, if not remove
+    os.system("if [ `find " + dir + "/out_raw/ -mindepth 1 ! -type l | wc -l` -eq 0 ]; then  rm -r " + dir + "/out_raw; fi")
 
 
