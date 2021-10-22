@@ -1,3 +1,5 @@
+#!/bin/bash
+
 out_dir=$1
 from=$2
 to=$3

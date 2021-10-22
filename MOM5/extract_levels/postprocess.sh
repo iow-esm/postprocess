@@ -7,4 +7,4 @@ dependencies=("process_raw_output")
 module load cdo
 module load anaconda3
 
-python3 extract_levels.py "${out_dir}" ${from_date} ${to_date}
+python3 ../../auxiliary/extract_levels.py "${out_dir}" ${from_date} ${to_date} "$PWD"

@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../../auxiliary')
 from plot_config import PlotConfig
 
 def convert_K2C(variable, units):

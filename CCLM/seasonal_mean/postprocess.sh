@@ -7,4 +7,4 @@ dependencies=("process_raw_output" "sum_up_rain")
 module load cdo
 module load anaconda3
 
-python3 seasonal_mean.py "${out_dir}" ${from_date} ${to_date}
+python3 ../../auxiliary/seasonal_mean.py "${out_dir}" ${from_date} ${to_date} "$PWD"
