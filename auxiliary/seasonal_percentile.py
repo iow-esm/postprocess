@@ -22,16 +22,22 @@ import create_results_dir
 results_dir = create_results_dir.create_results_dir(out_dir, from_date, to_date)
 
 for var in variables:
+
+    try:
+        setvrange = "-setvrange," + config.ranges[var]
+    except:
+        setvrange = ""
+        
     files=""
     for dir in dirs:
         files += dir + "/" + var + ".nc "
 	
     for names, numbers in seasons.items():
     
-        os.system("cdo timmin -selmon," + numbers + " -cat \'" + files + "\' "  + results_dir + "/minfile.nc")
-        os.system("cdo timmax -selmon," + numbers + " -cat \'" + files + "\' "  + results_dir + "/maxfile.nc")
+        os.system("cdo timmin " + setvrange + " -selmon," + numbers + " -cat \'" + files + "\' "  + results_dir + "/minfile.nc")
+        os.system("cdo timmax " + setvrange + " -selmon," + numbers + " -cat \'" + files + "\' "  + results_dir + "/maxfile.nc")
         
         for p in percentiles:
-            os.system("cdo timpctl," + p + " -selmon," + numbers + " -cat \'" + files + "\' " + results_dir + "/minfile.nc " + results_dir + "/maxfile.nc " + results_dir + "/" + var + "-" + names + "-PCTL_" + p + ".nc")
+            os.system("cdo timpctl," + p + " " + setvrange + " -selmon," + numbers + " -cat \'" + files + "\' " + results_dir + "/minfile.nc " + results_dir + "/maxfile.nc " + results_dir + "/" + var + "-" + names + "-PCTL_" + p + ".nc")
         
         os.system("rm " + results_dir + "/maxfile.nc " + results_dir + "/minfile.nc ")

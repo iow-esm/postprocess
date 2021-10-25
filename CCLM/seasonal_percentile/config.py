@@ -7,3 +7,7 @@ seasons = {
 
 variables = ["T_2M", "RAIN_CON", "RAIN_GSP", "RAIN_TOT", "TOT_PREC"]
 percentiles = ["95", "5", "25"]
+
+ranges = { "RAIN_TOT" : "1,10000",
+           "TOT_PREC" : "1,10000"
+}
