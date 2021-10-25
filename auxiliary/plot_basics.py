@@ -70,12 +70,12 @@ def process_config(plot_config, variable, units, add_info = ""):
     if plot_config.min_value is not None:
         vmin = plot_config.min_value
     else:
-        vmin = min(variable.flatten())
+        vmin = variable.min()
 
     if plot_config.max_value is not None:
         vmax = plot_config.max_value
     else:
-        vmax = max(variable.flatten())
+        vmax = variable.max()
 
     if plot_config.delta_value is not None:
         delta = plot_config.delta_value
