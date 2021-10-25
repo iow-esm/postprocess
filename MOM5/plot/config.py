@@ -25,6 +25,16 @@ for season in seasons:
         sst = sst.clone(min_value = -2.0, max_value = 8.0, delta_value = 1.0)
         
     plot_configs[season] = [sst.clone(), eta.clone(), sss.clone()]
+    
+percentiles = ["95", "5"]
+mom_temp = PlotConfig("", task_name="seasonal_percentile", lon_name = "xt_ocean", lat_name = "yt_ocean", width = 1500000, height = 1800000)
+
+sst = mom_temp.clone("sst", contour = True, delta_value = 1.0, color_map = 'YlOrRd')
+eta = mom_temp.clone("eta_t", delta_value = 0.05, contour = True, color_map = 'coolwarm')
+sss = mom_temp.clone("sss", delta_value = 1.25, contour = True, color_map = 'RdPu')
+for season in seasons:
+    for percentile in percentiles:
+        plot_configs[season + "-PCTL_" + percentile] = [sst.clone(), eta.clone(), sss.clone()]
 
     
 
