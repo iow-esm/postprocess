@@ -16,7 +16,7 @@ cclm_template = PlotConfig("", width=7000000, height=5000000)
 
 # templates for temperatur and rain
 t2m = cclm_template.clone("T_2M", contour = True, color_map = 'YlOrRd', transform_variable = convert_K2C, task_name="seasonal_mean")
-rain = cclm_template.clone("RAIN_TOT", min_value = 0.0, max_value = 4.0, delta_value = 0.5, color_map = 'YlGnBu', task_name="seasonal_mean")
+rain = cclm_template.clone("TOT_PREC", min_value = 0.0, max_value = 4.0, delta_value = 0.5, color_map = 'YlGnBu', task_name="seasonal_mean")
 
 seasons = ["JJA", "MAM", "SON", "DJF"]
 
@@ -34,11 +34,11 @@ for season in seasons:
     plot_configs[season] = [t2m.clone(), 
                             t2m.clone(path=reference_dir + "/T_2M-" + season + ".nc", title = "T_2M-" + season + "-" + reference_title),
                             rain.clone(),
-                            rain.clone(path=reference_dir + "/RAIN_TOT-" + season + ".nc", title = "RAIN_TOT-" + season + "-" + reference_title)]
+                            rain.clone(path=reference_dir + "/TOT_PREC-" + season + ".nc", title = "TOT_PREC-" + season + "-" + reference_title)]
 
 # templates for temperatur and rain
 t2m = cclm_template.clone("T_2M", contour = True, color_map = 'YlOrRd', transform_variable = convert_K2C, task_name="seasonal_percentile")
-rain = cclm_template.clone("RAIN_TOT", min_value = 0.0, max_value = 4.0, delta_value = 0.5, color_map = 'YlGnBu', task_name="seasonal_percentile")
+rain = cclm_template.clone("TOT_PREC", min_value = 0.0, max_value = 4.0, delta_value = 0.5, color_map = 'YlGnBu', task_name="seasonal_percentile")
     
 seasons = ["JJA", "DJF"]
 percentiles = ["95", "5"]
@@ -58,13 +58,13 @@ for season in seasons:
                 t2m = t2m.clone(min_value = -7.0, max_value = 20.0, delta_value = 3.0)
                 
         if percentile == "5":
-            rain = rain.clone(min_value = 0.0, max_value = 1.0, delta_value = 0.1)
+            rain = rain.clone(min_value = 1.0, max_value = 10.0, delta_value = 1.0)
         elif percentile == "95":
-            rain = rain.clone(min_value = 0.0, max_value = 10.0, delta_value = 1.0) 
+            rain = rain.clone(min_value = 10.0, max_value = 20.0, delta_value = 1.0) 
             
         plot_configs[season + "-PCTL_" + percentile] = [t2m.clone(), 
                                                         t2m.clone(path=reference_dir + "/T_2M-" + season + "-PCTL_" + percentile + ".nc", 
                                                                   title = "T_2M-" + season + "-PCTL_" + percentile + "-" + reference_title),
                                                         rain.clone(),
-                                                        rain.clone(path=reference_dir + "/RAIN_TOT-" + season + "-PCTL_" + percentile + ".nc", 
-                                                                   title = "RAIN_TOT-" + season + "-PCTL_" + percentile + "-" + reference_title)]
+                                                        rain.clone(path=reference_dir + "/TOT_PREC-" + season + "-PCTL_" + percentile + ".nc", 
+                                                                   title = "TOT_PREC-" + season + "-PCTL_" + percentile + "-" + reference_title)]

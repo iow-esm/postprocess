@@ -11,7 +11,8 @@ reference = "E-OBS"
 
 if reference == "E-OBS":  
     variables = {"T_2M" : "tg_ens_mean_0.1deg_reg_v23.1e",
-                 "RAIN_TOT" : "rr_ens_mean_0.1deg_reg_v23.1e"}
+                 #"RAIN_TOT" : "rr_ens_mean_0.1deg_reg_v23.1e",
+                 "TOT_PREC" : "rr_ens_mean_0.1deg_reg_v23.1e"}
 else:
     variables = {}
 
