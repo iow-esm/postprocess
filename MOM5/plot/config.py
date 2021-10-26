@@ -11,6 +11,14 @@ sss = mom_temp.clone("sss", min_value = 0.0, max_value = 10.0, delta_value = 1.2
 
 seasons = ["JJA", "MAM", "SON", "DJF"]
 
+reference_dir = "../process_reference/results/_scratch_usr_mvkkarst_obs_Copernicus-19820101_19821231"
+reference_title = "Copernicus-19820101_19821231"
+
+def convert_K2C(variable, units):
+    variable -= 273.15
+    units = "Celsius"
+    return variable, units
+
 plot_configs = {}
 
 for season in seasons:
@@ -24,7 +32,9 @@ for season in seasons:
     elif season == "DJF":
         sst = sst.clone(min_value = -2.0, max_value = 8.0, delta_value = 1.0)
         
-    plot_configs[season] = [sst.clone(), eta.clone(), sss.clone()]
+    plot_configs[season] = [sst.clone(),
+                            sst.clone(path=reference_dir + "/sst-" + season + ".nc", title = "sst-" + season + "-" + reference_title, lon_name = "lon", lat_name = "lat", transform_variable = convert_K2C),
+                            eta.clone(), sss.clone()]
     
 percentiles = ["95", "5"]
 mom_temp = PlotConfig("", task_name="seasonal_percentile", lon_name = "xt_ocean", lat_name = "yt_ocean", width = 1500000, height = 1800000)
