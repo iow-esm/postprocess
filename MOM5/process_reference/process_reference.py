@@ -34,15 +34,11 @@ if reference == "Copernicus":
         all_files = sorted(glob.glob(out_dir + "/" + variables[var]["pattern"]))
         files[var] = ""
         for file in all_files:
-            if from_date > 0 and to_date > 0:
-                if int(file.split("/")[-1][:8]) >= from_date and int(file.split("/")[-1][:8]) <= to_date:
-                    files[var] += file + " "
-                
-        merge_file = results_dir + "/" + var + ".nc"        
-        os.system("cdo -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files[var] + " " + merge_file)
+            files[var] += file + " " 
 
 for var in variables.keys():	
     merge_file = results_dir + "/" + var + ".nc"
+    os.system("cdo -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files[var] + " " + merge_file)
     
     for names, numbers in seasons.items():
     
