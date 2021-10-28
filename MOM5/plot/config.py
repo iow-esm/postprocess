@@ -9,10 +9,10 @@ sst = mom_temp.clone("sst", contour = True, color_map = 'YlOrRd')
 eta = mom_temp.clone("eta_t", min_value = -0.6, max_value = 0.6, delta_value = 0.05, contour = True, color_map = 'coolwarm')
 sss = mom_temp.clone("sss", min_value = 0.0, max_value = 10.0, delta_value = 1.25, contour = True, color_map = 'RdPu')
 
-seasons = ["JJA", "MAM", "SON", "DJF"]
+seasons = ["MAM", "SON", "JJA", "DJF"]
 
-reference_dir = "../process_reference/results/_scratch_usr_mvkkarst_obs_Copernicus-19820101_19821231"
-reference_title = "Copernicus-19820101_19821231"
+reference_dir = "../process_reference/results/_scratch_usr_mvkkarst_obs_Copernicus-19810901_20091130"
+reference_title = "Copernicus-19810901_20091130"
 
 def convert_K2C(variable, units):
     variable -= 273.15
@@ -33,7 +33,7 @@ for season in seasons:
         sst = sst.clone(min_value = -2.0, max_value = 8.0, delta_value = 1.0)
         
     plot_configs[season] = [sst.clone(),
-                            sst.clone(path=reference_dir + "/sst-" + season + ".nc", title = "sst-" + season + "-" + reference_title, lon_name = "lon", lat_name = "lat", transform_variable = convert_K2C),
+                            sst.clone(path=reference_dir + "/sst-" + season + ".nc", title = "sst-" + season + "-" + reference_title, transform_variable = convert_K2C),
                             eta.clone(), sss.clone()]
     
 percentiles = ["95", "5"]
@@ -44,7 +44,20 @@ eta = mom_temp.clone("eta_t", delta_value = 0.05, contour = True, color_map = 'c
 sss = mom_temp.clone("sss", delta_value = 1.25, contour = True, color_map = 'RdPu')
 for season in seasons:
     for percentile in percentiles:
-        plot_configs[season + "-PCTL_" + percentile] = [sst.clone(), eta.clone(), sss.clone()]
+        if season == "JJA":
+            if percentile == "95":
+                sst = sst.clone(min_value = 10.0, max_value = 24.0, delta_value = 2.0,)
+            elif percentile == "5":
+                sst = sst.clone(min_value = 2.0, max_value = 15.0, delta_value = 2.0)
+        elif season == "DJF":
+            if percentile == "95":
+                sst = sst.clone(min_value = 2.0, max_value = 7.0, delta_value = 0.5,)
+            elif percentile == "5":
+                sst = sst.clone(min_value = -2.0, max_value = 3.0, delta_value = 0.5)
+                
+        plot_configs[season + "-PCTL_" + percentile] = [sst.clone(), 
+                                                        sst.clone(path=reference_dir + "/sst-" + season + ".nc", title = "sst-" + season + "-PCTL_" + percentile + "-" + reference_title, transform_variable = convert_K2C),
+                                                        eta.clone(), sss.clone()]
 
     
 
