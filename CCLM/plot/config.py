@@ -58,9 +58,9 @@ for season in seasons:
                 t2m = t2m.clone(min_value = -7.0, max_value = 20.0, delta_value = 3.0)
                 
         if percentile == "5":
-            rain = rain.clone(min_value = 1.0, max_value = 10.0, delta_value = 1.0)
+            rain = rain.clone(min_value = 1.0, max_value = 1.5, delta_value = 0.05)
         elif percentile == "95":
-            rain = rain.clone(min_value = 10.0, max_value = 20.0, delta_value = 1.0) 
+            rain = rain.clone(min_value = 10.0, max_value = 30.0, delta_value = 2.0) 
             
         plot_configs[season + "-PCTL_" + percentile] = [t2m.clone(), 
                                                         t2m.clone(path=reference_dir + "/T_2M-" + season + "-PCTL_" + percentile + ".nc", 
