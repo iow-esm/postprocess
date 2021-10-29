@@ -8,7 +8,7 @@ from_date = int(sys.argv[2])
 to_date = int(sys.argv[3])
 
 # read the local config
-from config import files_to_process, path_to_mppn
+from config import files_to_process, path_to_mppn, station_pattern
 
 # get all dirs to be processed
 sys.path.append('../../auxiliary')
@@ -28,12 +28,8 @@ for dir in dirs:
     # go over all file types that should be processed
     for f in files_to_process:
         
-        # extract the year and month from the directory's name
-        year = dir.split("/")[-1][0:4]
-        month = dir.split("/")[-1][4:6]
-        
         # construct the pattern for all files that should be processed
-        files_pattern = f + "_" + year + "_" + month + ".nc.????"
+        files_pattern = f + "*.nc.????"
         
         # if there is no file left of this type, go on with the next type
         if glob.glob(dir + "/out_raw/" + files_pattern) == []:
@@ -50,7 +46,7 @@ for dir in dirs:
         os.system(command)
         
         # check if the outputfile has been created
-        output_file = f + "_" + year + "_" + month + ".nc"
+        output_file = f + "*.nc"
         # if not, try the next file type
         if glob.glob(dir + "/out_raw/" + output_file) == []:
             print("Error: " + output_file + " could not be found.")
@@ -68,7 +64,7 @@ for dir in dirs:
         os.system(command)
      
     # save station data
-    os.system("mv " + dir + "/out_raw/" + "rregion_* " + dir + "/")
+    os.system("mv " + dir + "/out_raw/" + station_pattern + " " + dir + "/")
     
     # check if any real files (no links) are left in raw output, if not remove
     os.system("if [ `find " + dir + "/out_raw/ -mindepth 1 ! -type l | wc -l` -eq 0 ]; then  rm -r " + dir + "/out_raw; fi")
