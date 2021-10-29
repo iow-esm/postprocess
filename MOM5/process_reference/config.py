@@ -13,8 +13,12 @@ reference = "Copernicus"
     
 if reference == "Copernicus":  
     variables = {
-    "sst" : { "pattern" : "*-Baltic-ESACCI-L4_GHRSST-SSTdepth-OSTIA-GLOB_CDR2.0-v02.0-fv01.0.nc",
-              "name" : "analysed_sst" }
+    # sea surface temperature
+    "SST" : { "file-pattern" : "*-Baltic-ESACCI-L4_GHRSST-SSTdepth-OSTIA-GLOB_CDR2.0-v02.0-fv01.0.nc",
+              "name" : "analysed_sst" },
+    # fraction of ice
+    "FI" : { "file-pattern" : "*-Baltic-ESACCI-L4_GHRSST-SSTdepth-OSTIA-GLOB_CDR2.0-v02.0-fv01.0.nc",
+              "name" : "sea_ice_fraction" }              
     }
 else:
     variables = {}

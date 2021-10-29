@@ -22,28 +22,24 @@ if from_date > 0 and to_date > 0:
 else:
     seldate = ""
     
-files={}
-
 try:
     sellonlatbox = " -sellonlatbox," + config.sellonlatbox
 except:
     sellonlatbox = ""
 
-if reference == "Copernicus":
-    for var in variables.keys():
-        all_files = sorted(glob.glob(out_dir + "/" + variables[var]["pattern"]))
-        files[var] = ""
-        for file in all_files:
-            files[var] += file + " " 
-
 for var in variables.keys():	
+
+    files = sorted(glob.glob(out_dir + "/" + variables[var]["file-pattern"]))
+    files = " ".join(files)
+    
     merge_file = results_dir + "/" + var + ".nc"
-    os.system("cdo -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files[var] + " " + merge_file)
+    os.system("cdo -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files + " " + merge_file)
     
     for names, numbers in seasons.items():
     
         output_file = results_dir + "/" + var + "-" + names + ".nc"
         os.system("cdo -timmean " + " -selmon," + numbers +  " " + merge_file + " " + output_file)
+        os.system("cdo chname," + variables[var]["name"] + "," + var + " " + output_file + " tmp.nc; mv tmp.nc " + output_file)
         
         os.system("cdo timmin " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/minfile.nc")
         os.system("cdo timmax " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/maxfile.nc")
@@ -51,20 +47,6 @@ for var in variables.keys():
         for p in percentiles:
             output_file = results_dir + "/" + var + "-" + names + "-PCTL_" + p + ".nc"
             os.system("cdo timpctl," + p + " -selmon," + numbers + seldate + " " + merge_file + " " + results_dir + "/minfile.nc " + results_dir + "/maxfile.nc " + output_file)
-            
-        os.system("rm " + results_dir + "/maxfile.nc " + results_dir + "/minfile.nc ")
-
-if reference == "Copernicus":
-    for var in variables.keys():
-        for names, numbers in seasons.items():
-            output_file = results_dir + "/" + var + "-" + names + ".nc"
-            os.system("cdo chname,lon,xt_ocean " + output_file + " tmp.nc; mv tmp.nc " + output_file)
-            os.system("cdo chname,lat,yt_ocean " + output_file + " tmp.nc; mv tmp.nc " + output_file)
             os.system("cdo chname," + variables[var]["name"] + "," + var + " " + output_file + " tmp.nc; mv tmp.nc " + output_file)
             
-            for p in percentiles:
-                output_file = results_dir + "/" + var + "-" + names + "-PCTL_" + p + ".nc"
-                os.system("cdo chname,lon,xt_ocean " + output_file + " tmp.nc; mv tmp.nc " + output_file)
-                os.system("cdo chname,lat,yt_ocean " + output_file + " tmp.nc; mv tmp.nc " + output_file)
-                os.system("cdo chname," + variables[var]["name"] + "," + var + " " + output_file + " tmp.nc; mv tmp.nc " + output_file)
-            
+        os.system("rm " + results_dir + "/maxfile.nc " + results_dir + "/minfile.nc ")    
