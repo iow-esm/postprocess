@@ -5,4 +5,4 @@ seasons = {
     "DJF" : "12,1,2"
 }
 
-variables = ["sst", "sss", "eta_t"]
+variables = ["SST", "SSS", "SSH", "FI"]

@@ -5,5 +5,5 @@ seasons = {
     "DJF" : "12,1,2"
 }
 
-variables = ["sss", "sst", "eta_t"]
+variables = ["SSS", "SST", "SSH", "FI"]
 percentiles = ["95", "5"]
