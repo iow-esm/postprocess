@@ -62,6 +62,14 @@ for dir in dirs:
         command += "cdo -selname,$var " + output_file + " $var.nc 2> /dev/null; done; "
         command += "rm " + output_file
         os.system(command)
+        
+    # if ice concentration is available get the fraction of ice as a vertical sum over thickness
+    if glob.glob(dir + "/CN.nc") != []:
+        command = "cd " + dir + "/; "
+        command += "cdo vertsum CN.nc FI.nc; "
+        command += "cdo chname,CN,FI FI.nc tmp.nc && mv tmp.nc FI.nc; "
+        command += "cdo setattribute,FI@long_name=\"fraction of ice\" FI.nc tmp.nc && mv tmp.nc FI.nc; "
+        os.system(command)
      
     # save station data
     os.system("mv " + dir + "/out_raw/" + station_pattern + " " + dir + "/")
