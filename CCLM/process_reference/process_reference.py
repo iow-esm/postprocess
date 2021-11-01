@@ -41,12 +41,13 @@ for var in variables.keys():
         
         try: 
             remapped_file = output_file.split(".nc")[0] + "-remapped.nc"
-            os.system("cdo -remapbil," + variables[var]["remapping-file"] + " " + output_file " " + remapped_file)
+            os.system("cdo -remapbil," + variables[var]["remapping-file"] + " " + output_file + " " + remapped_file)
         except:
             pass
         
-        os.system("cdo timmin " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/minfile.nc")
-        os.system("cdo timmax " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/maxfile.nc")
+        if variables[var]["percentiles"] != []:
+            os.system("cdo timmin " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/minfile.nc")
+            os.system("cdo timmax " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/maxfile.nc")
         
         for p in variables[var]["percentiles"]:
             output_file = results_dir + "/" + var + "-" + names + "-PCTL_" + p + ".nc"
@@ -55,7 +56,7 @@ for var in variables.keys():
             
             try: 
                 remapped_file = output_file.split(".nc")[0] + "-remapped.nc"
-                os.system("cdo -remapbil," + variables[var]["remapping-file"] + " " + output_file " " + remapped_file)
+                os.system("cdo -remapbil," + variables[var]["remapping-file"] + " " + output_file + " " + remapped_file)
             except:
                 pass
             
