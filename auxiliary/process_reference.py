@@ -5,12 +5,13 @@ import sys
 out_dir = str(sys.argv[1])
 from_date = int(sys.argv[2])
 to_date = int(sys.argv[3])
+pwd = str(sys.argv[4])
 
+sys.path.append(pwd)
 import config
 variables = config.variables
 reference = config.reference
 
-sys.path.append('../../auxiliary')
 import create_results_dir
 
 results_dir = create_results_dir.create_results_dir(out_dir, from_date, to_date)
@@ -32,6 +33,12 @@ for var in variables.keys():
     
     merge_file = results_dir + "/" + var + ".nc"
     os.system("cdo -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files + " " + merge_file)
+    
+    try: 
+        remapped_file = merge_file.split(".nc")[0] + "-remapped.nc"
+        os.system("cdo -remapbil," + variables[var]["remapping-file"] + " " + merge_file + " " + remapped_file)
+    except:
+        pass
     
     for names, numbers in variables[var]["seasons"].items():
     
