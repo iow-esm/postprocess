@@ -10,7 +10,6 @@ pwd = str(sys.argv[4])
 sys.path.append(pwd)
 import config
 variables = config.variables
-seasons = config.seasons
 
 import get_all_dirs_from_to
 
@@ -20,5 +19,5 @@ import create_results_dir
 results_dir = create_results_dir.create_results_dir(out_dir, from_date, to_date)
 
 for var in variables:
-    command = "cdo griddes " + dir[0] + "/" + var + ".nc > " + results_dir + "/grid_" + var + ".txt"
+    command = "cdo griddes " + dirs[0] + "/" + var + ".nc > " + results_dir + "/grid_" + var + ".txt"
     os.system(command)
