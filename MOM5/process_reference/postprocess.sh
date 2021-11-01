@@ -7,4 +7,4 @@ dependencies=()
 module load cdo
 module load anaconda3
 
-python3 process_reference.py "${out_dir}" ${from_date} ${to_date}
+python3 ../../auxiliary/process_reference.py "${out_dir}" ${from_date} ${to_date} "$PWD"
