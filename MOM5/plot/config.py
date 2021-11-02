@@ -1,3 +1,6 @@
+# this depends on a processed raw output
+dependencies = ["seasonal_mean", "seasonal_percentile", "calculate_anomalies", "process_reference"]
+
 import sys
 sys.path.append('../../auxiliary')
 from plot_config import PlotConfig

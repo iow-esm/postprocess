@@ -1,3 +1,6 @@
+# this depends on a processed raw output
+dependencies = ["process_raw_output"]
+
 # assign your station names (left, as they appear in the output files) to the validator names (right, see , see https://openresearchsoftware.metajnl.com/articles/10.5334/jors.259/ and https://github.com/hagenradtke/validator)
 station_names = {
     "AnholtE"           : "anholte",

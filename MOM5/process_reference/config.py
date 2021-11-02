@@ -1,3 +1,7 @@
+# this depends on a processed raw output
+dependencies = ["create_remapping_files"]
+
+# a dictionary with season names (left, will appear in file names) and the corresponding numbers of months (separated by commas, no spaces, ready to be used by cdo)
 seasons = {
     "MAM" : "3,4,5",
     "JJA" : "6,7,8",
@@ -5,6 +9,7 @@ seasons = {
     "DJF" : "12,1,2"
 }
 
+# a list of percentiles (strings ready to be used by cdo)
 percentiles = ["95", "5"]#, "25"]
 
 reference = "Copernicus"

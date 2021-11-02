@@ -1,3 +1,6 @@
+# this depends on a processed raw output
+dependencies = ["process_raw_output"]
+
 # dictionary for level extraction
 # keys: name of variable from which we extraction
 # values: dictionary with
