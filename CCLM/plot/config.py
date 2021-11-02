@@ -33,8 +33,10 @@ for season in seasons:
         
     plot_configs[season] = [t2m.clone(), 
                             t2m.clone(path=reference_dir + "/T_2M-" + season + ".nc", title = "T_2M-" + season + "-" + reference_title),
+                            cclm_template.clone("T_2M", contour = True, task_name="calculate_anomalies", min_value = -6.5, max_value = 6.5, delta_value = 1.0, title = "T_2M-" + season + "-anomaly-" + reference_title, color_map = 'seismic'),
                             rain.clone(),
-                            rain.clone(path=reference_dir + "/TOT_PREC-" + season + ".nc", title = "TOT_PREC-" + season + "-" + reference_title)]
+                            rain.clone(path=reference_dir + "/TOT_PREC-" + season + ".nc", title = "TOT_PREC-" + season + "-" + reference_title),
+                            rain.clone(task_name="calculate_anomalies", min_value = -6.5, max_value = 6.5, delta_value = 1.0, title = "TOT_PREC-" + season + "-anomaly-" + reference_title, color_map = 'seismic_r')]
 
 # templates for temperatur and rain
 t2m = cclm_template.clone("T_2M", contour = True, color_map = 'YlOrRd', transform_variable = convert_K2C, task_name="seasonal_percentile")
