@@ -9,3 +9,5 @@ station_pattern = "rregion_*"
 
 # path to the MOM tool for combination of raw output 
 path_to_mppn = "../../../components/MOM5/src/postprocessing/mppnccombine" # relative to this directory 
+
+max_jobs = 96

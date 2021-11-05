@@ -10,6 +10,12 @@ to_date = int(sys.argv[3])
 # read the local config
 from config import files_to_process, path_to_mppn, station_pattern
 
+try:
+    from config import max_jobs
+    max_jobs = str(max_jobs)
+except:
+    max_jobs = str(len(files_to_process))
+
 # get all dirs to be processed
 sys.path.append('../../auxiliary')
 import get_all_dirs_from_to
@@ -25,6 +31,9 @@ for dir in dirs:
     
     print(dir)
     
+    # bash array for files to be processed
+    files_array = "("
+    
     # go over all file types that should be processed
     for f in files_to_process:
         
@@ -34,17 +43,39 @@ for dir in dirs:
         # if there is no file left of this type, go on with the next type
         if glob.glob(dir + "/out_raw/" + files_pattern) == []:
             continue
+            
+        files_array += f + " "
         
         print(f)
+
+    files_array = files_array[:-1] + ")"
         
-        # since path_to_mppn is defined relative to the local one, we have to know the local one
-        pwd = os.getcwd()
+    # since path_to_mppn is defined relative to the local one, we have to know the local one
+    pwd = os.getcwd()
+
+    # execute mppnccombine and combine all files of this type
+    shellscript_name = dir + "/mppnccombine.sh"
+    shellscript = open(shellscript_name, 'w')
+    shellscript.writelines("files_to_process=" + files_array + "\n")
+    shellscript.writelines("cd " + dir + "/out_raw/" + "\n")
+    shellscript.writelines("for f in ${files_to_process[@]}; do " + "\n")
+    shellscript.writelines("    while [ `jobs | wc -l` -ge " + max_jobs + " ]; do sleep 1; done " + "\n")
+    shellscript.writelines("    " + pwd + "/" + path_to_mppn + "/mppnccombine -n4 -m -k 0 ${f}*.nc.???? &" + "\n")
+    shellscript.writelines("done " + "\n")
+    shellscript.writelines("wait " + "\n")
+    shellscript.close()
     
-        # execute mppnccombine and combine all files of this type
-        command = "cd " + dir + "/out_raw/; "
-        command += pwd + "/" + path_to_mppn + "/mppnccombine -n4 -d 3 -m -k 11 -r " + files_pattern
-        os.system(command)
+    command = "chmod u+x " + shellscript_name + "; " + shellscript_name
+    print("execute: " + command, flush=True)
+    os.system(command)
+    
+    os.system("rm " + shellscript_name)
         
+    for f in files_to_process:
+        
+        # construct the pattern for all files that should be processed
+        files_pattern = f + "*.nc.????"
+    
         # check if the outputfile has been created
         output_file = f + "*.nc"
         # if not, try the next file type
@@ -55,14 +86,30 @@ for dir in dirs:
         # move the output file one level up (out_raw should be removed when everything is done)
         os.system("mv " + dir + "/out_raw/" + output_file + " " + dir + "/" + output_file)
         os.system("rm " + dir + "/out_raw/" + files_pattern)
-        
-        # from combined file extract variable-specific files, and remove combined file afterwards
-        command = "cd " + dir + "/; "
-        command += "for var in `cdo -showname " +  output_file +" 2> /dev/null`; do "
-        command += "cdo -selname,$var " + output_file + " $var.nc 2> /dev/null; done; "
-        command += "rm " + output_file
-        os.system(command)
-        
+    
+    # extract all variables from the files
+    shellscript_name = dir + "/extract_vars.sh"
+    shellscript = open(shellscript_name, 'w')
+    shellscript.writelines("files_to_process=" + files_array + "\n")
+    shellscript.writelines("cd " + dir + "/ " + "\n")
+    shellscript.writelines("for f in ${files_to_process[@]}; do " + "\n")
+    shellscript.writelines("    for var in `cdo -showname ${f}*.nc 2> /dev/null`; do " + "\n")
+    shellscript.writelines("        while [ `jobs | wc -l` -ge " + max_jobs + " ]; do sleep 1; done " + "\n")
+    shellscript.writelines("        cdo -selname,$var ${f}*.nc $var.nc &" + "\n")
+    shellscript.writelines("    done " + "\n")
+    shellscript.writelines("done " + "\n")
+    shellscript.writelines("wait " + "\n")
+    shellscript.writelines("for f in ${files_to_process[@]}; do " + "\n")
+    shellscript.writelines("    rm ${f}*.nc" + "\n")
+    shellscript.writelines("done " + "\n")
+    shellscript.close()
+    
+    command = "chmod u+x " + shellscript_name + "; source " + shellscript_name
+    print("execute: " + command, flush=True)
+    os.system(command)
+    
+    os.system("rm " + shellscript_name)
+     
     # if ice concentration is available get the fraction of ice as a vertical sum over thickness
     if glob.glob(dir + "/CN.nc") != []:
         command = "cd " + dir + "/; "
