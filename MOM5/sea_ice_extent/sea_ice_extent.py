@@ -8,7 +8,11 @@ from_date = int(sys.argv[2])
 to_date = int(sys.argv[3])
 
 # read the local config
-#from config import files_to_process, path_to_mppn, station_pattern
+try:
+    from config import sellonlatbox
+    sellonlatbox = " -sellonlatbox," + sellonlatbox
+except:
+    sellonlatbox = ""
 
 # get all dirs to be processed
 sys.path.append('../../auxiliary')
@@ -24,11 +28,15 @@ files = ""
 for dir in dirs:
     files += dir + "/FI.nc "
 
-command = "cdo -yearmax "
-command += "-divc,`cdo -s -infov " + files.split(" ")[0] + " | awk '{if(NR==2){print $6-$7}}'`"
-command += " -fldsum -cat \'" + files + "\' " + results_dir + "/FI.nc"
-
-os.system(command)
+try:
+    from config import operators
+except:
+    operators = [""]
+    
+for operator in operators:
+    command = "cdo " + operator
+    command += " -fldmean " + sellonlatbox + " -cat \'" + files + "\' " + results_dir + "/FI" + operator + ".nc"
+    os.system(command)
 
 try:
     from config import reference_file_pattern
@@ -39,17 +47,13 @@ try:
         seldate = " -seldate," + str(from_date)[0:4] + "-" + str(from_date)[4:6] + "-" + str(from_date)[6:8] + "," + str(to_date)[0:4] + "-" + str(to_date)[4:6] + "-" + str(to_date)[6:8]
     else:
         seldate = ""
-
-    command = "cdo -yearmax "
-    command += "-divc,`cdo -s -infov " + files.split(" ")[0] + " | awk '{if(NR==2){print $6-$7}}'`"
-    command += " -fldsum " + seldate + " -cat \'" + files + "\' " + results_dir + "/FI-reference.nc"
-
-    os.system(command)
- 
+        
+    for operator in operators:
+        command = "cdo " + operator
+        command += " -fldmean " + sellonlatbox + " -cat \'" + files + "\' " + results_dir + "/FI" + operator + "-reference.nc"
+        os.system(command)
+        
 except:
-    pass
-
-#cdo -yearmax -divc,`cdo ngridpoints /scratch/usr/mvkkarst/IOW_ESM/postprocess/MOM5/process_reference/results/_scratch_usr_mvkkarst_obs_Copernicus-19810901_20091130/FI-remapped.nc` -fldsum /scratch/usr/mvkkarst/IOW_ESM/postprocess/MOM5/process_reference/results/_scratch_usr_mvkkarst_obs_Copernicus-19810901_20091130/FI-remapped.nc test_obs.nc
-    
+    pass    
 
 
