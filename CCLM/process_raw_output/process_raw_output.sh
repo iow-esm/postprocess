@@ -2,6 +2,12 @@ if [ $# -lt 1 ]; then
 	echo "Usage: `basename "$0"` <dir1> [dir2] [dir3] ..."
 fi
 
+source ./config.sh
+
+if [ -z $max_jobs ]; then	
+	max_jobs = 1
+fi
+
 dirs=("$@")
 
 module load cdo
@@ -28,8 +34,10 @@ for d in ${dirs[@]}; do
 		# create individual files for the variables
 		if [ -f ${o}.nc ]; then
 			for var in `cdo -showname ${o}.nc`; do 
-				cdo -selname,$var ${o}.nc $var.nc
+				while [ `jobs | wc -l` -ge ${max_jobs} ]; do sleep 1; done
+				cdo -selname,$var ${o}.nc $var.nc &
 			done
+			wait
 			rm ${o}.nc
 		fi
 		
@@ -41,8 +49,10 @@ for d in ${dirs[@]}; do
 			fi
 			if [ -f ${o}_${s}.nc ]; then
 				for var in `cdo -showname ${o}_${s}.nc`; do 
-					cdo -selname,$var ${o}_${s}.nc ${var}_${s}.nc
+					while [ `jobs | wc -l` -ge ${max_jobs} ]; do sleep 1; done
+					cdo -selname,$var ${o}_${s}.nc ${var}_${s}.nc &
 				done
+				wait
 				rm ${o}_${s}.nc
 			fi
 		done
