@@ -10,8 +10,6 @@ fi
 
 dirs=("$@")
 
-module load cdo
-
 for d in ${dirs[@]}; do
 	
 	cd $d
