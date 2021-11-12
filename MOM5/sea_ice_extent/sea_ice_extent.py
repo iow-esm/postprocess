@@ -39,8 +39,20 @@ for operator in operators:
     os.system(command)
 
 try:
-    from config import reference_file_pattern
-    files = sorted(glob.glob(reference_file_pattern))
+    from config import additional_files
+except:
+    exit()
+    
+for f in additional_files.keys():
+
+    try:
+        files = sorted(glob.glob(additional_files[f]["path"]))
+    except:
+        try:
+           files = sorted(glob.glob("../" + additional_files[f]["task"] + "/" + results_dir + "/" + additional_files[f]["file"])) 
+        except:
+           files = sorted(glob.glob("../" + additional_files[f]["task"] + "/" + results_dir + "/FI.nc"))
+           
     files = " ".join(files)
 
     if from_date > 0 and to_date > 0:
@@ -50,10 +62,5 @@ try:
         
     for operator in operators:
         command = "cdo " + operator
-        command += " -fldmean " + sellonlatbox + " -cat \'" + files + "\' " + results_dir + "/FI" + operator + "-reference.nc"
+        command += " -fldmean " + sellonlatbox + " " + seldate + " -cat \'" + files + "\' " + results_dir + "/" + f + operator + ".nc"
         os.system(command)
-        
-except:
-    pass    
-
-
