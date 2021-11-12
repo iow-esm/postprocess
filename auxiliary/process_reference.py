@@ -10,10 +10,8 @@ pwd = str(sys.argv[4])
 sys.path.append(pwd)
 import config
 variables = config.variables
-reference = config.reference
 
 import create_results_dir
-
 results_dir = create_results_dir.create_results_dir(out_dir, from_date, to_date)
 
 if from_date > 0 and to_date > 0:
@@ -28,15 +26,20 @@ except:
 
 for var in variables.keys():	
 
-    files = sorted(glob.glob(out_dir + "/" + variables[var]["file-pattern"]))
+    files = sorted(glob.glob(variables[var]["file-pattern"]))
     files = " ".join(files)
     
     merge_file = results_dir + "/" + var + ".nc"
     os.system("cdo -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files + " " + merge_file)
     
     try: 
+        try:
+            remapping_file_path = variables[var]["remapping-file-path"]
+        except:
+            remapping_file_path = "../create_remapping_files/" + results_dir # default if no path is given
+            
         remapped_file = merge_file.split(".nc")[0] + "-remapped.nc"
-        os.system("cdo -remapbil," + variables[var]["remapping-file"] + " " + merge_file + " " + remapped_file)
+        os.system("cdo -remapbil," + remapping_file_path + "/" + variables[var]["remapping-file"] + " " + merge_file + " " + remapped_file)
     except:
         pass
     
@@ -48,7 +51,8 @@ for var in variables.keys():
         
         try: 
             remapped_file = output_file.split(".nc")[0] + "-remapped.nc"
-            os.system("cdo -remapbil," + variables[var]["remapping-file"] + " " + output_file + " " + remapped_file)
+            os.system("cdo -remapbil," + remapping_file_path + "/" + variables[var]["remapping-file"] + " " + output_file + " " + remapped_file)
+            os.system("cdo chname," + variables[var]["name"] + "," + var + " " + remapped_file + " tmp.nc; mv tmp.nc " + remapped_file)
         except:
             pass
         
@@ -63,7 +67,8 @@ for var in variables.keys():
             
             try: 
                 remapped_file = output_file.split(".nc")[0] + "-remapped.nc"
-                os.system("cdo -remapbil," + variables[var]["remapping-file"] + " " + output_file + " " + remapped_file)
+                os.system("cdo -remapbil," + remapping_file_path + "/" + variables[var]["remapping-file"] + " " + output_file + " " + remapped_file)
+                os.system("cdo chname," + variables[var]["name"] + "," + var + " " + remapped_file + " tmp.nc; mv tmp.nc " + remapped_file)
             except:
                 pass
             
