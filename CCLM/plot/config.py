@@ -8,10 +8,6 @@ def convert_K2C(variable, units):
         units = "Celsius"
     return variable, units
 
-
-reference_dir = "../process_reference/results/_scratch_usr_mvkkarst_obs_E-OBS-19790901_20091130"
-reference_title = "E-OBS-19790901_20091130"
-
 cclm_template = PlotConfig("", width=7000000, height=5000000)
 
 # templates for temperatur and rain
@@ -32,11 +28,11 @@ for season in seasons:
         t2m = t2m.clone(min_value = -15.0, max_value = 15.0, delta_value = 3.75)
         
     plot_configs[season] = [t2m.clone(), 
-                            t2m.clone(path=reference_dir + "/T_2M-" + season + ".nc", title = "T_2M-" + season + "-" + reference_title),
-                            cclm_template.clone("T_2M", contour = True, task_name="calculate_anomalies", min_value = -6.5, max_value = 6.5, delta_value = 1.0, title = "T_2M-" + season + "-anomaly-" + reference_title, color_map = 'seismic'),
+                            t2m.clone(task_name="process_reference", title = "T_2M-" + season + "-reference", lon_name="longitude", lat_name="latitude"),
+                            cclm_template.clone("T_2M", contour = True, task_name="calculate_anomalies", min_value = -6.5, max_value = 6.5, delta_value = 1.0, title = "T_2M-" + season + "-anomaly", color_map = 'seismic'),
                             rain.clone(),
-                            rain.clone(path=reference_dir + "/TOT_PREC-" + season + ".nc", title = "TOT_PREC-" + season + "-" + reference_title),
-                            rain.clone(task_name="calculate_anomalies", min_value = -6.5, max_value = 6.5, delta_value = 1.0, title = "TOT_PREC-" + season + "-anomaly-" + reference_title, color_map = 'seismic_r')]
+                            rain.clone(task_name="process_reference", title = "TOT_PREC-" + season + "-reference", lon_name="longitude", lat_name="latitude"),
+                            rain.clone(task_name="calculate_anomalies", min_value = -6.5, max_value = 6.5, delta_value = 1.0, title = "TOT_PREC-" + season + "-anomaly", color_map = 'seismic_r')]
 
 # templates for temperatur and rain
 t2m = cclm_template.clone("T_2M", contour = True, color_map = 'YlOrRd', transform_variable = convert_K2C, task_name="seasonal_percentile")
@@ -65,8 +61,8 @@ for season in seasons:
             rain = rain.clone(min_value = 10.0, max_value = 30.0, delta_value = 2.0) 
             
         plot_configs[season + "-PCTL_" + percentile] = [t2m.clone(), 
-                                                        t2m.clone(path=reference_dir + "/T_2M-" + season + "-PCTL_" + percentile + ".nc", 
-                                                                  title = "T_2M-" + season + "-PCTL_" + percentile + "-" + reference_title),
+                                                        t2m.clone(task_name="process_reference", 
+                                                                  title = "T_2M-" + season + "-PCTL_" + percentile + "-reference", lon_name="longitude", lat_name="latitude"),
                                                         rain.clone(),
-                                                        rain.clone(path=reference_dir + "/TOT_PREC-" + season + "-PCTL_" + percentile + ".nc", 
-                                                                   title = "TOT_PREC-" + season + "-PCTL_" + percentile + "-" + reference_title)]
+                                                        rain.clone(task_name="process_reference", 
+                                                                   title = "TOT_PREC-" + season + "-PCTL_" + percentile + "-reference", lon_name="longitude", lat_name="latitude")]

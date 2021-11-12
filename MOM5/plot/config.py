@@ -15,9 +15,6 @@ fi = mom_temp.clone("FI", min_value = 0.0, max_value = 1.0, delta_value = 0.1, c
 
 seasons = ["MAM", "SON", "JJA", "DJF"]
 
-reference_dir = "../process_reference/results/_scratch_usr_mvkkarst_obs_Copernicus-19810901_20091130"
-reference_title = "Copernicus-19810901_20091130"
-
 def convert_K2C(variable, units):
     variable -= 273.15
     units = "Celsius"
@@ -37,13 +34,13 @@ for season in seasons:
         sst = sst.clone(min_value = -2.0, max_value = 8.0, delta_value = 1.0)
         
     plot_configs[season] = [sst.clone(),
-                            sst.clone(path=reference_dir + "/SST-" + season + ".nc", title = "SST-" + season + "-" + reference_title, transform_variable = convert_K2C, lon_name = "lon", lat_name = "lat"),
-                            sst.clone(task_name="calculate_anomalies", min_value = -6.5, max_value = 6.5, delta_value = 1.0, title = "SST-" + season + "-anomaly-" + reference_title, color_map = 'seismic'),
+                            sst.clone(task_name="process_reference", title = "SST-" + season + "-reference", transform_variable = convert_K2C, lon_name = "lon", lat_name = "lat"),
+                            sst.clone(task_name="calculate_anomalies", min_value = -6.5, max_value = 6.5, delta_value = 1.0, title = "SST-" + season + "-anomaly", color_map = 'seismic'),
                             eta.clone(), 
                             sss.clone(),
                             fi.clone(),
-                            fi.clone(path=reference_dir + "/FI-" + season + ".nc", title = "FI-" + season + "-" + reference_title, lon_name = "lon", lat_name = "lat"),
-                            fi.clone(task_name="calculate_anomalies", min_value = -0.65, max_value = 0.65, delta_value = 0.1, title = "FI-" + season + "-anomaly-" + reference_title, color_map = 'seismic_r')]
+                            fi.clone(task_name="process_reference", title = "FI-" + season + "-reference", lon_name = "lon", lat_name = "lat"),
+                            fi.clone(task_name="calculate_anomalies", min_value = -0.65, max_value = 0.65, delta_value = 0.1, title = "FI-" + season + "-anomaly", color_map = 'seismic_r')]
     
 # percentiles = ["95", "5"]
 # mom_temp = PlotConfig("", task_name="seasonal_percentile", lon_name = "xt_ocean", lat_name = "yt_ocean", width = 1500000, height = 1800000)
