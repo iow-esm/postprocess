@@ -21,14 +21,27 @@ for var in file_pairs.keys():
     except:
         pass
         
-    command += file_pairs[var][0]["path"] + " "
+    try:
+        command += file_pairs[var][0]["path"] + "/" + file_pairs[var][0]["file"] + " "
+    except:
+        try:
+            command += "../" + file_pairs[var][0]["task"] + "/" + results_dir + "/" + file_pairs[var][0]["file"] + " "
+        except:
+            command += "../" + file_pairs[var][0]["task"] + "/" + results_dir + "/" + var + ".nc "
+            
     
     try:
         command += file_pairs[var][1]["additional-operators"] + " "
     except:
         pass
         
-    command += file_pairs[var][1]["path"] + " "
+    try:
+        command += file_pairs[var][1]["path"] + "/" + file_pairs[var][1]["file"] + " "
+    except:
+        try:
+            command += "../" + file_pairs[var][1]["task"] + "/" + results_dir + "/" + file_pairs[var][1]["file"] + " "
+        except:
+            command += "../" + file_pairs[var][1]["task"] + "/" + results_dir + "/" + var + ".nc "
     
     command += results_dir + "/" + var + ".nc"
     
