@@ -1,5 +1,5 @@
 import numpy as np
-from netCDF4 import Dataset
+from netCDF4 import Dataset, num2date
 from mpl_toolkits.basemap import Basemap
 
 import matplotlib.pyplot as plt
@@ -56,6 +56,21 @@ def read_data(plot_config, nc_file):
     fh.close()
     
     return lons, lats, variable, units
+    
+def read_time_series(plot_config, nc_file):
+    
+    fh = Dataset(nc_file, mode='r')
+    
+    time_name = plot_config.time_name
+    
+    time = fh.variables[time_name]
+    time = np.sort(num2date(np.squeeze(time[:]),time.units))
+    variable = fh.variables[plot_config.variable][:]
+    units = fh.variables[plot_config.variable].units
+    
+    fh.close()
+    
+    return time, variable, units
     
 def process_config(plot_config, variable, units, add_info = ""):
     
@@ -147,3 +162,45 @@ def plot_on_map(plot_configs, results_dir):
             
             print(" plot saved in: " + out_file)
             print("...done")
+            
+def plot_time_series(plot_configs, results_dir):
+    for suffix in plot_configs.keys():
+        for plot_config in plot_configs[suffix]:
+
+            if plot_config.first_plot:
+                print("plotting: " + plot_config.variable + " " + suffix + "...")
+
+                plt.figure(figsize=(12, 8), dpi=80)
+
+            # read the data
+            if plot_config.path is None:
+                nc_file = '../' + plot_config.task_name + '/' + results_dir + '/' + plot_config.variable + '-' + suffix + '.nc'
+            else:
+                nc_file = plot_config.path
+
+            time, variable, units = read_time_series(plot_config, nc_file)
+
+            # build addtional info for title: time range if specified (last 17 characters and a minus)
+            add_info = suffix
+            if results_dir[-8:].isnumeric() and results_dir[-17:-9].isnumeric():
+                add_info += " " + results_dir[-17:]
+                
+            # decode the config
+            title, variable, units, vmin, vmax, delta, nlevels, color_map, contour = process_config(plot_config, variable, units, add_info = add_info)
+
+            # Plot Data
+            if plot_config.linestyle is not None:
+                cs = plt.plot(time, np.squeeze(variable), plot_config.linestyle)
+            else:
+                cs = plt.plot(time, np.squeeze(variable))
+            
+            if plot_config.last_plot:
+                # Add Title
+                plt.title(title)
+
+                out_file = results_dir + "/" + title.replace(" ", "-") + ".pdf"
+                plt.savefig(out_file)
+                plt.close()
+            
+                print(" plot saved in: " + out_file)
+                print("...done")
