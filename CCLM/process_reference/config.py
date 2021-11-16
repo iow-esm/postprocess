@@ -11,9 +11,9 @@ percentiles = []#["95", "5"]#, "25"]
 
      
 variables = {
-"T_2M" : {  "file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/tg_ens_mean_0.1deg_reg_v23.1e.nc",
+"T_2M_AV" : {  "file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/tg_ens_mean_0.1deg_reg_v23.1e.nc",
             "name" : "tg",
-            "remapping-file" : "grid_T_2M.txt",
+            "remapping-file" : "grid_T_2M_AV.txt",
             "seasons" : seasons,
             "percentiles" : percentiles
          },

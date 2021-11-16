@@ -8,4 +8,4 @@ seasons = {
     "DJF" : "12,1,2"
 }
 
-variables = ["T_2M", "ASOB_S", "TOT_PREC"]
+variables = ["T_2M_AV", "ASOB_S", "TOT_PREC"]

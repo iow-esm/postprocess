@@ -1,3 +1,5 @@
+dependencies = ["process_raw_output"]
+
 seasons = {
     "MAM" : "3,4,5",
     "JJA" : "6,7,8",
@@ -5,9 +7,7 @@ seasons = {
     "DJF" : "12,1,2"
 }
 
-variables = ["T_2M", "RAIN_CON", "RAIN_GSP", "RAIN_TOT", "TOT_PREC"]
+variables = ["T_2M_AV", "TOT_PREC"]
 percentiles = ["95", "5", "25"]
 
-ranges = { "RAIN_TOT" : "1,10000",
-           "TOT_PREC" : "1,10000"
-}
+ranges = { "TOT_PREC" : "1,10000" }
