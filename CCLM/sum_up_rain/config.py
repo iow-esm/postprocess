@@ -1,3 +1,5 @@
+dependencies = ["process_raw_output"]
+
 import sys
 sys.path.append('../../auxiliary')
 from arithmetics import Arithmetics
