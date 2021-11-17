@@ -31,7 +31,8 @@ for var in variables.keys():
     
     merge_file = results_dir + "/" + var + ".nc"
     os.system("cdo -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files + " " + merge_file)
-    
+    os.system("cdo chname," + variables[var]["name"] + "," + var + " " + merge_file + " tmp.nc; mv tmp.nc " + merge_file)
+
     try: 
         try:
             remapping_file_path = variables[var]["remapping-file-path"]
