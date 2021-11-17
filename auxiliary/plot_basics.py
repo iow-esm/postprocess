@@ -65,12 +65,17 @@ def read_time_series(plot_config, nc_file):
     
     time = fh.variables[time_name]
     time = np.sort(num2date(np.squeeze(time[:]),time.units))
-    variable = fh.variables[plot_config.variable][:]
+    variable = np.squeeze(fh.variables[plot_config.variable][:])
     units = fh.variables[plot_config.variable].units
     
+    try:
+        std = np.squeeze(fh.variables[plot_config.variable + "_STD"][:])
+    except:
+        std = None
+        
     fh.close()
     
-    return time, variable, units
+    return time, variable, units, std
     
 def process_config(plot_config, variable, units):
     
@@ -175,17 +180,31 @@ def plot_time_series(plot_configs, results_dir):
             else:
                 nc_file = '../' + plot_config.task_name + '/' + results_dir + '/' + plot_config.variable + ".nc"
 
-            time, variable, units = read_time_series(plot_config, nc_file)
+            time, variable, units, std = read_time_series(plot_config, nc_file)
 
             # decode the config
             variable, units, vmin, vmax, delta, nlevels, color_map, contour = process_config(plot_config, variable, units)
 
+            plt.grid(linestyle='--')
+          
+
             # Plot Data
             if plot_config.linestyle is not None:
-                cs = plt.plot(time, np.squeeze(variable), plot_config.linestyle)
+                p = plt.plot(time, variable, plot_config.linestyle, label=plot_config.title)
             else:
-                cs = plt.plot(time, np.squeeze(variable))
-            
+                p = plt.plot(time, variable, label=plot_config.title)
+                
+            if std is not None:
+                if plot_config.linestyle is not None:
+                    plt.plot(time, variable + 0.5*std, plot_config.linestyle, linestyle="--", marker="", linewidth=0.1)
+                    plt.plot(time, variable - 0.5*std, plot_config.linestyle, linestyle="--", marker="", linewidth=0.1)    
+                else:
+                    plt.plot(time, variable + 0.5*std, color=p[-1].get_color(), linestyle="--", marker="", linewidth=0.1)
+                    plt.plot(time, variable - 0.5*std, color=p[-1].get_color(), linestyle="--", marker="", linewidth=0.1)        
+                    
+                plt.fill_between(time, variable - 0.5*std, variable + 0.5*std, color=p[-1].get_color(), alpha=0.1)
+
+            plt.legend(loc="upper left")
             
         # build addtional info for title: time range if specified (last 17 characters and a minus)
         if results_dir[-8:].isnumeric() and results_dir[-17:-9].isnumeric():

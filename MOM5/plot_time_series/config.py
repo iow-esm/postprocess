@@ -18,8 +18,8 @@ plot_configs = {}
 
 for station in stations:
     for operator in operators:
-        plot_configs["SST-" + station + "-" + operator] = [sst.clone(file="SST-" + station + "-" + operator + ".nc"),
-                                                           sst.clone(file="SST-reference-" + station + "-" + operator + ".nc", linestyle="ro", transform_variable = convert_K2C) ]       
+        plot_configs["SST-" + station + "-" + operator] = [sst.clone(file="SST-" + station + "-" + operator + ".nc", title="model"),
+                                                           sst.clone(file="SST-reference-" + station + "-" + operator + ".nc", linestyle="ro", transform_variable = convert_K2C, title="reference") ]       
 
     
 
