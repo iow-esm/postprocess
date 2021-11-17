@@ -6,7 +6,7 @@ sys.path.append('../../auxiliary')
 from plot_config import PlotConfig
 
 # templates for temperatur and rain
-mom_temp = PlotConfig("", task_name="seasonal_mean", lon_name = "xt", lat_name = "yt", width = 1500000, height = 1800000)
+mom_temp = PlotConfig("", lon_name = "xt", lat_name = "yt", width = 1500000, height = 1800000)
 
 sst = mom_temp.clone("SST", contour = True, color_map = 'YlOrRd')
 eta = mom_temp.clone("SSH", min_value = -0.6, max_value = 0.6, delta_value = 0.05, contour = True, color_map = 'PiYG')
@@ -32,16 +32,19 @@ for season in seasons:
         sst = sst.clone(min_value = 5.0, max_value = 15.0, delta_value = 1.0)
     elif season == "DJF":
         sst = sst.clone(min_value = -2.0, max_value = 8.0, delta_value = 1.0)
-        
-    plot_configs[season] = [sst.clone(),
-                            sst.clone(task_name="process_reference", title = "SST-" + season + "-reference", transform_variable = convert_K2C, lon_name = "lon", lat_name = "lat"),
-                            sst.clone(task_name="calculate_anomalies", min_value = -6.5, max_value = 6.5, delta_value = 1.0, title = "SST-" + season + "-anomaly", color_map = 'seismic'),
-                            eta.clone(), 
-                            sss.clone(),
-                            fi.clone(),
-                            fi.clone(task_name="process_reference", title = "FI-" + season + "-reference", lon_name = "lon", lat_name = "lat"),
-                            fi.clone(task_name="calculate_anomalies", min_value = -0.65, max_value = 0.65, delta_value = 0.1, title = "FI-" + season + "-anomaly", color_map = 'seismic_r')]
+      
+    plot_configs["SST-" + season] = [sst.clone(task_name="seasonal_mean", file="SST-" + season + ".nc")]
+    plot_configs["SST-reference-" + season] = [sst.clone(task_name="process_reference", file = "SST-" + season + ".nc", lon_name="lon", lat_name="lat", transform_variable = convert_K2C)]
+    plot_configs["SST-anomaly-" + season] = [sst.clone(task_name="calculate_anomalies", file = "SST-" + season + ".nc", min_value = -6.5, max_value = 6.5, delta_value = 1.0, color_map = 'seismic')]
+      
+    plot_configs["SSH-" + season] = [eta.clone(task_name="seasonal_mean", file="SSH-" + season + ".nc")]
     
+    plot_configs["SSS-" + season] = [sss.clone(task_name="seasonal_mean", file="SSS-" + season + ".nc")]
+    
+    plot_configs["FI-" + season] = [fi.clone(task_name="seasonal_mean", file="FI-" + season + ".nc")]
+    plot_configs["FI-reference-" + season] = [fi.clone(task_name="process_reference", file = "FI-" + season + ".nc", lon_name="lon", lat_name="lat")]
+    plot_configs["FI-anomaly-" + season] = [fi.clone(task_name="calculate_anomalies", file = "FI-" + season + ".nc", min_value = -0.65, max_value = 0.65, delta_value = 0.1, color_map = 'seismic_r')]
+         
 # percentiles = ["95", "5"]
 # mom_temp = PlotConfig("", task_name="seasonal_percentile", lon_name = "xt_ocean", lat_name = "yt_ocean", width = 1500000, height = 1800000)
 

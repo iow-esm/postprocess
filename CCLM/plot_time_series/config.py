@@ -4,7 +4,8 @@ import sys
 sys.path.append('../../auxiliary')
 from plot_config import PlotConfig
 
-stations = ["ROSTOCK-WARNEMUNDE"]
+stations = ["ROSTOCK-WARNEMUNDE", "HELSINKI-KAISANIEMI", "STOCKHOLM", "TALLINN", "VISBY", "SUNDSVALL", "LULEA", "VAASA-PALOSAARI"]
+
 operators = ["monmean", "ymonmean"]
 
 def convert_K2C(variable, units):
@@ -19,11 +20,10 @@ plot_configs = {}
 
 for station in stations:
     for operator in operators:
-        
-        plot_configs[station + "-" + operator] = [t2m.clone(transform_variable = convert_K2C, first_plot = True, last_plot = False)]   
-        plot_configs["reference-" + station + "-" + operator] = [t2m.clone(linestyle="ro", first_plot = False, last_plot = True)]     
-        plot_configs[station + "-" + operator] = [rain.clone(first_plot = True, last_plot = False)]   
-        plot_configs["reference-" + station + "-" + operator] = [rain.clone(linestyle="r-", first_plot = False, last_plot = True)]     
+        plot_configs["T_2M_AV-" + station + "-" + operator] = [ t2m.clone(file="T_2M_AV-" + station + "-" + operator + ".nc", transform_variable = convert_K2C), 
+                                                                t2m.clone(file="T_2M_AV-reference-" + station + "-" + operator + ".nc", linestyle="ro")]   
+        plot_configs["TOT_PREC-" + station + "-" + operator] = [ rain.clone(file="TOT_PREC-" + station + "-" + operator + ".nc"), 
+                                                                rain.clone(file="TOT_PREC-reference-" + station + "-" + operator + ".nc", linestyle="ro-")]     
 
     
 

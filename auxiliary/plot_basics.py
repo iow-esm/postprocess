@@ -72,12 +72,7 @@ def read_time_series(plot_config, nc_file):
     
     return time, variable, units
     
-def process_config(plot_config, variable, units, add_info = ""):
-    
-    if plot_config.title is not None:
-        title = plot_config.title
-    else:
-        title = plot_config.variable + " " + add_info
+def process_config(plot_config, variable, units):
     
     if plot_config.transform_variable is not None:
         variable, units = plot_config.transform_variable(variable, units)
@@ -109,32 +104,29 @@ def process_config(plot_config, variable, units, add_info = ""):
     else:
         contour = False
     
-    return title, variable, units, vmin, vmax, delta, nlevels, color_map, contour
+    return variable, units, vmin, vmax, delta, nlevels, color_map, contour
 
 
 def plot_on_map(plot_configs, results_dir):
-    for suffix in plot_configs.keys():
-        for plot_config in plot_configs[suffix]:
-
-            print("plotting: " + plot_config.variable + " " + suffix + "...")
-
-            plt.figure(figsize=(12, 8), dpi=80)
+    for title in plot_configs.keys():
+    
+        print("plotting: " + title + "...")
+        plt.figure(figsize=(12, 8), dpi=80)
+            
+        for plot_config in plot_configs[title]:
 
             # read the data
-            if plot_config.path is None:
-                nc_file = '../' + plot_config.task_name + '/' + results_dir + '/' + plot_config.variable + '-' + suffix + '.nc'
+            if plot_config.path is not None:
+                nc_file = plot_config.path + "/" + plot_config.file
+            elif plot_config.file is not None:
+                nc_file = '../' + plot_config.task_name + '/' + results_dir + '/' + plot_config.file
             else:
-                nc_file = plot_config.path
+                nc_file = '../' + plot_config.task_name + '/' + results_dir + '/' + plot_config.variable + ".nc"
 
             lons, lats, variable, units = read_data(plot_config, nc_file)
-
-            # build addtional info for title: time range if specified (last 17 characters and a minus)
-            add_info = suffix
-            if results_dir[-8:].isnumeric() and results_dir[-17:-9].isnumeric():
-                add_info += " " + results_dir[-17:]
                 
             # decode the config
-            title, variable, units, vmin, vmax, delta, nlevels, color_map, contour = process_config(plot_config, variable, units, add_info = add_info)
+            variable, units, vmin, vmax, delta, nlevels, color_map, contour = process_config(plot_config, variable, units)
 
             # build the base map
             m, xi, yi = build_basemap(lons = lons, lats = lats, width = plot_config.width, height = plot_config.height)
@@ -152,41 +144,41 @@ def plot_on_map(plot_configs, results_dir):
             # Add Colorbar
             cbar = m.colorbar(cs, location='bottom', pad="10%")
             cbar.set_label(units)
-
-            # Add Title
-            plt.title(title)
-
-            out_file = results_dir + "/" + title.replace(" ", "-") + ".pdf"
-            plt.savefig(out_file)
-            plt.close()
             
-            print(" plot saved in: " + out_file)
-            print("...done")
+        # build addtional info for title: time range if specified (last 17 characters and a minus)
+        if results_dir[-8:].isnumeric() and results_dir[-17:-9].isnumeric():
+            title += " " + results_dir[-17:]
+            
+        # Add Title
+        plt.title(title)
+
+        out_file = results_dir + "/" + title.replace(" ", "-") + ".pdf"
+        plt.savefig(out_file)
+        plt.close()
+        
+        print(" plot saved in: " + out_file)
+        print("...done")
             
 def plot_time_series(plot_configs, results_dir):
-    for suffix in plot_configs.keys():
-        for plot_config in plot_configs[suffix]:
+    for title in plot_configs.keys():
 
-            if plot_config.first_plot:
-                print("plotting: " + plot_config.variable + " " + suffix + "...")
-
-                plt.figure(figsize=(12, 8), dpi=80)
+        print("plotting: " + title + "...")
+        plt.figure(figsize=(12, 8), dpi=80)
+        
+        for plot_config in plot_configs[title]:
 
             # read the data
-            if plot_config.path is None:
-                nc_file = '../' + plot_config.task_name + '/' + results_dir + '/' + plot_config.variable + '-' + suffix + '.nc'
+            if plot_config.path is not None:
+                nc_file = plot_config.path + "/" + plot_config.file
+            elif plot_config.file is not None:
+                nc_file = '../' + plot_config.task_name + '/' + results_dir + '/' + plot_config.file
             else:
-                nc_file = plot_config.path
+                nc_file = '../' + plot_config.task_name + '/' + results_dir + '/' + plot_config.variable + ".nc"
 
             time, variable, units = read_time_series(plot_config, nc_file)
 
-            # build addtional info for title: time range if specified (last 17 characters and a minus)
-            add_info = suffix
-            if results_dir[-8:].isnumeric() and results_dir[-17:-9].isnumeric():
-                add_info += " " + results_dir[-17:]
-                
             # decode the config
-            title, variable, units, vmin, vmax, delta, nlevels, color_map, contour = process_config(plot_config, variable, units, add_info = add_info)
+            variable, units, vmin, vmax, delta, nlevels, color_map, contour = process_config(plot_config, variable, units)
 
             # Plot Data
             if plot_config.linestyle is not None:
@@ -194,13 +186,17 @@ def plot_time_series(plot_configs, results_dir):
             else:
                 cs = plt.plot(time, np.squeeze(variable))
             
-            if plot_config.last_plot:
-                # Add Title
-                plt.title(title)
-
-                out_file = results_dir + "/" + title.replace(" ", "-") + ".pdf"
-                plt.savefig(out_file)
-                plt.close()
             
-                print(" plot saved in: " + out_file)
-                print("...done")
+        # build addtional info for title: time range if specified (last 17 characters and a minus)
+        if results_dir[-8:].isnumeric() and results_dir[-17:-9].isnumeric():
+            title += " " + results_dir[-17:]
+            
+        # Add Title
+        plt.title(title)
+
+        out_file = results_dir + "/" + title.replace(" ", "-") + ".pdf"
+        plt.savefig(out_file)
+        plt.close()
+    
+        print(" plot saved in: " + out_file)
+        print("...done")
