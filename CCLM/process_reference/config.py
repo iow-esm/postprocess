@@ -25,9 +25,9 @@ variables = {
                 "percentiles" : percentiles
              },    
 
-"ASOB_S" : {  "file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/qq_ens_mean_0.1deg_reg_v23.1e.nc",
+"ASWD_S" : {  "file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/qq_ens_mean_0.1deg_reg_v23.1e.nc",
                 "name" : "qq",
-                "remapping-file" : "grid_ASOB_S.txt",
+                "remapping-file" : "grid_ASWD_S.txt",
                 "seasons" : seasons,
                 "percentiles" : percentiles
            },     

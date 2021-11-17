@@ -1,7 +1,7 @@
 dependencies = ["seasonal_mean", "process_reference"]
 
 seasons = ["MAM", "SON", "JJA", "DJF"]
-variables = ["T_2M_AV", "TOT_PREC", "ASOB_S"]
+variables = ["T_2M_AV", "TOT_PREC", "ASWD_S"]
 
 file_pairs = {}
 

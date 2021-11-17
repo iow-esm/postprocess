@@ -1,5 +1,5 @@
 # this depends on a processed raw output
-dependencies = ["process_raw_output"]
+dependencies = ["process_raw_output", "sum_up_radiation"]
 
 seasons = {
     "MAM" : "3,4,5",
@@ -8,4 +8,4 @@ seasons = {
     "DJF" : "12,1,2"
 }
 
-variables = ["T_2M_AV", "ASOB_S", "TOT_PREC"]
+variables = ["T_2M_AV", "ASWD_S", "TOT_PREC"]
