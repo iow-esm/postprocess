@@ -33,6 +33,16 @@ variables = {
                             "task" : "process_reference",
                             "file" : "TOT_PREC.nc",
                             "operators" : operators,
+                         },
+    "ASWD_S" : {
+                "stations" : stations,
+                "operators" : operators,
+                },   
+    "ASWD_S-reference" : {
+                            "stations" : stations,
+                            "task" : "process_reference",
+                            "file" : "ASWD_S.nc",
+                            "operators" : operators,
                          }
 }
 
