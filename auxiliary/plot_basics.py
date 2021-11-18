@@ -1,5 +1,5 @@
 import numpy as np
-from netCDF4 import Dataset, num2date
+from netCDF4 import Dataset, num2date, date2num
 from mpl_toolkits.basemap import Basemap
 
 import matplotlib.pyplot as plt
@@ -64,6 +64,7 @@ def read_time_series(plot_config, nc_file):
     time_name = plot_config.time_name
     
     time = fh.variables[time_name]
+    time_units = time.units
     time = np.sort(num2date(np.squeeze(time[:]),time.units))
     variable = np.squeeze(fh.variables[plot_config.variable][:])
     units = fh.variables[plot_config.variable].units
@@ -75,7 +76,7 @@ def read_time_series(plot_config, nc_file):
         
     fh.close()
     
-    return time, variable, units, std
+    return time, variable, units, std, time_units
     
 def process_config(plot_config, variable, units):
     
@@ -180,21 +181,20 @@ def plot_time_series(plot_configs, results_dir):
             else:
                 nc_file = '../' + plot_config.task_name + '/' + results_dir + '/' + plot_config.variable + ".nc"
 
-            time, variable, units, std = read_time_series(plot_config, nc_file)
+            time, variable, units, std, time_units = read_time_series(plot_config, nc_file)
 
             # decode the config
             variable, units, vmin, vmax, delta, nlevels, color_map, contour = process_config(plot_config, variable, units)
 
             plt.grid(linestyle='--')
           
-
             # Plot Data
             if plot_config.linestyle is not None:
                 p = plt.plot(time, variable, plot_config.linestyle, label=plot_config.title)
             else:
                 p = plt.plot(time, variable, label=plot_config.title)
                 
-            if std is not None:
+            if std is not None and plot_config.std_deviation:
                 if plot_config.linestyle is not None:
                     plt.plot(time, variable + 0.5*std, plot_config.linestyle, linestyle="--", marker="", linewidth=0.1)
                     plt.plot(time, variable - 0.5*std, plot_config.linestyle, linestyle="--", marker="", linewidth=0.1)    
@@ -204,6 +204,12 @@ def plot_time_series(plot_configs, results_dir):
                     
                 plt.fill_between(time, variable - 0.5*std, variable + 0.5*std, color=p[-1].get_color(), alpha=0.1)
 
+            if plot_config.trend:
+                x = date2num(time, time_units)
+                z = np.polyfit(x, variable, 1)
+                z = np.poly1d(z)
+                plt.plot(time, z(x), color=p[-1].get_color(), linestyle="dotted")
+                
             plt.legend(loc="upper left")
             
         # build addtional info for title: time range if specified (last 17 characters and a minus)
@@ -212,6 +218,8 @@ def plot_time_series(plot_configs, results_dir):
             
         # Add Title
         plt.title(title)
+        plt.ylabel(plot_config.variable + " [" + units + "]")
+        plt.xlabel(plot_config.time_name)
 
         out_file = results_dir + "/" + title.replace(" ", "-") + ".pdf"
         plt.savefig(out_file)
