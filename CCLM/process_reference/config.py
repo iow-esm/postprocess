@@ -17,7 +17,7 @@ for var in global_settings.variables.keys():
                             "percentiles" : percentiles
                        } 
     try:
-        variables[var]["additional-operators"] = global_settings.variables[var]["additional-operators"]
+        variables[var]["additional-operators"] = global_settings.variables[var]["reference-additional-operators"]
     except:
         pass
 

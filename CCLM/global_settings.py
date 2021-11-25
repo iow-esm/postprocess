@@ -1,19 +1,3 @@
-variables = {
-    "T_2M_AV" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/tg_ens_mean_0.1deg_reg_v23.1e.nc",
-                   "reference-variable-name" : "tg",
-                   "additional-operators" : "-setattribute,tg@units=Kelvin -addc,273.15"
-             },
-
-    "TOT_PREC" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/rr_ens_mean_0.1deg_reg_v23.1e.nc",
-                    "reference-variable-name" : "rr",
-
-                 },    
-
-    "ASWD_S" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/qq_ens_mean_0.1deg_reg_v23.1e.nc",
-                  "reference-variable-name" : "qq",
-               },  
-}
-         
 seasons = {
     "MAM" : "3,4,5",
     "JJA" : "6,7,8",
@@ -35,3 +19,32 @@ stations = {
 }
 
 time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]
+
+variables = {
+    "T_2M_AV" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/tg_ens_mean_0.1deg_reg_v23.1e.nc",
+                   "reference-variable-name" : "tg",
+                   "reference-additional-operators" : "-setattribute,tg@units=Kelvin -addc,273.15",
+                   "seasons" : seasons,
+                   "percentiles" : percentiles, 
+                   "stations" : stations,
+                   "time-series-operators" : time_series_operators
+             },
+
+    "TOT_PREC" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/rr_ens_mean_0.1deg_reg_v23.1e.nc",
+                    "reference-variable-name" : "rr",
+                    "seasons" : seasons,
+                    "percentiles" : percentiles,
+                    "stations" : stations,
+                    "time-series-operators" : time_series_operators
+                 },    
+
+    "ASWD_S" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/qq_ens_mean_0.1deg_reg_v23.1e.nc",
+                  "reference-variable-name" : "qq",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                  "time-series-operators" : time_series_operators
+               },  
+}
+         
+

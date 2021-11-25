@@ -4,26 +4,24 @@ import sys
 sys.path.append('../')
 import global_settings
 
-seasons = global_settings.seasons
-variables = global_settings.variables.keys()
-
-stations = global_settings.stations
-operators = global_settings.time_series_operators
+variables = global_settings.variables
 
 file_pairs = {}
 
-for season in seasons:
-    for var in variables:
+
+for var in variables.keys():
+    for season in variables[var]["seasons"]:
         file_pairs.update({ var + "-" + season : 
             [ 
                 { "task" : "seasonal_mean" } ,
-                { "task" : "process_reference",
-                  "file" : var + "-" + season + "-remapped.nc" }
+                { "task" : "seasonal_mean",
+                  "file" : var + "-reference-" + season + "-remapped.nc" }
             ] 
         })
           
-for station in stations.keys():
-    for var in variables:
+
+for var in variables.keys():
+    for station in variables[var]["stations"].keys():
         file_pairs.update({ var + "-" + station : 
             [ 
                 { "task" : "extract_stations" } ,
@@ -33,9 +31,10 @@ for station in stations.keys():
         })
 
 
-for operator in operators:
-    for station in stations.keys():
-        for var in variables:
+for var in variables.keys():
+    for station in variables[var]["stations"].keys():
+        for operator in variables[var]["time-series-operators"]:
+
             file_pairs.update({ var + "-" + station + operator : 
                 [ 
                     { "task" : "extract_stations" } ,
@@ -44,13 +43,13 @@ for operator in operators:
                 ] 
             })
                 
-    for var in variables:
-        file_pairs.update({ var + "-ensmean" + operator : 
-            [ 
-                { "task" : "extract_stations" } ,
-                { "task" : "extract_stations",
-                  "file" : var + "-reference-ensmean" + operator + ".nc" }
-            ] 
-        })
+
+            file_pairs.update({ var + "-ensmean" + operator : 
+                [ 
+                    { "task" : "extract_stations" } ,
+                    { "task" : "extract_stations",
+                      "file" : var + "-reference-ensmean" + operator + ".nc" }
+                ] 
+            })
                   
 

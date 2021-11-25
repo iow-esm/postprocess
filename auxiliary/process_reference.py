@@ -50,35 +50,25 @@ for var in variables.keys():
     except:
         pass
     
-    for names, numbers in variables[var]["seasons"].items():
-    
-        output_file = results_dir + "/" + var + "-" + names + ".nc"
-        os.system("cdo -timmean " + " -selmon," + numbers +  " " + merge_file + " " + output_file)
-        os.system("cdo chname," + variables[var]["name"] + "," + var + " " + output_file + " tmp.nc; mv tmp.nc " + output_file)
+    # for names, numbers in variables[var]["seasons"].items():
         
-        try: 
-            remapped_file = output_file.split(".nc")[0] + "-remapped.nc"
-            os.system("cdo -remapbil," + remapping_file_path + "/" + variables[var]["remapping-file"] + " " + output_file + " " + remapped_file)
-            os.system("cdo chname," + variables[var]["name"] + "," + var + " " + remapped_file + " tmp.nc; mv tmp.nc " + remapped_file)
-        except:
-            pass
+        # if variables[var]["percentiles"] != []:
+            # os.system("cdo timmin " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/minfile.nc")
+            # os.system("cdo timmax " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/maxfile.nc")
         
-        if variables[var]["percentiles"] != []:
-            os.system("cdo timmin " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/minfile.nc")
-            os.system("cdo timmax " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/maxfile.nc")
-        
-        for p in variables[var]["percentiles"]:
-            output_file = results_dir + "/" + var + "-" + names + "-PCTL_" + p + ".nc"
-            os.system("cdo timpctl," + p + " -selmon," + numbers + seldate + " " + merge_file + " " + results_dir + "/minfile.nc " + results_dir + "/maxfile.nc " + output_file)
-            os.system("cdo chname," + variables[var]["name"] + "," + var + " " + output_file + " tmp.nc; mv tmp.nc " + output_file)
+        # for p in variables[var]["percentiles"]:
+            # output_file = results_dir + "/" + var + "-" + names + "-PCTL_" + p + ".nc"
+            # os.system("cdo timpctl," + p + " -selmon," + numbers + seldate + " " + merge_file + " " + results_dir + "/minfile.nc " + results_dir + "/maxfile.nc " + output_file)
+            # os.system("cdo chname," + variables[var]["name"] + "," + var + " " + output_file + " tmp.nc; mv tmp.nc " + output_file)
             
-            try: 
-                remapped_file = output_file.split(".nc")[0] + "-remapped.nc"
-                os.system("cdo -remapbil," + remapping_file_path + "/" + variables[var]["remapping-file"] + " " + output_file + " " + remapped_file)
-                os.system("cdo chname," + variables[var]["name"] + "," + var + " " + remapped_file + " tmp.nc; mv tmp.nc " + remapped_file)
-            except:
-                pass
-            
-        os.system("rm " + results_dir + "/maxfile.nc " + results_dir + "/minfile.nc ")   
+            # try: 
+                # remapped_file = output_file.split(".nc")[0] + "-remapped.nc"
+                # os.system("cdo -remapbil," + remapping_file_path + "/" + variables[var]["remapping-file"] + " " + output_file + " " + remapped_file)
+                # os.system("cdo chname," + variables[var]["name"] + "," + var + " " + remapped_file + " tmp.nc; mv tmp.nc " + remapped_file)
+            # except:
+                # pass
+                
+        # if variables[var]["percentiles"] != []: 
+            # os.system("rm " + results_dir + "/maxfile.nc " + results_dir + "/minfile.nc ")   
             
             
