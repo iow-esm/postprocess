@@ -62,6 +62,22 @@ for d in ${dirs[@]}; do
 		
 		cd ..
 		
+		# sum up downward radiation to compare to reference 
+		if [ -f "ASWDIR_S.nc" ] && [ -f "ASWDIFD_S.nc" ]; then
+			cdo add ASWDIR_S.nc ASWDIFD_S.nc ASWD_S.nc
+			cdo chname,ASWDIR_S,ASWD_S ASWD_S.nc tmp.nc; mv tmp.nc ASWD_S.nc
+			cdo setattribute,ASWD_S@standard_name="averaged_total_sw_downward_radiation" ASWD_S.nc ASWD_S.nc
+			cdo setattribute,ASWD_S@long_name="averaged total shortwave downward radiation at surface" ASWD_S.nc ASWD_S.nc
+		fi
+		
+		# sum up rain 
+		if [ -f "RAIN_CON.nc" ] && [ -f "RAIN_GSP.nc" ]; then
+			cdo add RAIN_CON.nc RAIN_GSP.nc RAIN_TOT.nc
+			cdo chname,RAIN_CON,RAIN_TOT RAIN_TOT.nc tmp.nc; mv tmp.nc RAIN_TOT.nc
+			cdo setattribute,RAIN_TOT@standard_name="total_rainfall_amount" RAIN_TOT.nc RAIN_TOT.nc
+			cdo setattribute,RAIN_TOT@long_name="total rainfall" RAIN_TOT.nc RAIN_TOT.nc
+		fi
+		
 		# ... and remove the empty folder
 		if [ `ls $o | wc -l` -eq 0 ]; then
 			rm -r $o
