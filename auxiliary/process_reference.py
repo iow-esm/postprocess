@@ -30,7 +30,13 @@ for var in variables.keys():
     files = " ".join(files)
     
     merge_file = results_dir + "/" + var + ".nc"
-    os.system("cdo -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files + " " + merge_file)
+    
+    try:
+        additional_operators = variables[var]["additional-operators"]
+    except:
+        additional_operators = ""
+        
+    os.system("cdo " +  additional_operators + " -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files + " " + merge_file)
     os.system("cdo chname," + variables[var]["name"] + "," + var + " " + merge_file + " tmp.nc; mv tmp.nc " + merge_file)
 
     try: 
