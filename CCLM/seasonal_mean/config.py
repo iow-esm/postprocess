@@ -1,11 +1,10 @@
 # this depends on a processed raw output
-dependencies = ["process_raw_output", "sum_up_radiation"]
+dependencies = ["process_raw_output"]
 
-seasons = {
-    "MAM" : "3,4,5",
-    "JJA" : "6,7,8",
-    "SON" : "9,10,11",
-    "DJF" : "12,1,2"
-}
+import sys
+sys.path.append('../')
+import global_settings
 
-variables = ["T_2M_AV", "ASWD_S", "TOT_PREC"]
+seasons = global_settings.seasons
+
+variables = global_settings.variables.keys()

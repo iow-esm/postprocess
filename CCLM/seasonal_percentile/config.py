@@ -1,13 +1,12 @@
 dependencies = ["process_raw_output"]
 
-seasons = {
-    "MAM" : "3,4,5",
-    "JJA" : "6,7,8",
-    "SON" : "9,10,11",
-    "DJF" : "12,1,2"
-}
+import sys
+sys.path.append('../')
+import global_settings
 
-variables = ["T_2M_AV", "TOT_PREC"]
-percentiles = ["95", "5", "25"]
+seasons = global_settings.seasons
+
+variables = global_settings.variables.keys()
+percentiles = global_settings.percentiles
 
 ranges = { "TOT_PREC" : "1,10000" }
