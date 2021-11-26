@@ -1,47 +1,45 @@
-dependencies = ["extract_stations"]
+dependencies = ["extract_stations", "calculate_anomalies"]
 
 import sys
 sys.path.append('../../auxiliary')
 from plot_config import PlotConfig
 
-stations = ["ROSTOCK-WARNEMUNDE", "HELSINKI-KAISANIEMI", "STOCKHOLM", "TALLINN", "VISBY", "SUNDSVALL", "LULEA", "VAASA-PALOSAARI"]
-
-operators = ["monmean", "ymonmean"]
+sys.path.append('../')
+import global_settings
 
 def convert_K2C(variable, units):
     variable -= 273.15
     units = "Celsius"
     return variable, units
 
-t2m = PlotConfig("T_2M_AV", task_name="extract_stations")
-rain = PlotConfig("TOT_PREC", task_name="extract_stations")
-swfl = PlotConfig("ASWD_S", task_name="extract_stations")
-
 plot_configs = {}
 
-for station in stations:
-    for operator in operators:
+for var in global_settings.variables.keys():
     
-        if operator == "monmean":
-            trend = True
-            std = False
-        else:
-            trend = False
-            std = True   
-            
-        plot_configs["T_2M_AV-" + station + "-" + operator] = [ t2m.clone(file="T_2M_AV-" + station + "-" + operator + ".nc", transform_variable = convert_K2C, title="model", trend=trend, std_deviation=std), 
-                                                                t2m.clone(file="T_2M_AV-reference-" + station + "-" + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std)]  
-        plot_configs["TOT_PREC-" + station + "-" + operator] = [ rain.clone(file="TOT_PREC-" + station + "-" + operator + ".nc", title="model", trend=trend, std_deviation=std), 
-                                                                rain.clone(file="TOT_PREC-reference-" + station + "-" + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std)]     
-        plot_configs["ASWD_S-" + station + "-" + operator] = [ swfl.clone(file="ASWD_S-" + station + "-" + operator + ".nc", title="model", trend=trend, std_deviation=std), 
-                                                                swfl.clone(file="ASWD_S-reference-" + station + "-" + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std)]     
+    temp = PlotConfig(var, task_name="extract_stations")
+    if var == "T_2M_AV":
+        transform_variable = convert_K2C
+    else:
+        transform_variable = None
+        
+    for operator in global_settings.variables[var]["time-series-operators"]:
+        for station in global_settings.variables[var]["stations"]:
+        
+            if operator == "monmean":
+                trend = True
+                std = False
+            else:
+                trend = False
+                std = True   
 
-        plot_configs["T_2M_AV-ensmean-" + operator] = [ t2m.clone(file="T_2M_AV-ensmean-" + operator + ".nc", transform_variable = convert_K2C, title="model", trend=trend, std_deviation=std), 
-                                                                t2m.clone(file="T_2M_AV-reference-ensmean-" + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std)]             
-        plot_configs["TOT_PREC-ensmean-" + operator] = [ rain.clone(file="TOT_PREC-ensmean-" + operator + ".nc", title="model", trend=trend, std_deviation=std), 
-                                                                rain.clone(file="TOT_PREC-reference-ensmean-" + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std)]      
-        plot_configs["ASWD_S-ensmean-" + operator] = [ swfl.clone(file="ASWD_S-ensmean-" + operator + ".nc", title="model", trend=trend, std_deviation=std), 
-                                                                swfl.clone(file="ASWD_S-reference-ensmean-" + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std)]                                                                      
+            plot_configs[var + "-" + station + operator] = [ temp.clone(file=var + "-" + station + operator + ".nc", transform_variable = transform_variable, title="model", trend=trend, std_deviation=std), 
+                                                                   temp.clone(file=var + "-reference-" + station + operator + ".nc", transform_variable = transform_variable, linestyle="r.-", title="reference", trend=trend, std_deviation=std),
+                                                                   temp.clone(task_name="calculate_anomalies", file=var + "-" + station + operator + ".nc", title="anomaly", trend=False, std_deviation=False)]  
+                
+
+        plot_configs[var + "-ensmean" + operator] = [temp.clone(file=var + "-ensmean" + operator + ".nc", transform_variable = transform_variable, title="model", trend=trend, std_deviation=std), 
+                                                      temp.clone(file=var + "-reference-ensmean" + operator + ".nc", transform_variable = transform_variable, linestyle="r.-", title="reference", trend=trend, std_deviation=std),
+                                                      temp.clone(task_name="calculate_anomalies", file= var + "-ensmean" + operator + ".nc", title="anomaly", trend=False, std_deviation=False)]                                                                                
 
     
 

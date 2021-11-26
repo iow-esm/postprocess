@@ -14,7 +14,7 @@ def convert_K2C(variable, units):
 cclm_template = PlotConfig("", width=7000000, height=5000000)
 
 # templates for temperatur and rain
-t2m = cclm_template.clone("T_2M_AV", contour = True, color_map = 'YlOrRd', transform_variable = convert_K2C)
+t2m = cclm_template.clone("T_2M_AV", contour = True, color_map = 'YlOrRd')
 rain = cclm_template.clone("TOT_PREC", min_value = 0.0, max_value = 4.0, delta_value = 0.5, color_map = 'YlGnBu')
 swfl = cclm_template.clone("ASWD_S", min_value = 0.0, max_value = 300.0, delta_value = 30.0, contour = True, color_map = 'viridis')
 
@@ -31,16 +31,16 @@ for season in seasons:
     elif season == "DJF":
         t2m = t2m.clone(min_value = -15.0, max_value = 15.0, delta_value = 3.75)
         
-    plot_configs["T_2M_AV-" + season] = [t2m.clone(task_name="seasonal_mean", file="T_2M_AV-" + season + ".nc")]
-    plot_configs["T_2M_AV-reference-" + season] = [t2m.clone(task_name="seasonal_mean", lon_name="longitude", lat_name="latitude")]
+    plot_configs["T_2M_AV-" + season] = [t2m.clone(task_name="seasonal_mean", file="T_2M_AV-" + season + ".nc", transform_variable = convert_K2C)]
+    plot_configs["T_2M_AV-reference-" + season] = [t2m.clone(task_name="seasonal_mean", file="T_2M_AV-reference-" + season + ".nc", transform_variable = convert_K2C)]
     plot_configs["T_2M_AV-anomaly-" + season] = [t2m.clone(task_name="calculate_anomalies", file = "T_2M_AV-" + season + ".nc", min_value = -6.5, max_value = 6.5, delta_value = 1.0, color_map = 'seismic')]
     
     plot_configs["TOT_PREC-" + season] = [rain.clone(task_name="seasonal_mean", file="TOT_PREC-" + season + ".nc")]
-    plot_configs["TOT_PREC-reference-" + season] = [rain.clone(task_name="seasonal_mean", lon_name="longitude", lat_name="latitude")]
+    plot_configs["TOT_PREC-reference-" + season] = [rain.clone(task_name="seasonal_mean", file="TOT_PREC-reference-" + season + ".nc")]
     plot_configs["TOT_PREC-anomaly-" + season] = [rain.clone(task_name="calculate_anomalies", file = "TOT_PREC-" + season + ".nc", min_value = -4.5, max_value = 4.5, delta_value = 1.0, color_map = 'BrBG')]
     
     plot_configs["ASWD_S-" + season] = [swfl.clone(task_name="seasonal_mean", file="ASWD_S-" + season + ".nc")]
-    plot_configs["ASWD_S-reference-" + season] = [swfl.clone(task_name="seasonal_mean", lon_name="longitude", lat_name="latitude")]
+    plot_configs["ASWD_S-reference-" + season] = [swfl.clone(task_name="seasonal_mean", file="ASWD_S-reference-" + season + ".nc")]
     plot_configs["ASWD_S-anomaly-" + season] = [swfl.clone(task_name="calculate_anomalies", file = "ASWD_S-" + season + ".nc", min_value = -45.0, max_value = 45.0, delta_value = 10.0, color_map = 'RdGy_r')]
 
 
