@@ -65,8 +65,15 @@ def read_time_series(plot_config, nc_file):
     
     time = fh.variables[time_name]
     time_units = time.units
-    time = np.sort(num2date(np.squeeze(time[:]),time.units))
+    time = num2date(np.squeeze(time[:]),time.units)
+    
     variable = np.squeeze(fh.variables[plot_config.variable][:])
+    
+    # sort variable according to the time
+    szl = sorted(zip(time, variable))
+    time = np.array([element for element,_ in szl])
+    variable = np.array([element for _, element in szl])
+    
     units = fh.variables[plot_config.variable].units
     
     try:
