@@ -11,6 +11,13 @@ for var in global_settings.variables.keys():
     variables[var] = {
                 "seasons" : global_settings.variables[var]["seasons"],
                 }
+                
+    try: 
+        global_settings.variables[var]["reference-file-pattern"]
+    except:
+        print("No reference is given for " + var)
+        continue
+        
     variables[var + "-reference"] = {
                             "seasons" : global_settings.variables[var]["seasons"],
                             "task" : "process_reference",

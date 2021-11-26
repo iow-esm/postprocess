@@ -10,6 +10,13 @@ file_pairs = {}
 
 
 for var in variables.keys():
+
+    try: 
+        global_settings.variables[var]["reference-file-pattern"]
+    except:
+        print("No reference is given for " + var)
+        continue
+        
     for season in variables[var]["seasons"]:
         file_pairs.update({ var + "-" + season : 
             [ 
@@ -20,7 +27,6 @@ for var in variables.keys():
         })
           
 
-for var in variables.keys():
     for station in variables[var]["stations"].keys():
         file_pairs.update({ var + "-" + station : 
             [ 
@@ -31,7 +37,6 @@ for var in variables.keys():
         })
 
 
-for var in variables.keys():
     for station in variables[var]["stations"].keys():
         for operator in variables[var]["time-series-operators"]:
 

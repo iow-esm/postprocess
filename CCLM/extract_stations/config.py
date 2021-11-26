@@ -11,6 +11,13 @@ for var in global_settings.variables.keys():
                 "stations" : global_settings.variables[var]["stations"],
                 "operators" : global_settings.variables[var]["time-series-operators"]
                 }
+                
+    try: 
+        global_settings.variables[var]["reference-file-pattern"]
+    except:
+        print("No reference is given for " + var)
+        continue
+        
     variables[var + "-reference"] = {
                             "stations" : global_settings.variables[var]["stations"],
                             "task" : "process_reference",

@@ -10,6 +10,13 @@ percentiles = global_settings.percentiles
 
 variables = {}
 for var in global_settings.variables.keys():     
+
+    try: 
+        global_settings.variables[var]["reference-file-pattern"]
+    except:
+        print("No reference is given for " + var)
+        continue
+        
     variables[var] =  {    "file-pattern" : global_settings.variables[var]["reference-file-pattern"],
                             "name" : global_settings.variables[var]["reference-variable-name"],
                             "remapping-file" : "grid_" + var + ".txt",
