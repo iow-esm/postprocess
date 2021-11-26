@@ -1,11 +1,26 @@
 # this depends on a processed raw output
-dependencies = ["process_raw_output"]
+dependencies = ["process_raw_output", "process_reference"]
 
-seasons = {
-    "MAM" : "3,4,5",
-    "JJA" : "6,7,8",
-    "SON" : "9,10,11",
-    "DJF" : "12,1,2"
-}
+import sys
+sys.path.append('../')
+import global_settings
 
-variables = ["SST", "SSS", "SSH", "FI"]
+variables = {}
+
+for var in global_settings.variables.keys():
+    variables[var] = {
+                "seasons" : global_settings.variables[var]["seasons"],
+                }
+                
+    try: 
+        global_settings.variables[var]["reference-file-pattern"]
+    except:
+        print("No reference is given for " + var)
+        continue
+        
+    variables[var + "-reference"] = {
+                            "seasons" : global_settings.variables[var]["seasons"],
+                            "task" : "process_reference",
+                            "file" : var + ".nc",
+                            "remapping-file" : "grid_" + var + ".txt",
+                         }

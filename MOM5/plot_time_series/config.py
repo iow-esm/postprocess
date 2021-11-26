@@ -1,37 +1,50 @@
-dependencies = ["extract_stations"]
+dependencies = ["extract_stations", "calculate_anomalies"]
 
 import sys
 sys.path.append('../../auxiliary')
 from plot_config import PlotConfig
 
-stations = ["BY5", "F9", "SR5", "BY31"]
-    
-operators = ["monmean", "ymonmean"]
+sys.path.append('../')
+import global_settings
 
 def convert_K2C(variable, units):
     variable -= 273.15
     units = "Celsius"
     return variable, units
 
-sst = PlotConfig("SST", task_name="extract_stations")
-fi = PlotConfig("FI", task_name="extract_stations")
-
 plot_configs = {}
 
-for station in stations:
-    for operator in operators:
+for var in global_settings.variables.keys():
     
-        if operator == "monmean":
-            trend = True
-            std = False
-        else:
-            trend = False
-            std = True   
-            
-        plot_configs["SST-" + station + "-" + operator] = [sst.clone(file="SST-" + station + "-" + operator + ".nc", title="model", trend=trend, std_deviation=std),
-                                                           sst.clone(file="SST-reference-" + station + "-" + operator + ".nc", linestyle="r.-", transform_variable = convert_K2C, title="reference", trend=trend, std_deviation=std) ]      
-        plot_configs["FI-" + station + "-" + operator] = [fi.clone(file="FI-" + station + "-" + operator + ".nc", title="model", trend=trend, std_deviation=std),
-                                                           fi.clone(file="FI-reference-" + station + "-" + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std) ]                                                           
+    temp = PlotConfig(var, task_name="extract_stations")
+        
+    for operator in global_settings.variables[var]["time-series-operators"]:
+        for station in global_settings.variables[var]["stations"]:
+        
+            if operator == "-monmean":
+                trend = True
+                std = False
+            else:
+                trend = False
+                std = True   
 
+            plot_configs[var + "-" + station + operator] = [temp.clone(file=var + "-" + station + operator + ".nc", title="model", trend=trend, std_deviation=std)]
+            
+            try: 
+                global_settings.variables[var]["reference-file-pattern"]
+                plot_configs[var + "-" + station + operator] += [temp.clone(file=var + "-reference-" + station + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std),
+                                                                 temp.clone(task_name="calculate_anomalies", file=var + "-" + station + operator + ".nc", title="anomaly", trend=False, std_deviation=False)]  
+            except:
+                print("No reference is given for " + var)
+                pass
+
+        plot_configs[var + "-ensmean" + operator] = [temp.clone(file=var + "-ensmean" + operator + ".nc", title="model", trend=trend, std_deviation=std)]        
+        try: 
+            global_settings.variables[var]["reference-file-pattern"]
+            plot_configs[var + "-ensmean" + operator] += [temp.clone(file=var + "-reference-ensmean" + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std),
+                                                          temp.clone(task_name="calculate_anomalies", file= var + "-ensmean" + operator + ".nc", title="anomaly", trend=False, std_deviation=False)]                                                                                
+        except:
+            print("No reference is given for " + var)
+            pass
     
 

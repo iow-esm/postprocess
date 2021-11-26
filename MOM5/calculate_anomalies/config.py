@@ -1,25 +1,60 @@
-# this depends on seasonal means and a processed reference
-dependencies = ["seasonal_mean", "process_reference"]
+dependencies = ["seasonal_mean", "process_reference", "extract_stations"]
 
-seasons = ["MAM", "SON", "JJA", "DJF"]
-variables = ["SST", "FI"]
+import sys
+sys.path.append('../')
+import global_settings
+
+variables = global_settings.variables
 
 file_pairs = {}
 
-for season in seasons:
-    for var in variables:
+
+for var in variables.keys():
+
+    try: 
+        global_settings.variables[var]["reference-file-pattern"]
+    except:
+        print("No reference is given for " + var)
+        continue
+        
+    for season in variables[var]["seasons"]:
         file_pairs.update({ var + "-" + season : 
             [ 
                 { "task" : "seasonal_mean" } ,
-                { "task" : "process_reference",
-                  "file" : var + "-" + season + "-remapped.nc" }
+                { "task" : "seasonal_mean",
+                  "file" : var + "-reference-" + season + "-remapped.nc" }
             ] 
         })
-        
-        if var == "SST":
-            file_pairs[var + "-" + season][1]["additional-operators"] = "-subc,273.15"
           
 
+    for station in variables[var]["stations"].keys():
+        file_pairs.update({ var + "-" + station : 
+            [ 
+                { "task" : "extract_stations" } ,
+                { "task" : "extract_stations",
+                  "file" : var + "-reference-" + station + ".nc" }
+            ] 
+        })
 
 
+    for station in variables[var]["stations"].keys():
+        for operator in variables[var]["time-series-operators"]:
+
+            file_pairs.update({ var + "-" + station + operator : 
+                [ 
+                    { "task" : "extract_stations" } ,
+                    { "task" : "extract_stations",
+                      "file" : var + "-reference-" + station + operator + ".nc" }
+                ] 
+            })
+                
+
+            file_pairs.update({ var + "-ensmean" + operator : 
+                [ 
+                    { "task" : "extract_stations" } ,
+                    { "task" : "extract_stations",
+                      "file" : var + "-reference-ensmean" + operator + ".nc" }
+                ] 
+            })
+                  
 
