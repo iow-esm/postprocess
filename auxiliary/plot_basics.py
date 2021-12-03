@@ -212,10 +212,13 @@ def plot_time_series(plot_configs, results_dir):
                 plt.fill_between(time, variable - 0.5*std, variable + 0.5*std, color=p[-1].get_color(), alpha=0.1)
 
             if plot_config.trend:
-                x = date2num(time, time_units)
-                z = np.polyfit(x, variable, 1)
-                z = np.poly1d(z)
-                plt.plot(time, z(x), color=p[-1].get_color(), linestyle="dotted")
+                try:
+                    x = date2num(time, time_units)
+                    z = np.polyfit(x, variable, 1)
+                    z = np.poly1d(z)
+                    plt.plot(time, z(x), color=p[-1].get_color(), linestyle="dotted")
+                except Exception as e:
+                    print("Could not calculate trend due to exception:", e)
                 
             plt.legend(loc="upper left")
             
