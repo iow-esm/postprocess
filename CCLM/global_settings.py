@@ -29,7 +29,7 @@ variables = {
                    "time-series-operators" : time_series_operators
              },
 
-    "TOT_PREC" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/rr_ens_mean_0.1deg_reg_v23.1e.nc",
+    "DAY_PREC" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/rr_ens_mean_0.1deg_reg_v23.1e.nc",
                     "reference-variable-name" : "rr",
                     "reference-additional-operators" : "-chname,longitude,lon -chname,latitude,lat",
                     "seasons" : seasons,
@@ -46,6 +46,24 @@ variables = {
                   "stations" : stations,
                   "time-series-operators" : time_series_operators
                },  
+               
+    "SPEED_10M_AV" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/fg_ens_mean_0.1deg_reg_v23.1e.nc",
+                  "reference-variable-name" : "fg",
+                  "reference-additional-operators" : "-setattribute,fg@missing_value=-9999s -chname,longitude,lon -chname,latitude,lat", # change missing value from string to number, otherwise problems with plotting
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                  "time-series-operators" : time_series_operators
+               }, 
+               
+    "PMSL_AV" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/pp_ens_mean_0.1deg_reg_v23.1e.nc",
+                  "reference-variable-name" : "pp",
+                  "reference-additional-operators" : "-b f32 -chname,longitude,lon -chname,latitude,lat -setattribute,pp@units=Pa -mulc,100.0",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                  "time-series-operators" : time_series_operators
+               }, 
 }
          
 

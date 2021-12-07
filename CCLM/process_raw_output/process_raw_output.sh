@@ -62,6 +62,8 @@ for d in ${dirs[@]}; do
 		
 		cd ..
 		
+		# get some means and sums for comparison to observational data
+		
 		# sum up downward radiation to compare to reference 
 		if [ -f "ASWDIR_S.nc" ] && [ -f "ASWDIFD_S.nc" ]; then
 			cdo add ASWDIR_S.nc ASWDIFD_S.nc ASWD_S.nc
@@ -78,6 +80,22 @@ for d in ${dirs[@]}; do
 			cdo setattribute,RAIN_TOT@long_name="total rainfall" RAIN_TOT.nc RAIN_TOT.nc
 		fi
 		
+		# sum up daily precipitation amount
+		if [ -f "TOT_PREC.nc" ]; then
+			cdo daysum TOT_PREC.nc DAY_PREC.nc
+			cdo chname,TOT_PREC,DAY_PREC DAY_PREC.nc tmp.nc; mv tmp.nc DAY_PREC.nc
+		fi
+	
+		# calculate daily mean of wind speed
+		if [ -f "U_10M.nc" ] && [ -f "V_10M.nc" ]; then 
+			cdo -setattribute,SPEED_10M_AV@units="m/s" -daymean -expr,'SPEED_10M_AV=sqrt(U_10M*U_10M+V_10M*V_10M)' -merge U_10M.nc V_10M.nc SPEED_10M_AV.nc
+		fi
+
+		# calculate daily mean of sea level pressure
+		if [ -f "PMSL.nc" ]; then 
+			cdo -chname,PMSL,PMSL_AV -daymean PMSL.nc PMSL_AV.nc 
+		fi
+
 		# ... and remove the empty folder
 		if [ `ls $o | wc -l` -eq 0 ]; then
 			rm -r $o

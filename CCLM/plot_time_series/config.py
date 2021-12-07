@@ -36,8 +36,9 @@ for var in global_settings.variables.keys():
             
             try: 
                 global_settings.variables[var]["reference-file-pattern"]
-                plot_configs[var + "-" + station + operator] += [temp.clone(file=var + "-reference-" + station + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std, transform_variable = transform_variable),
-                                                                 temp.clone(task_name="calculate_anomalies", file=var + "-" + station + operator + ".nc", title="anomaly", trend=False, std_deviation=False)]  
+                plot_configs[var + "-" + station + operator] += [temp.clone(file=var + "-reference-" + station + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std, transform_variable = transform_variable)]
+                if var != "PMSL_AV":
+                    plot_configs[var + "-" + station + operator] += [temp.clone(task_name="calculate_anomalies", file=var + "-" + station + operator + ".nc", title="anomaly", trend=False, std_deviation=False)]  
             except:
                 print("No reference is given for " + var)
                 pass
@@ -45,8 +46,9 @@ for var in global_settings.variables.keys():
         plot_configs[var + "-ensmean" + operator] = [temp.clone(file=var + "-ensmean" + operator + ".nc", title="model", trend=trend, std_deviation=std, transform_variable = transform_variable)]        
         try: 
             global_settings.variables[var]["reference-file-pattern"]
-            plot_configs[var + "-ensmean" + operator] += [temp.clone(file=var + "-reference-ensmean" + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std, transform_variable = transform_variable),
-                                                          temp.clone(task_name="calculate_anomalies", file= var + "-ensmean" + operator + ".nc", title="anomaly", trend=False, std_deviation=False)]                                                                                
+            plot_configs[var + "-ensmean" + operator] += [temp.clone(file=var + "-reference-ensmean" + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std, transform_variable = transform_variable)]
+            if var != "PMSL_AV":
+                plot_configs[var + "-ensmean" + operator] += [temp.clone(task_name="calculate_anomalies", file= var + "-ensmean" + operator + ".nc", title="anomaly", trend=False, std_deviation=False)]                                                                               
         except:
             print("No reference is given for " + var)
             pass
