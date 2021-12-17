@@ -17,6 +17,10 @@ stations = {
     "VAASA-PALOSAARI" : {"lat" : "63:06:00", "lon" : "21:36:00"},
 }
 
+regions = { 
+    "BALTIC_SEA" : {"lat-min" : "52.0", "lat-max" : "68.0", "lon-min" : "8.0", "lon-max" : "32.0"},
+}
+
 time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]
 
 variables = {
@@ -26,6 +30,7 @@ variables = {
                    "seasons" : seasons,
                    "percentiles" : percentiles, 
                    "stations" : stations,
+                   "regions" : regions,
                    "time-series-operators" : time_series_operators
              },
 
@@ -35,6 +40,7 @@ variables = {
                     "seasons" : seasons,
                     "percentiles" : percentiles,
                     "stations" : stations,
+                    "regions" : regions,
                     "time-series-operators" : time_series_operators
                  },    
 
@@ -44,6 +50,7 @@ variables = {
                   "seasons" : seasons,
                   "percentiles" : percentiles,
                   "stations" : stations,
+                  "regions" : regions,
                   "time-series-operators" : time_series_operators
                },  
                
@@ -53,6 +60,7 @@ variables = {
                   "seasons" : seasons,
                   "percentiles" : percentiles,
                   "stations" : stations,
+                  "regions" : regions,
                   "time-series-operators" : time_series_operators
                }, 
                
@@ -62,6 +70,7 @@ variables = {
                   "seasons" : seasons,
                   "percentiles" : percentiles,
                   "stations" : stations,
+                  "regions" : regions,
                   "time-series-operators" : time_series_operators
                }, 
 }
