@@ -5,7 +5,7 @@ class PlotConfig:
         color_map = None, contour = False, transform_variable = None, task_name = None, path = None, file = None,
         lon_name = "lon", lat_name = "lat", width = None, height = None, 
         time_name = "time", trend=False, std_deviation=True,
-        linestyle = None):
+        linestyle = None, symmetric = False):
         
         args = locals()
         for arg in args.keys():
@@ -16,7 +16,7 @@ class PlotConfig:
         color_map = None, contour = None, transform_variable = None, task_name = None, path = None, file = None, 
         lon_name = None, lat_name = None, width = None, height = None, 
         time_name = None, trend=None, std_deviation=None,
-        linestyle = None):
+        linestyle = None, symmetric = None):
 
         args = locals()
         for arg in args.keys():
@@ -28,13 +28,13 @@ class PlotConfig:
         color_map = None, contour = None, transform_variable = None, task_name = None, path = None, file = None, 
         lon_name = None, lat_name = None, width = None, height = None, 
         time_name = None, trend=None, std_deviation=None,
-        linestyle = None, linecolor = None):
+        linestyle = None, symmetric = None):
         
         c = deepcopy(self)
         c.reconfigure(variable, title, min_value, max_value, delta_value,
         color_map, contour, transform_variable, task_name, path, file,
         lon_name, lat_name, width, height,
         time_name, trend, std_deviation,
-        linestyle)
+        linestyle, symmetric)
         
         return c

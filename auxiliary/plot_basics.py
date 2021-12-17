@@ -3,6 +3,7 @@ from netCDF4 import Dataset, num2date, date2num
 from mpl_toolkits.basemap import Basemap
 
 import matplotlib.pyplot as plt
+import os
         
 def build_basemap(lons, lats, width = None, height = None):
     # Get some parameters for the Stereographic Projection
@@ -99,6 +100,10 @@ def process_config(plot_config, variable, units):
         vmax = plot_config.max_value
     else:
         vmax = variable.max()
+        
+    if plot_config.symmetric:
+        vmax = max(abs(vmax), abs(vmin))
+        vmin = -vmax
 
     if plot_config.delta_value is not None:
         delta = plot_config.delta_value
@@ -106,6 +111,10 @@ def process_config(plot_config, variable, units):
     else:
         delta = None
         nlevels = None
+        
+        if plot_config.symmetric:
+            delta = (vmax-vmin)/9.0
+            nlevels = 9
         
     if plot_config.color_map is not None:
         color_map = plot_config.color_map
@@ -170,6 +179,9 @@ def plot_on_map(plot_configs, results_dir):
         plt.close()
         
         print(" plot saved in: " + out_file)
+        
+        os.system("pdfcrop " + out_file + " " + out_file)
+        
         print("...done")
             
 def plot_time_series(plot_configs, results_dir):
@@ -236,4 +248,7 @@ def plot_time_series(plot_configs, results_dir):
         plt.close()
     
         print(" plot saved in: " + out_file)
+        
+        os.system("pdfcrop " + out_file + " " + out_file)
+        
         print("...done")
