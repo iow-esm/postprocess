@@ -39,7 +39,12 @@ for season in seasons:
     plot_configs["FI-" + season] = [fi.clone(task_name="seasonal_mean", file="FI-" + season + ".nc")]
     plot_configs["FI-reference-" + season] = [fi.clone(task_name="seasonal_mean", file = "FI-reference-" + season + ".nc")]
     plot_configs["FI-anomaly-" + season] = [fi.clone(task_name="calculate_anomalies", file = "FI-" + season + ".nc", min_value = -0.65, max_value = 0.65, delta_value = 0.1, color_map = 'seismic_r')]
-         
+    
+    #fluxes = ["LH", "SH", "EVAP", "swdn", "lwdn"]
+    #for flx in fluxes:
+    #    plot_configs[flx + "-anomaly-" + season] = [ mom_temp.clone(flx, task_name="calculate_anomalies", file = flx + "-" + season + ".nc", color_map = 'seismic', symmetric = True) ]
+    #plot_configs["tau_x-anomaly-" + season] = [ mom_temp.clone("tau_x", lon_name = "xu_ocean", lat_name = "yu_ocean", task_name="calculate_anomalies", file = "tau_x-" + season + ".nc", color_map = 'seismic', symmetric = True) ]
+    #plot_configs["tau_y-anomaly-" + season] = [ mom_temp.clone("tau_y", lon_name = "xu_ocean", lat_name = "yu_ocean", task_name="calculate_anomalies", file = "tau_y-" + season + ".nc", color_map = 'seismic', symmetric = True) ]   
 # percentiles = ["95", "5"]
 # mom_temp = PlotConfig("", task_name="seasonal_percentile", lon_name = "xt_ocean", lat_name = "yt_ocean", width = 1500000, height = 1800000)
 
