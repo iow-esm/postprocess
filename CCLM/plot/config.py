@@ -36,23 +36,31 @@ for season in seasons:
     plot_configs["T_2M_AV-" + season] = [t2m.clone(task_name="seasonal_mean", file="T_2M_AV-" + season + ".nc", transform_variable = convert_K2C)]
     plot_configs["T_2M_AV-reference-" + season] = [t2m.clone(task_name="seasonal_mean", file="T_2M_AV-reference-" + season + ".nc", transform_variable = convert_K2C)]
     plot_configs["T_2M_AV-anomaly-" + season] = [t2m.clone(task_name="calculate_anomalies", file = "T_2M_AV-" + season + ".nc", min_value = -6.5, max_value = 6.5, delta_value = 1.0, color_map = 'seismic')]
+    #plot_configs["T_2M_AV-anomaly-" + season] = [t2m.clone(task_name="calculate_anomalies", file = "T_2M_AV-" + season + ".nc", min_value = -0.65, max_value = 0.65, delta_value = 0.1, contour = False, color_map = 'seismic')]
     
     plot_configs["DAY_PREC-" + season] = [rain.clone(task_name="seasonal_mean", file="DAY_PREC-" + season + ".nc")]
     plot_configs["DAY_PREC-reference-" + season] = [rain.clone(task_name="seasonal_mean", file="DAY_PREC-reference-" + season + ".nc")]
     plot_configs["DAY_PREC-anomaly-" + season] = [rain.clone(task_name="calculate_anomalies", file = "DAY_PREC-" + season + ".nc", min_value = -4.5, max_value = 4.5, delta_value = 1.0, color_map = 'BrBG')]
+    #plot_configs["DAY_PREC-anomaly-" + season] = [rain.clone(task_name="calculate_anomalies", file = "DAY_PREC-" + season + ".nc", min_value = -0.65, max_value = 0.65, delta_value = 0.1, color_map = 'BrBG')]
     
     plot_configs["ASWD_S-" + season] = [swfl.clone(task_name="seasonal_mean", file="ASWD_S-" + season + ".nc")]
     plot_configs["ASWD_S-reference-" + season] = [swfl.clone(task_name="seasonal_mean", file="ASWD_S-reference-" + season + ".nc")]
     plot_configs["ASWD_S-anomaly-" + season] = [swfl.clone(task_name="calculate_anomalies", file = "ASWD_S-" + season + ".nc", min_value = -45.0, max_value = 45.0, delta_value = 10.0, color_map = 'seismic')]
+    #plot_configs["ASWD_S-anomaly-" + season] = [swfl.clone(task_name="calculate_anomalies", file = "ASWD_S-" + season + ".nc", min_value = -9.0, max_value = 9.0, delta_value = 2.0, contour = False, color_map = 'seismic')]
     
     plot_configs["SPEED_10M_AV-" + season] = [speed.clone(task_name="seasonal_mean", file="SPEED_10M_AV-" + season + ".nc")]
     plot_configs["SPEED_10M_AV-reference-" + season] = [speed.clone(task_name="seasonal_mean", file="SPEED_10M_AV-reference-" + season + ".nc")]
     plot_configs["SPEED_10M_AV-anomaly-" + season] = [speed.clone(task_name="calculate_anomalies", file = "SPEED_10M_AV-" + season + ".nc", min_value = -5.5, max_value = 5.5, delta_value = 1.0, color_map = 'seismic')]
+    #plot_configs["SPEED_10M_AV-anomaly-" + season] = [speed.clone(task_name="calculate_anomalies", file = "SPEED_10M_AV-" + season + ".nc", min_value = -1.125, max_value = 1.125, delta_value = 0.25, color_map = 'seismic')]
     
     plot_configs["PMSL_AV-" + season] = [pmsl.clone(task_name="seasonal_mean", file="PMSL_AV-" + season + ".nc")]
     plot_configs["PMSL_AV-reference-" + season] = [pmsl.clone(task_name="seasonal_mean", file="PMSL_AV-reference-" + season + ".nc")]
     plot_configs["PMSL_AV-anomaly-" + season] = [pmsl.clone(task_name="calculate_anomalies", file = "PMSL_AV-" + season + ".nc", min_value = -550.0, max_value = 550.0, delta_value = 100.0, color_map = 'seismic')]
+    #plot_configs["PMSL_AV-anomaly-" + season] = [pmsl.clone(task_name="calculate_anomalies", file = "PMSL_AV-" + season + ".nc", min_value = -112.5, max_value = 112.5, delta_value = 25.0, color_map = 'seismic')]
 
+    fluxes = []#["AEVAP_S", "ALHFL_S", "ASHFL_S", "AUMFL_S", "AVMFL_S", "ALWU_S"]
+    for flx in fluxes:
+        plot_configs[flx + "-anomaly-" + season] = [ cclm_template.clone(flx, task_name="calculate_anomalies", file = flx + "-" + season + ".nc", color_map = 'seismic', symmetric = True) ]
 
 # templates for temperatur and rain
 # t2m = cclm_template.clone("T_2M", contour = True, color_map = 'YlOrRd', transform_variable = convert_K2C, task_name="seasonal_percentile")
