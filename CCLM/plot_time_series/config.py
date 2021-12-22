@@ -16,13 +16,16 @@ plot_configs = {}
 
 for var in global_settings.variables.keys():
     
-    temp = PlotConfig(var, task_name="extract_stations")
+    
     if var == "T_2M_AV":
         transform_variable = convert_K2C
     else:
         transform_variable = None
         
     for operator in global_settings.variables[var]["time-series-operators"]:
+    
+        temp = PlotConfig(var, task_name="extract_stations")
+        
         for station in global_settings.variables[var]["stations"]:
         
             if operator == "-monmean":
@@ -52,5 +55,20 @@ for var in global_settings.variables.keys():
         except:
             print("No reference is given for " + var)
             pass
+            
+        temp = PlotConfig(var, task_name="extract_regions")
+        
+        for station in global_settings.variables[var]["regions"]:
+
+            plot_configs[var + "-" + station + operator] = [temp.clone(file=var + "-" + station + operator + ".nc", title="model", trend=trend, std_deviation=std, transform_variable = transform_variable)]
+            
+            try: 
+                global_settings.variables[var]["reference-file-pattern"]
+                plot_configs[var + "-" + station + operator] += [temp.clone(file=var + "-reference-" + station + operator + ".nc", linestyle="r.-", title="reference", trend=trend, std_deviation=std, transform_variable = transform_variable)]
+                if var != "PMSL_AV":
+                    plot_configs[var + "-" + station + operator] += [temp.clone(task_name="calculate_anomalies", file=var + "-" + station + operator + ".nc", title="anomaly", trend=False, std_deviation=False)]  
+            except:
+                print("No reference is given for " + var)
+                pass            
     
 

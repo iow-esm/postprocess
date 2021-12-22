@@ -18,7 +18,7 @@ stations = {
 }
 
 regions = { 
-    "BALTIC_SEA" : {"lat-min" : "52.0", "lat-max" : "68.0", "lon-min" : "8.0", "lon-max" : "32.0"},
+    "BALTIC_SEA" : {"lat-min" : "52.0", "lat-max" : "67.0", "lon-min" : "8.0", "lon-max" : "32.0"},
 }
 
 time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]

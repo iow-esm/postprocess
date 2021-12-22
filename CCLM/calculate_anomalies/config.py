@@ -56,5 +56,27 @@ for var in variables.keys():
                       "file" : var + "-reference-ensmean" + operator + ".nc" }
                 ] 
             })
+            
+            
+            
                   
+    for station in variables[var]["regions"].keys():
+        file_pairs.update({ var + "-" + station : 
+            [ 
+                { "task" : "extract_regions" } ,
+                { "task" : "extract_regions",
+                  "file" : var + "-reference-" + station + ".nc" }
+            ] 
+        })
+
+    for station in variables[var]["regions"].keys():
+        for operator in variables[var]["time-series-operators"]:
+
+            file_pairs.update({ var + "-" + station + operator : 
+                [ 
+                    { "task" : "extract_regions" } ,
+                    { "task" : "extract_regions",
+                      "file" : var + "-reference-" + station + operator + ".nc" }
+                ] 
+            })
 
