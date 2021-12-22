@@ -78,28 +78,4 @@ for var in variables.keys():
                 
                 command = "rm " + std_file
                 os.system(command)   
-                
-    files = ""        
-    for station in stations.keys():
-        files += results_dir + "/" + var + "-" + station + ".nc "
-        
-    command = "cdo ensmean " + files + " " + results_dir + "/" + var + "-regions_mean.nc"   
-    os.system(command)
-    
-    command = "cdo ensstd1 " + files + " " + results_dir + "/" + var + "_STD.nc"   
-    os.system(command)
-    
-    command = "for var in `cdo showname " + results_dir + "/" + var + "_STD.nc`; do "
-    command += "cdo chname,$var,${var}_STD " + results_dir + "/" + var + "_STD.nc tmp.nc; mv tmp.nc " + results_dir + "/" + var + "_STD.nc; done"
-    os.system(command)
-    
-    command = "cdo merge " + results_dir + "/" + var + "_STD.nc " + results_dir + "/" + var + "-regions_mean.nc tmp.nc; mv tmp.nc " + results_dir + "/" + var + "-regions_mean.nc"    
-    os.system(command)
-    
-    command = "rm " + results_dir + "/" + var + "_STD.nc"
-    os.system(command)
-    
-    for operator in operators:
-        command = "cdo " + operator + " " + results_dir + "/" + var + "-regions_mean.nc" + " " + results_dir + "/" + var + "-regions_mean" + operator + ".nc"
-        os.system(command)
         
