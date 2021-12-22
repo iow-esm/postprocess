@@ -1,0 +1,129 @@
+seasons = {
+    "MAM" : "3,4,5",
+    "JJA" : "6,7,8",
+    "SON" : "9,10,11",
+    "DJF" : "12,1,2"
+}
+
+percentiles = []
+
+stations = { 
+    "ROSTOCK-WARNEMUNDE" : {"lat" : "54.18", "lon" : "12.08"},
+    "STOCKHOLM" : {"lat" : "59.35", "lon" : "18.05"},
+    "TALLINN" : {"lat" : "59:23:53", "lon" : "24:36:10"},
+    "VISBY" : {"lat" : "57:40:00", "lon" : "18:19:59"},
+    "SUNDSVALL" : {"lat" : "62:24:36", "lon" : "17:16:12"},
+    "LULEA" : {"lat" : "65:37:12", "lon" : "22:07:48"},
+    "VAASA-PALOSAARI" : {"lat" : "63:06:00", "lon" : "21:36:00"},
+}
+
+regions = {
+    "BALTIC_SEA" : {"lat-min" : "52.0", "lat-max" : "67.0", "lon-min" : "8.0", "lon-max" : "32.0"},
+}
+
+time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]
+
+variables = {
+    "T_2M_AV" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/T_2M_AV.nc",
+                   "reference-variable-name" : "T_2M_AV",
+                   "seasons" : seasons,
+                   "percentiles" : percentiles, 
+                   "stations" : stations,
+                   "regions" : regions,
+                   "time-series-operators" : time_series_operators
+             },
+
+    "DAY_PREC" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/DAY_PREC.nc",
+                    "reference-variable-name" : "DAY_PREC",
+                    "seasons" : seasons,
+                    "percentiles" : percentiles,
+                    "stations" : stations
+                   "regions" : regions,,
+                    "time-series-operators" : time_series_operators
+                 },    
+
+    "ASWD_S" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/ASWD_S.nc",
+                  "reference-variable-name" : "ASWD_S",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                   "regions" : regions,
+                  "time-series-operators" : time_series_operators
+               },
+
+    "PMSL_AV" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/PMSL_AV.nc",
+                  "reference-variable-name" : "PMSL_AV",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                   "regions" : regions,
+                  "time-series-operators" : time_series_operators
+               }, 
+
+    "SPEED_10M_AV" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/SPEED_10M_AV.nc",
+                  "reference-variable-name" : "SPEED_10M_AV",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                   "regions" : regions,
+                  "time-series-operators" : time_series_operators
+               },
+
+    "AEVAP_S" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/AEVAP_S.nc",
+                  "reference-variable-name" : "AEVAP_S",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                   "regions" : regions,
+                  "time-series-operators" : time_series_operators
+               },
+
+   "ALHFL_S" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/ALHFL_S.nc",
+                  "reference-variable-name" : "ALHFL_S",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                   "regions" : regions,
+                  "time-series-operators" : time_series_operators
+               },
+
+    "ALWU_S" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/ALWU_S.nc",
+                  "reference-variable-name" : "ALWU_S",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                   "regions" : regions,
+                  "time-series-operators" : time_series_operators
+               },
+
+    "ASHFL_S" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/ASHFL_S.nc",
+                  "reference-variable-name" : "ASHFL_S",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                   "regions" : regions,
+                  "time-series-operators" : time_series_operators
+               },
+
+    "AUMFL_S" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/AUMFL_S.nc",
+                  "reference-variable-name" : "AUMFL_S",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                   "regions" : regions,
+                  "time-series-operators" : time_series_operators
+               },
+
+    "AVMFL_S" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/IOW_ESM_CCLM_uncoupled/output/CCLM_RUN01/CCLM_Eurocordex/AVMFL_S.nc",
+                  "reference-variable-name" : "AVMFL_S",
+                  "seasons" : seasons,
+                  "percentiles" : percentiles,
+                  "stations" : stations,
+                   "regions" : regions,
+                  "time-series-operators" : time_series_operators
+               },
+
+ 
+}
+         
+
