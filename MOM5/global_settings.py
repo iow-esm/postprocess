@@ -14,6 +14,8 @@ stations = {
         "BY31" : {"lat" : "58.58", "lon" : "18.23"}        
 }
 
+regions = {}
+
 time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]
 
 variables = {
@@ -23,6 +25,7 @@ variables = {
                    "seasons" : seasons,
                    "percentiles" : percentiles, 
                    "stations" : stations,
+                   "regions" : regions,
                    "time-series-operators" : time_series_operators
              },
 
@@ -32,20 +35,23 @@ variables = {
                     "seasons" : seasons,
                     "percentiles" : percentiles,
                     "stations" : stations,
+                    "regions" : regions,
                     "time-series-operators" : time_series_operators
                  },  
-                 
     "SSH" : {      "seasons" : seasons,
-                   "percentiles" : percentiles, 
+                   "percentiles" : percentiles,
                    "stations" : stations,
+                   "regions" : regions, 
                    "time-series-operators" : time_series_operators
              },
 
     "SSS" : {       "seasons" : seasons,
                     "percentiles" : percentiles,
                     "stations" : stations,
+                    "regions" : regions,                  
                     "time-series-operators" : time_series_operators
-                 },                  
+                 },
+
 }
          
 
