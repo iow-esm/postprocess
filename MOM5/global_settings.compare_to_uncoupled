@@ -16,6 +16,10 @@ stations = {
 
 regions = {
     "BALTIC_SEA" : {"lat-min" : "52.0", "lat-max" : "67.0", "lon-min" : "8.0", "lon-max" : "32.0"},
+	"BOTHNIAN_GULF" : {"lat-min" : "60.6", "lat-max" : "66.0", "lon-min" : "16.0", "lon-max" : "26.0"},
+    "BALTIC_PROPER" : {"lat-min" : "53.0", "lat-max" : "60.6", "lon-min" : "14.0", "lon-max" : "23.0"},
+    "BELTS" : {"lat-min" : "53.0", "lat-max" : "60.6", "lon-min" : "8.0", "lon-max" : "14.0"},
+    "RIGA_FINLAND" : {"lat-min" : "56.5", "lat-max" : "60.6", "lon-min" : "23.0", "lon-max" : "31.5"},
 }
 
 
