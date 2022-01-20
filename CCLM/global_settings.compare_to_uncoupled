@@ -37,8 +37,8 @@ variables = {
                     "reference-variable-name" : "DAY_PREC",
                     "seasons" : seasons,
                     "percentiles" : percentiles,
-                    "stations" : stations
-                   "regions" : regions,,
+                    "stations" : stations,
+                   "regions" : regions,
                     "time-series-operators" : time_series_operators
                  },    
 
