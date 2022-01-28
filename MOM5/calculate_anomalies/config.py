@@ -1,4 +1,4 @@
-dependencies = ["seasonal_mean", "process_reference", "extract_stations"]
+dependencies = ["seasonal_mean", "process_reference", "extract_stations", "extract_regions"]
 
 import sys
 sys.path.append('../')
