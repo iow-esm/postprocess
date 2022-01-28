@@ -15,25 +15,29 @@ stations = {
         "BY31" : {"lat" : "58.58", "lon" : "18.23"}        
 }
 
-regions = {}
+regions = {
+    "BALTIC_SEA" : {"lat-min" : "52.0", "lat-max" : "67.0", "lon-min" : "8.0", "lon-max" : "32.0"},
+    "BOTHNIAN_GULF" : {"lat-min" : "60.6", "lat-max" : "66.0", "lon-min" : "16.0", "lon-max" : "26.0"},
+    "BALTIC_PROPER" : {"lat-min" : "53.0", "lat-max" : "60.6", "lon-min" : "14.0", "lon-max" : "23.0"},
+    "BELTS" : {"lat-min" : "53.0", "lat-max" : "60.6", "lon-min" : "8.0", "lon-max" : "14.0"},
+    "RIGA_FINLAND" : {"lat-min" : "56.5", "lat-max" : "60.6", "lon-min" : "23.0", "lon-max" : "31.5"},
+	}
 
 time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]
 
 variables = {
-    "SST" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/Copernicus/*-Baltic-ESACCI-L4_GHRSST-SSTdepth-OSTIA-GLOB_CDR2.0-v02.0-fv01.0.nc",
-                   "reference-variable-name" : "analysed_sst",
-                   "reference-additional-operators" : "-chname,lon,xt -chname,lat,yt -setattribute,analysed_sst@units=Celsius -subc,273.15",
-                   "seasons" : seasons,
+    "SST" : {      "seasons" : seasons,
                    "percentiles" : percentiles, 
                    "stations" : stations,
                    "regions" : regions,
-                   "time-series-operators" : time_series_operators
+                   "time-series-operators" : time_series_operators,
+                   #"reference-file-pattern" : "/scratch/usr/mvkkarst/obs/Copernicus/*-Baltic-ESACCI-L4_GHRSST-SSTdepth-OSTIA-GLOB_CDR2.0-v02.0-fv01.0.nc",
+                   #"reference-variable-name" : "analysed_sst",
+                   #"reference-additional-operators" : "-chname,lon,xt -chname,lat,yt -setattribute,analysed_sst@units=Celsius -subc,273.15",
+
              },
 
-    "FI" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/Copernicus/*-Baltic-ESACCI-L4_GHRSST-SSTdepth-OSTIA-GLOB_CDR2.0-v02.0-fv01.0.nc",
-                    "reference-variable-name" : "sea_ice_fraction",
-                    "reference-additional-operators" : "-chname,lon,xt -chname,lat,yt",
-                    "seasons" : seasons,
+    "FI" : {        "seasons" : seasons,
                     "percentiles" : percentiles,
                     "stations" : stations,
                     "regions" : regions,

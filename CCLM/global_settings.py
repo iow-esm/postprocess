@@ -25,54 +25,43 @@ regions = {
 time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]
 
 variables = {
-    "T_2M_AV" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/tg_ens_mean_0.1deg_reg_v23.1e.nc",
-                   "reference-variable-name" : "tg",
-                   "reference-additional-operators" : "-chname,longitude,lon -chname,latitude,lat -setattribute,tg@units=Kelvin -addc,273.15",
-                   "seasons" : seasons,
+    "T_2M_AV" : {  "seasons" : seasons,
                    "percentiles" : percentiles, 
                    "stations" : stations,
                    "regions" : regions,
                    "time-series-operators" : time_series_operators
              },
 
-    "DAY_PREC" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/rr_ens_mean_0.1deg_reg_v23.1e.nc",
-                    "reference-variable-name" : "rr",
-                    "reference-additional-operators" : "-chname,longitude,lon -chname,latitude,lat",
-                    "seasons" : seasons,
+    "DAY_PREC" : {  "seasons" : seasons,
                     "percentiles" : percentiles,
                     "stations" : stations,
                     "regions" : regions,
                     "time-series-operators" : time_series_operators
                  },    
 
-    "ASWD_S" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/qq_ens_mean_0.1deg_reg_v23.1e.nc",
-                  "reference-variable-name" : "qq",
-                  "reference-additional-operators" : "-chname,longitude,lon -chname,latitude,lat",
-                  "seasons" : seasons,
+    "ASWD_S" : {  "seasons" : seasons,
                   "percentiles" : percentiles,
                   "stations" : stations,
                   "regions" : regions,
                   "time-series-operators" : time_series_operators
                },  
                
-    "SPEED_10M_AV" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/fg_ens_mean_0.1deg_reg_v23.1e.nc",
-                  "reference-variable-name" : "fg",
-                  "reference-additional-operators" : "-setattribute,fg@missing_value=-9999s -chname,longitude,lon -chname,latitude,lat", # change missing value from string to number, otherwise problems with plotting
-                  "seasons" : seasons,
+    "SPEED_10M_AV" : {  "seasons" : seasons,
                   "percentiles" : percentiles,
                   "stations" : stations,
                   "regions" : regions,
                   "time-series-operators" : time_series_operators
                }, 
                
-    "PMSL_AV" : {  "reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/pp_ens_mean_0.1deg_reg_v23.1e.nc",
-                  "reference-variable-name" : "pp",
-                  "reference-additional-operators" : "-b f32 -chname,longitude,lon -chname,latitude,lat -setattribute,pp@units=Pa -mulc,100.0",
+    "PMSL_AV" : {  
                   "seasons" : seasons,
                   "percentiles" : percentiles,
                   "stations" : stations,
                   "regions" : regions,
-                  "time-series-operators" : time_series_operators
+                  "time-series-operators" : time_series_operators,
+                  #"reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/pp_ens_mean_0.1deg_reg_v23.1e.nc",
+                  #"reference-variable-name" : "pp",
+                  #"reference-additional-operators" : "-b f32 -chname,longitude,lon -chname,latitude,lat -setattribute,pp@units=Pa -mulc,100.0",
                }, 
 }
          
