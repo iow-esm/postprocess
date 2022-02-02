@@ -9,7 +9,18 @@ pwd = str(sys.argv[4])
 
 sys.path.append(pwd)
 import config
-remapping_file_path = config.remapping_file_path
+
+remapping_file_path = None
+remapping = None
+
+try:
+    remapping_file_path = config.remapping_file_path
+except:
+    try: 
+        remapping = config.remapping
+    except:
+        print("No remapping is specified!")
+        exit()
 
 sys.path.append('../../auxiliary')
 import get_all_dirs_from_to
@@ -18,6 +29,12 @@ dirs = get_all_dirs_from_to.get_all_dirs_from_to(out_dir, from_date, to_date)
 
 import create_results_dir
 results_dir = create_results_dir.create_results_dir(out_dir, from_date, to_date)
+
+if (remapping_file_path is None) and (remapping is not None):
+    remapping_file_path = results_dir + "/remapping.txt"
+    f = open(remapping_file_path, "w")
+    f.write(remapping)
+    f.close()
 
 # input variables from CCLM that are used
 variables = ["T_2M", "U_10M", "V_10M", "PMSL", "CLCT", "QV_2M", "TOT_PREC", "ASOB_S", "ALWD_S"]
