@@ -73,6 +73,7 @@ from plot_config import PlotConfig
 #                                       (if "reference-file-pattern" is set this must be set as well)
 # "reference-additional-operators" :    a string containing additional cdo operators applied to the reference files, e.g. commented examples below
 #                                       (if "reference-file-pattern" is set this must be set as well)
+# "plot-config-anomaly" :               a PlotConfig instance for plotting the difference between data and reference as given below (optional)
 
 variables = {
     "SST" : {      "seasons" : seasons,
@@ -84,6 +85,7 @@ variables = {
                    #"reference-file-pattern" : "/scratch/usr/mvkkarst/obs/Copernicus/*-Baltic-ESACCI-L4_GHRSST-SSTdepth-OSTIA-GLOB_CDR2.0-v02.0-fv01.0.nc",
                    #"reference-variable-name" : "analysed_sst",
                    #"reference-additional-operators" : "-chname,lon,xt -chname,lat,yt -setattribute,analysed_sst@units=Celsius -subc,273.15",
+                   #"plot-config-anomaly" : PlotConfig("SST", lon_name = "xt", lat_name = "yt", width = 1500000, height = 1800000, min_value = -6.5, max_value = 6.5, delta_value = 1.0, contour = True, color_map = 'seismic'),
              },
     "FI" : {        "seasons" : seasons,
                     "percentiles" : percentiles,

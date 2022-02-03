@@ -31,5 +31,10 @@ for var in global_settings.variables.keys():
             continue
         
         plot_configs[var + "-reference-" + season] = [config.clone(var, task_name="seasonal_mean", file=var + "-reference-" + season + ".nc")]
-        plot_configs[var + "-anomaly-" + season] = [template.clone(var, task_name="calculate_anomalies", file = var + "-" + season + ".nc", symmetric = True, color_map = 'seismic')]
+        
+        try:
+                anomaly_config = global_settings.variables[var]["plot-config-anomaly"].clone()
+        except:
+                anomaly_config = template.clone(symmetric = True, color_map = 'seismic')
+        plot_configs[var + "-anomaly-" + season] = [anomaly_config.clone(var, task_name="calculate_anomalies", file = var + "-" + season + ".nc")]
 

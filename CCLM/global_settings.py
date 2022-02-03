@@ -79,6 +79,7 @@ def convert_K2C(variable, units):
 #                                       (if "reference-file-pattern" is set this must be set as well)
 # "reference-additional-operators" :    a string containing additional cdo operators applied to the reference files, e.g. commented examples below
 #                                       (if "reference-file-pattern" is set this must be set as well)
+# "plot-config-anomaly" :               a PlotConfig instance for plotting the difference between data and reference as given below (optional)
 
 variables = {
     "T_2M_AV" : {  "seasons" : seasons,
@@ -90,6 +91,7 @@ variables = {
                    #"reference-file-pattern" : "/scratch/usr/mvkkarst/obs/E-OBS/tg_ens_mean_0.1deg_reg_v23.1e.nc",
                    #"reference-variable-name" : "tg",
                    #"reference-additional-operators" : "-chname,longitude,lon -chname,latitude,lat -setattribute,tg@units=Kelvin -addc,273.15",
+                   #"plot-config-anomaly" : PlotConfig("T_2M_AV", width=7000000, height=5000000, min_value = -6.5, max_value = 6.5, delta_value = 1.0, contour = True, color_map = 'seismic'),
              },
 
     "DAY_PREC" : {  "seasons" : seasons,
