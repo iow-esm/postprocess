@@ -37,7 +37,9 @@ for var in variables.keys():
         additional_operators = ""
         
     os.system("cdo " +  additional_operators + " -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files + " " + merge_file)
-    os.system("cdo chname," + variables[var]["name"] + "," + var + " " + merge_file + " tmp.nc; mv tmp.nc " + merge_file)
+    
+    if variables[var]["name"] != var:
+        os.system("cdo chname," + variables[var]["name"] + "," + var + " " + merge_file + " " + results_dir +"/tmp.nc; mv " + results_dir +"/tmp.nc " + merge_file)
 
     try: 
         try:
@@ -49,26 +51,3 @@ for var in variables.keys():
         os.system("cdo -remapbil," + remapping_file_path + "/" + variables[var]["remapping-file"] + " " + merge_file + " " + remapped_file)
     except:
         pass
-    
-    # for names, numbers in variables[var]["seasons"].items():
-        
-        # if variables[var]["percentiles"] != []:
-            # os.system("cdo timmin " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/minfile.nc")
-            # os.system("cdo timmax " + " -selmon," + numbers + " " + merge_file + " "  + results_dir + "/maxfile.nc")
-        
-        # for p in variables[var]["percentiles"]:
-            # output_file = results_dir + "/" + var + "-" + names + "-PCTL_" + p + ".nc"
-            # os.system("cdo timpctl," + p + " -selmon," + numbers + seldate + " " + merge_file + " " + results_dir + "/minfile.nc " + results_dir + "/maxfile.nc " + output_file)
-            # os.system("cdo chname," + variables[var]["name"] + "," + var + " " + output_file + " tmp.nc; mv tmp.nc " + output_file)
-            
-            # try: 
-                # remapped_file = output_file.split(".nc")[0] + "-remapped.nc"
-                # os.system("cdo -remapbil," + remapping_file_path + "/" + variables[var]["remapping-file"] + " " + output_file + " " + remapped_file)
-                # os.system("cdo chname," + variables[var]["name"] + "," + var + " " + remapped_file + " tmp.nc; mv tmp.nc " + remapped_file)
-            # except:
-                # pass
-                
-        # if variables[var]["percentiles"] != []: 
-            # os.system("rm " + results_dir + "/maxfile.nc " + results_dir + "/minfile.nc ")   
-            
-            
