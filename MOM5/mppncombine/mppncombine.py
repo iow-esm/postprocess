@@ -70,7 +70,7 @@ for dir in dirs:
     os.system(command)
     
     os.system("rm " + shellscript_name)
-        
+
     for f in files_to_process:
         
         # construct the pattern for all files that should be processed
@@ -84,44 +84,12 @@ for dir in dirs:
             continue
         
         # move the output file one level up (out_raw should be removed when everything is done)
-        os.system("mv " + dir + "/out_raw/" + output_file + " " + dir + "/" + output_file)
+        os.system("mv " + dir + "/out_raw/" + output_file + " " + dir + "/" + f + ".nc")
         os.system("rm " + dir + "/out_raw/" + files_pattern)
+        
     
-    # extract all variables from the files
-    shellscript_name = dir + "/extract_vars.sh"
-    shellscript = open(shellscript_name, 'w')
-    shellscript.writelines("files_to_process=" + files_array + "\n")
-    shellscript.writelines("cd " + dir + "/ " + "\n")
-    shellscript.writelines("for f in ${files_to_process[@]}; do " + "\n")
-    shellscript.writelines("    for var in `cdo -showname ${f}*.nc 2> /dev/null`; do " + "\n")
-    shellscript.writelines("        while [ `jobs | wc -l` -ge " + max_jobs + " ]; do sleep 1; done " + "\n")
-    shellscript.writelines("        cdo -selname,$var ${f}*.nc $var.nc &" + "\n")
-    shellscript.writelines("    done " + "\n")
-    shellscript.writelines("done " + "\n")
-    shellscript.writelines("wait " + "\n")
-    shellscript.writelines("for f in ${files_to_process[@]}; do " + "\n")
-    shellscript.writelines("    rm ${f}*.nc" + "\n")
-    shellscript.writelines("done " + "\n")
-    shellscript.close()
-    
-    command = "chmod u+x " + shellscript_name + "; source " + shellscript_name
-    print("execute: " + command, flush=True)
-    os.system(command)
-    
-    os.system("rm " + shellscript_name)
-     
-    # if ice concentration is available get the fraction of ice as a vertical sum over thickness
-    if glob.glob(dir + "/CN.nc") != []:
-        command = "cd " + dir + "/; "
-        command += "cdo vertsum CN.nc FI.nc; "
-        command += "cdo chname,CN,FI FI.nc tmp.nc && mv tmp.nc FI.nc; "
-        command += "cdo setattribute,FI@long_name=\"fraction of ice\" FI.nc tmp.nc && mv tmp.nc FI.nc; "
-        os.system(command)
-     
     # save station data
     os.system("mv " + dir + "/out_raw/" + station_pattern + " " + dir + "/")
     
     # check if any real files (no links) are left in raw output, if not remove
     os.system("if [ `find " + dir + "/out_raw/ -mindepth 1 ! -type l | wc -l` -eq 0 ]; then  rm -r " + dir + "/out_raw; fi")
-
-
