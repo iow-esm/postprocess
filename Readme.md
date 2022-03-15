@@ -25,31 +25,6 @@ in create_postprocess_task.ipynb.
 
 # Versions
 
-## 1.00.00 (latest release)
-
-| date        | author(s)   | commit      |
-|---          |---          |---          |
-| 2022-01-31  | SK          | 32db08787b  |     
-
-<details>
-
-### changes
-* initital release
-  * configured variables can be plotted and compared to a reference 
-    via seasonal means and time series for stations and regions
-    
-### dependencies
-* python environment as anaconda3 or miniconda3
-* cdo, nco, (texlive), see load module scripts for your target
-  
-### known issues
-* plotting on HLRN Berlin not yet possible due to missing python module basemap
-
-### tested with
-* intensively tested on Göttingen's HLRN machine on MOM5 and CCLM output
-
-</details>
-
 ## 1.01.00 (in preparation)
 
 | date        | author(s)   | commit      |
@@ -77,4 +52,30 @@ in create_postprocess_task.ipynb.
 * intensively tested on Göttingen's HLRN machine on MOM5 and CCLM output
 * apart from plotting also tested on Berlin's HLRN
   
+</details>
+
+
+## 1.00.00 (latest release)
+
+| date        | author(s)   | commit      |
+|---          |---          |---          |
+| 2022-01-31  | SK          | 32db08787b  |     
+
+<details>
+
+### changes
+* initital release
+  * configured variables can be plotted and compared to a reference 
+    via seasonal means and time series for stations and regions
+    
+### dependencies
+* python environment as anaconda3 or miniconda3
+* cdo, nco, (texlive), see load module scripts for your target
+  
+### known issues
+* plotting on HLRN Berlin not yet possible due to missing python module basemap
+
+### tested with
+* intensively tested on Göttingen's HLRN machine on MOM5 and CCLM output
+
 </details>
