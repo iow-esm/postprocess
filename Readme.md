@@ -17,21 +17,21 @@ Each user can add his/her own customized postprocess tasks as described at
 https://git.io-warnemuende.de/phy_drcs/notebook_collection 
 in create_postprocess_task.ipynb.
 
-***
 
 # Authors
     
 * SK      (sven.karsten@io-warnemuende.de)
 
-***
 
 # Versions
 
----
-
 ## 1.00.00 (latest release)
-                                                                     
-**2022-01-31 (SK)**
+
+| date        | author(s)   | commit      |
+|---          |---          |---          |
+| 2022-01-31  | SK          | 32db08787b  |     
+
+<details>
 
 ### changes
 * initital release
@@ -47,12 +47,16 @@ in create_postprocess_task.ipynb.
 
 ### tested with
 * intensively tested on Göttingen's HLRN machine on MOM5 and CCLM output
-  
----
+
+</details>
 
 ## 1.01.00 (in preparation)
 
-**2022-03-14 (SK)**
+| date        | author(s)   | commit      |
+|---          |---          |---          |
+| 2022-03-15  | SK          | XXX         |   
+
+<details>
 
 ### changes
 * added task generate_mom_forcing to CCLM's tasks
@@ -73,4 +77,4 @@ in create_postprocess_task.ipynb.
 * intensively tested on Göttingen's HLRN machine on MOM5 and CCLM output
 * apart from plotting also tested on Berlin's HLRN
   
---- 
+</details>
