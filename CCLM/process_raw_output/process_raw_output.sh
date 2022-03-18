@@ -71,7 +71,7 @@ for d in ${dirs[@]}; do
 		
 		# sum up rain 
 		if [ -f "RAIN_CON.nc" ] && [ -f "RAIN_GSP.nc" ]; then
-			cdo -setattribute,RAIN_TOT@long_name="total rainfall" -setattribute,RAIN_TOT@standard_name="total_rainfall_amount" -chname,RAIN_CON,RAIN_TOT -add RAIN_CON.nc RAIN_GSP.nc RAIN_TOT.n
+			cdo -setattribute,RAIN_TOT@long_name="total rainfall" -setattribute,RAIN_TOT@standard_name="total_rainfall_amount" -chname,RAIN_CON,RAIN_TOT -add RAIN_CON.nc RAIN_GSP.nc RAIN_TOT.nc
 		fi
 		
 		# sum up daily precipitation amount
