@@ -27,9 +27,9 @@ in create_postprocess_task.ipynb.
 
 ## 1.01.00 (in preparation)
 
-| date        | author(s)   | commit      |
-|---          |---          |---          |
-| 2022-03-15  | SK          | XXX         |   
+| date        | author(s)   | link                                                                            |
+|---          |---          |---                                                                              |
+| 2022-03-15  | SK          | XXX |   
 
 <details>
 
@@ -57,9 +57,9 @@ in create_postprocess_task.ipynb.
 
 ## 1.00.00 (latest release)
 
-| date        | author(s)   | commit      |
-|---          |---          |---          |
-| 2022-01-31  | SK          | 32db08787b  |     
+| date        | author(s)   | link                                                                              |
+|---          |---          |---                                                                                |
+| 2022-01-31  | SK          | [1.00.00](https://git.io-warnemuende.de/iow_esm/postprocess/src/branch/1.00.00)   |     
 
 <details>
 
