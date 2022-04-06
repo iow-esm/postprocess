@@ -23,17 +23,17 @@ for var in global_settings.variables.keys():
         transform_variable = None
         
     for operator in global_settings.variables[var]["time-series-operators"]:
+
+        if operator == "-monmean":
+            trend = True
+            std = False
+        else:
+            trend = False
+            std = True          
     
         temp = PlotConfig(var, task_name="extract_stations")
         
         for station in global_settings.variables[var]["stations"]:
-        
-            if operator == "-monmean":
-                trend = True
-                std = False
-            else:
-                trend = False
-                std = True   
 
             plot_configs[var + "-" + station + operator] = [temp.clone(file=var + "-" + station + operator + ".nc", title="model", trend=trend, std_deviation=std, transform_variable = transform_variable)]
             

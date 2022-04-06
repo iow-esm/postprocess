@@ -1,5 +1,14 @@
 import numpy as np
-from netCDF4 import Dataset, num2date, date2num
+from netCDF4 import Dataset
+from cftime import date2num
+
+# On some machines the num2date function yields problems when plotting the time series.
+# On these machines the num2pydate function has to be used if available
+try:
+    from cftime import num2pydate
+except:
+    from cftime import num2date as num2pydate
+
 from mpl_toolkits.basemap import Basemap
 
 import matplotlib.pyplot as plt
@@ -66,7 +75,7 @@ def read_time_series(plot_config, nc_file):
     
     time = fh.variables[time_name]
     time_units = time.units
-    time = num2date(np.squeeze(time[:]),time.units)
+    time = num2pydate(np.squeeze(time[:]),time.units)
     
     variable = np.squeeze(fh.variables[plot_config.variable][:])
     
@@ -187,7 +196,7 @@ def plot_on_map(plot_configs, results_dir):
 def plot_time_series(plot_configs, results_dir):
     for title in plot_configs.keys():
 
-        print("plotting: " + title + "...")
+        print("plotting: " + title + "...", flush=True)
         plt.figure(figsize=(12, 8), dpi=80)
         
         for plot_config in plot_configs[title]:
@@ -247,8 +256,8 @@ def plot_time_series(plot_configs, results_dir):
         plt.savefig(out_file)
         plt.close()
     
-        print(" plot saved in: " + out_file)
+        print(" plot saved in: " + out_file, flush=True)
         
         os.system("pdfcrop " + out_file + " " + out_file)
         
-        print("...done")
+        print("...done", flush=True)
