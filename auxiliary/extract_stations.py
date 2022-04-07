@@ -49,14 +49,19 @@ for var in variables.keys():
         operators = []
     
     stations = variables[var]["stations"]
+
+    # go over stations
     for station in stations.keys():
+        # extract the station's time series via the remapnn (nearest neighbor) operator from cdo
         command = "cdo -remapnn,lon=" + convert_to_decimal(stations[station]["lon"]) + "/lat=" + convert_to_decimal(stations[station]["lat"]) + " -cat \'" + files + "\' " + results_dir + "/" + var + "-" + station + ".nc"
         os.system(command)
         
+        # apply operators to the station time series
         for operator in operators:
             command = "cdo " + operator + " " + results_dir + "/" + var + "-" + station + ".nc" + " " + results_dir + "/" + var + "-" + station + operator + ".nc"
             os.system(command)
-            
+
+    # add standard deviation for mean operators
     for station in stations.keys():
         for operator in operators:
             if operator[-4:] == "mean":
@@ -77,7 +82,8 @@ for var in variables.keys():
                 
                 command = "rm " + std_file
                 os.system(command)   
-                
+      
+    # add a mean over all station time series (ensmean) and add the standard deviation to that mean         
     files = ""        
     for station in stations.keys():
         files += results_dir + "/" + var + "-" + station + ".nc "
@@ -98,6 +104,7 @@ for var in variables.keys():
     command = "rm " + results_dir + "/" + var + "_STD.nc"
     os.system(command)
     
+    # apply operators also to mean over stations
     for operator in operators:
         command = "cdo " + operator + " " + results_dir + "/" + var + "-ensmean.nc" + " " + results_dir + "/" + var + "-ensmean" + operator + ".nc"
         os.system(command)
