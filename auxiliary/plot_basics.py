@@ -79,17 +79,23 @@ def read_time_series(plot_config, nc_file):
     
     variable = np.squeeze(fh.variables[plot_config.variable][:])
     
-    # sort variable according to the time
-    szl = sorted(zip(time, variable))
-    time = np.array([element for element,_ in szl])
-    variable = np.array([element for _, element in szl])
-    
     units = fh.variables[plot_config.variable].units
     
     try:
         std = np.squeeze(fh.variables[plot_config.variable + "_STD"][:])
     except:
         std = None
+
+    # sort variable according to the time
+    szl = sorted(zip(time, variable))
+    
+    # sort standard deviation as well
+    if std is not None:
+        szl_std = sorted(zip(time, std))
+        std = np.array([element for _, element in szl_std])
+
+    time = np.array([element for element,_ in szl])
+    variable = np.array([element for _, element in szl])
         
     fh.close()
     
