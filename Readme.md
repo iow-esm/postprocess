@@ -41,6 +41,8 @@ in create_postprocess_task.ipynb.
     * mppncombine does merging of MOM's output
     * split_files generates subsequently "1 file per variable" pattern
 * fixed file ending .nc in CCLM/process_raw_output for total rain variable
+* fixed plotting of standard deviation in time series
+* remove results directory when rerunning a task
     
 ### dependencies
 * python environment as anaconda3 or miniconda3
