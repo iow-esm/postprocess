@@ -14,8 +14,7 @@ The goal is to provide scripts for
    * generate forcings for MOM5 from the CCLM output
 
 Each user can add his/her own customized postprocess tasks as described at
-https://git.io-warnemuende.de/phy_drcs/notebook_collection 
-in create_postprocess_task.ipynb.
+https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
 
 
 # Authors
@@ -29,7 +28,7 @@ in create_postprocess_task.ipynb.
 
 | date        | author(s)   | link                                                                            |
 |---          |---          |---                                                                              |
-| 2022-03-15  | SK          | XXX |   
+| 2022-04-21  | SK          | XXX |   
 
 <details>
 
@@ -43,6 +42,7 @@ in create_postprocess_task.ipynb.
 * fixed file ending .nc in CCLM/process_raw_output for total rain variable
 * fixed plotting of standard deviation in time series
 * remove results directory when rerunning a task
+* if no units are specified, arbitrary units "a.u." appear in the plot
     
 ### dependencies
 * python environment as anaconda3 or miniconda3

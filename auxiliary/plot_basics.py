@@ -61,7 +61,11 @@ def read_data(plot_config, nc_file):
     lons = fh.variables[lon_name][:]
     lats = fh.variables[lat_name][:]
     variable = fh.variables[plot_config.variable][:]
-    units = fh.variables[plot_config.variable].units
+    try:
+        units = fh.variables[plot_config.variable].units
+    except:
+        print("No units are specified. Take arbitrary units.")
+        units = "a.u."
     
     fh.close()
     
@@ -79,7 +83,11 @@ def read_time_series(plot_config, nc_file):
     
     variable = np.squeeze(fh.variables[plot_config.variable][:])
     
-    units = fh.variables[plot_config.variable].units
+    try:
+        units = fh.variables[plot_config.variable].units
+    except:
+        print("No units are specified. Take arbitrary units.")
+        units = "a.u."
     
     try:
         std = np.squeeze(fh.variables[plot_config.variable + "_STD"][:])
