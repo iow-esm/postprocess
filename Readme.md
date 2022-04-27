@@ -24,11 +24,11 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
 
 # Versions
 
-## 1.01.00 (in preparation)
+## 1.01.00 (latest release)
 
 | date        | author(s)   | link                                                                            |
 |---          |---          |---                                                                              |
-| 2022-04-21  | SK          | XXX |   
+| 2022-04-27  | SK          | [1.01.00](https://git.io-warnemuende.de/iow_esm/postprocess/src/branch/1.01.00) |   
 
 <details>
 
@@ -50,15 +50,25 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
   
 ### known issues
 * plotting on HLRN Berlin not yet possible due to missing python module basemap
+  * can be circumvented by creating own conda environment via
+  ``` bash
+  module load anaconda3/2019.10
+  conda init bash
+  conda create --name plotting
+  conda activate plotting
+  conda install basemap
+  conda install netCDF4
+  conda install xarray
+  ```
+  and adding `conda activate plotting` to your local `load_modules.sh` on blogin
 
 ### tested with
-* intensively tested on Göttingen's HLRN machine on MOM5 and CCLM output
-* apart from plotting also tested on Berlin's HLRN
+* intensively tested on Berlin's (with workaround) and on Göttingen's HLRN machine on MOM5 and CCLM output
   
 </details>
 
 
-## 1.00.00 (latest release)
+## 1.00.00 
 
 | date        | author(s)   | link                                                                              |
 |---          |---          |---                                                                                |
