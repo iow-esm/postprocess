@@ -60,7 +60,7 @@ for dir in dirs:
     shellscript.writelines("cd " + dir + "/out_raw/" + "\n")
     shellscript.writelines("for f in ${files_to_process[@]}; do " + "\n")
     shellscript.writelines("    while [ `jobs | wc -l` -ge " + max_jobs + " ]; do sleep 1; done " + "\n")
-    shellscript.writelines("    " + pwd + "/" + path_to_mppn + "/mppnccombine -n4 -m -k 0 ${f}*.nc.???? &" + "\n")
+    shellscript.writelines("    " + pwd + "/" + path_to_mppn + "/mppnccombine -r -n4 -m -k 0 ${f}.nc ${f}*.nc.???? &" + "\n")
     shellscript.writelines("done " + "\n")
     shellscript.writelines("wait " + "\n")
     shellscript.close()
@@ -85,7 +85,6 @@ for dir in dirs:
         
         # move the output file one level up (out_raw should be removed when everything is done)
         os.system("mv " + dir + "/out_raw/" + output_file + " " + dir + "/" + f + ".nc")
-        os.system("rm " + dir + "/out_raw/" + files_pattern)
         
     
     # save station data
