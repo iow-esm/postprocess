@@ -55,6 +55,8 @@ for var in variables.keys():
         os.system(command)
         
         for operator in operators:
+            if operator == "":
+                continue
             command = "cdo " + operator + " " + results_dir + "/" + var + "-" + station + ".nc" + " " + results_dir + "/" + var + "-" + station + operator + ".nc"
             os.system(command)
             

@@ -58,6 +58,8 @@ for var in variables.keys():
         
         # apply operators to the station time series
         for operator in operators:
+            if operator == "":
+                continue
             command = "cdo " + operator + " " + results_dir + "/" + var + "-" + station + ".nc" + " " + results_dir + "/" + var + "-" + station + operator + ".nc"
             os.system(command)
 
@@ -106,6 +108,8 @@ for var in variables.keys():
     
     # apply operators also to mean over stations
     for operator in operators:
+        if operator == "":
+            continue
         command = "cdo " + operator + " " + results_dir + "/" + var + "-ensmean.nc" + " " + results_dir + "/" + var + "-ensmean" + operator + ".nc"
         os.system(command)
         
