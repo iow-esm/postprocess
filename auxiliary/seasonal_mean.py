@@ -33,8 +33,11 @@ for var in variables.keys():
     for names, numbers in variables[var]["seasons"].items():
     
         output_file = results_dir + "/" + var + "-" + names + ".nc"
-        os.system("cdo -timmean -selmon," + numbers + " -cat \'" + files + "\' " + output_file)
-        
+        if numbers != "":
+            os.system("cdo -timmean -selmon," + numbers + " -cat \'" + files + "\' " + output_file)
+        else:
+            os.system("cdo -timmean -cat \'" + files + "\' " + output_file)
+
         try:
             try:
                 remapping_file_path = variables[var]["remapping-file-path"]

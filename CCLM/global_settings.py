@@ -5,11 +5,11 @@
 # Define seasons for which time averages will be calculated.
 # Note, the values in the dictionary must be valid input for the cdo operator "-selmon".
 seasons = {
-    "MAM" : "3,4,5",
-    "JJA" : "6,7,8",
-    "SON" : "9,10,11",
-    "DJF" : "12,1,2",
-    "year": "1,2,3,4,5,6,7,8,9,10,11,12"
+    #"MAM" : "3,4,5",
+    #"JJA" : "6,7,8",
+    #"SON" : "9,10,11",
+    #"DJF" : "12,1,2",
+    "mean": ""
 }
 
 # Percentiles are not supproted currently, leave empty!
@@ -40,7 +40,8 @@ regions = {
 }
 
 # Define cdo operators which will be applied to the time series.
-time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]
+time_series_operators = []
+#time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]
 
 
 ##########################################################################
