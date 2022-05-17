@@ -40,7 +40,7 @@ regions = {
 }
 
 # Define cdo operators which will be applied to the time series.
-time_series_operators = []
+time_series_operators = [""]
 #time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]
 
 
