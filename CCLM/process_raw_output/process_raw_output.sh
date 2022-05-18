@@ -31,7 +31,7 @@ for d in ${dirs[@]}; do
 		fi
 		# create individual files for the variables
 		if [ -f ${o}.nc ]; then
-			for var in `cdo -showname ${o}.nc`; do 
+			for var in `cdo -showname ${o}.nc | head -n -1`; do 
 				while [ `jobs | wc -l` -ge ${max_jobs} ]; do sleep 1; done
 				cdo -selname,$var ${o}.nc $var.nc &
 			done
