@@ -5,9 +5,9 @@ from cftime import date2num
 # On some machines the num2date function yields problems when plotting the time series.
 # On these machines the num2pydate function has to be used if available
 try:
-    from cftime import num2pydate
+    from cftime import num2pydate as num2date
 except:
-    from cftime import num2date as num2pydate
+    from cftime import num2date
 
 from mpl_toolkits.basemap import Basemap
 
@@ -79,8 +79,13 @@ def read_time_series(plot_config, nc_file):
     
     time = fh.variables[time_name]
     time_units = time.units
-    time = num2pydate(np.squeeze(time[:]),time.units)
-    
+    try:
+        calendar = time.calendar
+    except:
+        calendar = "standard"
+
+    time = num2date(np.squeeze(time[:]), time.units, calendar=calendar)
+
     variable = np.squeeze(fh.variables[plot_config.variable][:])
     
     try:
