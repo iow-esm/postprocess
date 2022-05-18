@@ -54,7 +54,7 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
   conda install xarray
   ```
   and adding `conda activate plotting` to your local `load_modules.sh` on blogin
-* plotting time series on HLRN Göttingen with calendar "proleptic_gregorian" might be a problem
+* plotting time series sporadically fails due to yet unknown reason
 
 ### tested with
 * intensively tested on Berlin's (with workaround) and on Göttingen's HLRN machine on MOM5 and CCLM output
