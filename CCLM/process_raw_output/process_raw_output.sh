@@ -31,7 +31,7 @@ for d in ${dirs[@]}; do
 		fi
 		# create individual files for the variables
 		if [ -f ${o}.nc ]; then
-			for var in `cdo -showname ${o}.nc | head -n -1`; do 
+			for var in `cdo -showname ${o}.nc 2>&1 | grep -v "showname:"`; do 
 				while [ `jobs | wc -l` -ge ${max_jobs} ]; do sleep 1; done
 				cdo -selname,$var ${o}.nc $var.nc &
 			done
@@ -46,7 +46,7 @@ for d in ${dirs[@]}; do
 				cdo mergetime lffd*${s}.nc ${o}_${s}.nc && rm lffd*${s}.nc
 			fi
 			if [ -f ${o}_${s}.nc ]; then
-				for var in `cdo -showname ${o}_${s}.nc | head -n -1`; do  # skip last line showing info
+				for var in `cdo -showname ${o}_${s}.nc  2>&1 | grep -v "showname:"`; do  # skip last line showing info
 					while [ `jobs | wc -l` -ge ${max_jobs} ]; do sleep 1; done
 					cdo -selname,$var ${o}_${s}.nc ${var}_${s}.nc &
 				done
