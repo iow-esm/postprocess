@@ -51,7 +51,7 @@ for dir in dirs:
     shellscript.writelines("files_to_process=" + files_array + "\n")
     shellscript.writelines("cd " + dir + "/ " + "\n")
     shellscript.writelines("for f in ${files_to_process[@]}; do " + "\n")
-    shellscript.writelines("    for var in `cdo -showname ${f}  2>&1 | grep -v \"showname:\"`; do " + "\n") # skip last line showing info
+    shellscript.writelines("    for var in `cdo -showname ${f}  2> /dev/null | grep -v \"showname:\"`; do " + "\n") # skip last line showing info
     shellscript.writelines("        while [ `jobs | wc -l` -ge " + max_jobs + " ]; do sleep 1; done " + "\n")
     shellscript.writelines("        cdo -selname,$var ${f} $var.nc &" + "\n")
     shellscript.writelines("    done " + "\n")
