@@ -24,11 +24,11 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
 
 # Versions
 
-## 1.01.02 (in preparation)
+## 1.01.02 (latest release)
 
 | date        | author(s)   | link                                                                            |
 |---          |---          |---                                                                              |
-| 2022-05-18  | SK          | XXX |   
+| 2022-05-31  | SK          | [1.01.02](https://git.io-warnemuende.de/iow_esm/postprocess/src/branch/1.01.02) |   
 
 <details>
 
@@ -61,7 +61,7 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
   
 </details>
 
-## 1.01.01 (latest release)
+## 1.01.01 
 
 | date        | author(s)   | link                                                                            |
 |---          |---          |---                                                                              |
