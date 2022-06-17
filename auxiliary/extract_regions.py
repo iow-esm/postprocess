@@ -71,7 +71,7 @@ for var in variables.keys():
                 command = "cdo " + std_operator + " " + results_dir + "/" + var + "-" + station + ".nc" + " " + std_file   
                 os.system(command)
                 
-                command = "for var in `cdo showname " + std_file + "`; do "
+                command = "for var in `cdo showname " + std_file + " 2> /dev/null | grep -v \"showname:\"`; do "
                 command += "cdo chname,$var,${var}_STD " + std_file + " tmp.nc; mv tmp.nc " + std_file + "; done"
                 os.system(command)
                 
