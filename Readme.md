@@ -24,6 +24,46 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
 
 # Versions
 
+## 1.02.00 (in preparation)
+
+| date        | author(s)   | link                                                                            |
+|---          |---          |---                                                                              |
+| 2022-07-08  | SK          | XXX |   
+
+<details>
+
+### changes
+* plotting of seasonally averaged vertical profiles has been added
+  * variable must be a 4D (3 space + 1 time) variable
+  * dimension must be marked in global_settings.py as dicitonary entry "dimension" 
+    with integer value, e.g 3 or 4 for 3- or 4-dimensional field, respectively
+  * default dimension is assumed to be 3 (backward compatible)
+* seasonal means provide now standard deviation variables
+    
+### dependencies
+* python environment as anaconda3 or miniconda3
+* cdo, nco, (texlive), see load module scripts for your target
+  
+### known issues
+* plotting on HLRN Berlin not yet possible due to missing python module basemap
+  * can be circumvented by creating own conda environment via
+  ``` bash
+  module load anaconda3/2019.10
+  conda init bash
+  conda create --name plotting
+  conda activate plotting
+  conda install basemap
+  conda install netCDF4
+  conda install xarray
+  ```
+  and adding `conda activate plotting` to your local `load_modules.sh` on blogin
+* plotting time series sporadically fails due to yet unknown reason
+
+### tested with
+* intensively tested on Berlin's (with workaround) and on Göttingen's HLRN machine on MOM5 and CCLM output
+  
+</details>
+
 ## 1.01.02 (latest release)
 
 | date        | author(s)   | link                                                                            |

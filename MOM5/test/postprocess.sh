@@ -13,15 +13,17 @@ cd ../process_reference
 ./postprocess.sh ${out_dir} ${from_date} ${to_date}
 #----------------------------------------------------
 
-cd ../seasonal_mean
-./postprocess.sh ${out_dir} ${from_date} ${to_date} &
-
 cd ../extract_regions
 ./postprocess.sh ${out_dir} ${from_date} ${to_date} &
 
 cd ../extract_stations
 ./postprocess.sh ${out_dir} ${from_date} ${to_date}
 wait
+
+#----------------------------------------------------
+
+cd ../seasonal_mean
+./postprocess.sh ${out_dir} ${from_date} ${to_date}
 
 #----------------------------------------------------
 

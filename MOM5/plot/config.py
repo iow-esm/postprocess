@@ -13,6 +13,15 @@ template = PlotConfig("", lon_name = "xt", lat_name = "yt", width = 1500000, hei
 plot_configs = {}
 
 for var in global_settings.variables.keys():
+
+    # check the dimensionality of the variable (only 3D (2 spatial + time) can be plotted on map)
+    try:
+        dimension = global_settings.variables[var]["dimension"]
+    except:
+        dimension = 3
+
+    if dimension != 3:
+        continue
     
     try:
         config = global_settings.variables[var]["plot-config"].clone()

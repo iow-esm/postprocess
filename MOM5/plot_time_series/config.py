@@ -16,6 +16,14 @@ plot_configs = {}
 
 for var in global_settings.variables.keys():
     
+    # check the dimensionality of the variable (only station/region data of 3D (2 spatial + time) variable can be plotted as time series)
+    try:
+        dimension = global_settings.variables[var]["dimension"]
+    except:
+        dimension = 3
+
+    if dimension != 3:
+        continue    
         
     for operator in global_settings.variables[var]["time-series-operators"]:
 

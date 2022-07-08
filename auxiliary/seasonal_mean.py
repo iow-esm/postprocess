@@ -38,6 +38,15 @@ for var in variables.keys():
         else:
             os.system("cdo -timmean -cat \'" + files + "\' " + output_file)
 
+        # add standard deviation to seasonal mean
+        cmd = "for var in `cdo -showname "+output_file+"  2> /dev/null | grep -v \"showname:\"`; do "
+        if numbers != "":
+            cmd += "cdo -chname,$var,${var}_STD -timstd -selmon," + numbers + " -cat \'" + files + "\' " + output_file+"_STD; "
+        else:
+            cmd += "cdo -chname,$var,${var}_STD -timstd -cat \'" + files + "\' " + output_file+"_STD; "
+        cmd += "cdo merge "+output_file+" "+output_file+"_STD tmp.nc; rm "+output_file+"_STD; mv tmp.nc "+output_file+"; done"
+        os.system(cmd)
+
         try:
             try:
                 remapping_file_path = variables[var]["remapping-file-path"]
