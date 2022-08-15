@@ -76,5 +76,8 @@ for dir in dirs:
         command += "cdo setattribute,FI@long_name=\"fraction of ice\" FI.nc tmp.nc && mv tmp.nc FI.nc; "
         os.system(command)
      
-
+        command = "cd " + dir + "/; "
+        command += "cdo -mul -gtc,0.01 HI.nc -mul FI.nc -gtc,0.1 FI.nc tmp.nc; " # filter out cells with less than 10% coverage and cells with ice thinner than 1cm
+        command += "cdo -setattribute,ice_extent@long_name=\"ice extent\" -setattribute,ice_extent@standard_name=\"ice extent\" -setattribute,ice_extent@units=\"km^2\"  -mulc,0.000001 -chname,cell_area,ice_extent -fldsum -mul -gridarea FI.nc tmp.nc ice_extent.nc; rm tmp.nc" # multiply filtered ice coverage with grid area and sumover area fractions
+        os.system(command)
 
