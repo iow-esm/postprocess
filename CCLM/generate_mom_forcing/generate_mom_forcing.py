@@ -37,7 +37,7 @@ if (remapping_file_path is None) and (remapping is not None):
     f.close()
 
 # input variables from CCLM that are used
-variables = ["T_2M", "U_10M", "V_10M", "PMSL", "CLCT", "QV_2M", "TOT_PREC", "ASOB_S", "ALWD_S"]
+variables = ["T_2M", "U_10M", "V_10M", "PMSL", "CLCT", "QV_2M", "TOT_PREC", "ASWD_S", "ALWD_S"]
 
 for i, dir in enumerate(dirs):
     # make output directory according to time slice of input directory
@@ -203,8 +203,8 @@ for i, dir in enumerate(dirs):
     
     ##### shortwave radiation ASOB_S -> swdn
     cmd = "cdo "
-    cmd += "-L -chname,ASOB_S,swdn -remapbil," + remapping_file_path 
-    cmd += " " + output_dir + "/ASOB_S.nc " + output_dir + "/swdn.mom.dta.nc"
+    cmd += "-L -chname,ASWD_S,swdn -remapbil," + remapping_file_path 
+    cmd += " " + output_dir + "/ASWD_S.nc " + output_dir + "/swdn.mom.dta.nc"
     os.system(cmd)
     
     cmd = "ncatted -a cartesian_axis,lon,o,c,X -a cartesian_axis,lat,o,c,Y " + output_dir + "/swdn.mom.dta.nc"
