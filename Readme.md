@@ -28,11 +28,14 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
 
 | date        | author(s)   | link                                                                            |
 |---          |---          |---                                                                              |
-| 2022-07-08  | SK          | XXX |   
+| 2022-09-01  | SK          | XXX |   
 
 <details>
 
 ### changes
+* result directories can have prefix that is defined as "name" in global_settings.py
+* fixed bug with empty stations and regions
+* ice extent is calculated during processing of raw output
 * plotting of seasonally averaged vertical profiles has been added
   * variable must be a 4D (3 space + 1 time) variable
   * dimension must be marked in global_settings.py as dicitonary entry "dimension" 
