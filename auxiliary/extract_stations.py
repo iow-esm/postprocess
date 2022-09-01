@@ -33,6 +33,11 @@ def convert_to_decimal(value):
 # go over all variables from where we extract (as defined in the local config)
 for var in variables.keys():
 
+    stations = variables[var]["stations"]
+
+    if not stations:
+        continue
+
     try:
         files = glob.glob(variables[var]["path"] + "/" + variables[var]["file"])
     except:
@@ -47,8 +52,6 @@ for var in variables.keys():
         operators = variables[var]["operators"]
     except:
         operators = []
-    
-    stations = variables[var]["stations"]
 
     # go over stations
     for station in stations.keys():

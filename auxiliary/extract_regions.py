@@ -33,6 +33,11 @@ def convert_to_decimal(value):
 # go over all variables from where we extract (as defined in the local config)
 for var in variables.keys():
 
+    stations = variables[var]["regions"]
+
+    if not stations:
+        continue
+
     try:
         files = glob.glob(variables[var]["path"] + "/" + variables[var]["file"])
     except:
@@ -48,7 +53,7 @@ for var in variables.keys():
     except:
         operators = []
     
-    stations = variables[var]["regions"]
+
     for station in stations.keys():
         lonlatbox = convert_to_decimal(stations[station]["lon-min"]) + "," + convert_to_decimal(stations[station]["lon-max"]) + "," + convert_to_decimal(stations[station]["lat-min"]) + "," + convert_to_decimal(stations[station]["lat-max"])
         command = "cdo -fldmean -sellonlatbox," + lonlatbox + " -cat \'" + files + "\' " + results_dir + "/" + var + "-" + station + ".nc"
