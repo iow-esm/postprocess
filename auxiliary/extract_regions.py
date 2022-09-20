@@ -46,7 +46,16 @@ for var in variables.keys():
         except:
             files = [dir + "/" + var + ".nc" for dir in dirs]
             
-    files = " ".join(files)
+    if files == []:
+        print("No netcdf files found for variable "+var)
+        continue
+
+    cat_file = results_dir + "/" + var + ".nc"
+    if len(files) > 1:       
+        files = " ".join(files)
+        os.system("cdo  -cat \'" + files + "\' " + cat_file)
+    else:
+        os.system("cp "+files[0]+" "+cat_file)
     
     try:
         operators = variables[var]["operators"]
@@ -56,7 +65,7 @@ for var in variables.keys():
 
     for station in stations.keys():
         lonlatbox = convert_to_decimal(stations[station]["lon-min"]) + "," + convert_to_decimal(stations[station]["lon-max"]) + "," + convert_to_decimal(stations[station]["lat-min"]) + "," + convert_to_decimal(stations[station]["lat-max"])
-        command = "cdo -fldmean -sellonlatbox," + lonlatbox + " -cat \'" + files + "\' " + results_dir + "/" + var + "-" + station + ".nc"
+        command = "cdo -fldmean -sellonlatbox," + lonlatbox + " " + cat_file + " " + results_dir + "/" + var + "-" + station + ".nc"
         os.system(command)
         
         for operator in operators:
@@ -64,7 +73,10 @@ for var in variables.keys():
                 continue
             command = "cdo " + operator + " " + results_dir + "/" + var + "-" + station + ".nc" + " " + results_dir + "/" + var + "-" + station + operator + ".nc"
             os.system(command)
-            
+
+    os.system("rm " + cat_file)
+
+    # add standard deviation for mean operators
     for station in stations.keys():
         for operator in operators:
             if operator[-4:] == "mean":
