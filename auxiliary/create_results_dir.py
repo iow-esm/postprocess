@@ -8,7 +8,10 @@ def create_results_dir(out_dir, from_date, to_date):
     sys.path.append(pwd+"/../")
     try:
         from global_settings import name
-        prefix = name+"_"
+        if (name is not None) and (name != ""):
+            prefix = name+"_"
+        else:
+            prefix = ""
     except:
         prefix = ""
 
