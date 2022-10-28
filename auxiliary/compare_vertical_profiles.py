@@ -53,7 +53,7 @@ for var in variables.keys():
     seasons = variables[var]["seasons"]
     stations = variables[var]["stations"]
 
-    fig, axs = plt.subplots(len(stations), len(seasons), figsize=(3*len(seasons), 5*len(stations)), sharex=True, sharey='row')
+    fig, axs = plt.subplots(len(stations), len(seasons), figsize=(3*len(seasons), 5*len(stations)), sharex=True, sharey='row', squeeze=0)
 
     for i, station in enumerate(stations):
         for j, season in enumerate(seasons.keys()):
