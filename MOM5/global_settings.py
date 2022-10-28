@@ -23,10 +23,10 @@ percentiles = []
 # Note, longitudes and latitudes can be in decimal format or in degrees, minutes and seconds separated by a colon.
 # Leave empty if no stations are desired.
 stations = { 
-        "BY5" : {"lat" : "55.25", "lon" : "15.98"},
-        "F9" : {"lat" : "64.71", "lon" : "22.07"},
-        "SR5" : {"lat" : "61.08", "lon" : "19.58"},
-        "BY31" : {"lat" : "58.58", "lon" : "18.23"}        
+        "BY5" : {"lat" : "55.25", "lon" : "15.98", "alternative-names" : ["BornholmdeepBY5"]},
+        "F9" : {"lat" : "64.71", "lon" : "22.07", "alternative-names" : ["BothnianBayF9"]},
+        "SR5" : {"lat" : "61.08", "lon" : "19.58", "alternative-names" : ["BothnianSeaSR5"]},
+        "BY31" : {"lat" : "58.58", "lon" : "18.23", "alternative-names" : ["LandsortDeepBY31"]}        
 }
 
 # Define regions over which a spatial average will be performed.

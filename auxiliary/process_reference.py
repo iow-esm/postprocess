@@ -26,7 +26,13 @@ except:
 
 for var in variables.keys():	
 
-    files = sorted(glob.glob(variables[var]["file-pattern"]))
+    try: 
+        variables[var]["reference-file-pattern"]
+    except:
+        print("No reference is given for " + var)
+        continue
+
+    files = sorted(glob.glob(variables[var]["reference-file-pattern"]))
     files = " ".join(files)
     
     merge_file = results_dir + "/" + var + ".nc"
@@ -36,10 +42,10 @@ for var in variables.keys():
     except:
         additional_operators = ""
         
-    os.system("cdo " +  additional_operators + " -selvar," + variables[var]["name"] + sellonlatbox + seldate +  " -mergetime " + files + " " + merge_file)
+    os.system("cdo " +  additional_operators + " -selvar," + variables[var]["reference-variable-name"] + sellonlatbox + seldate +  " -mergetime " + files + " " + merge_file)
     
-    if variables[var]["name"] != var:
-        os.system("cdo chname," + variables[var]["name"] + "," + var + " " + merge_file + " " + results_dir +"/tmp.nc; mv " + results_dir +"/tmp.nc " + merge_file)
+    if variables[var]["reference-variable-name"] != var:
+        os.system("cdo chname," + variables[var]["reference-variable-name"] + "," + var + " " + merge_file + " " + results_dir +"/tmp.nc; mv " + results_dir +"/tmp.nc " + merge_file)
 
     try: 
         try:
@@ -48,6 +54,11 @@ for var in variables.keys():
             remapping_file_path = "../create_remapping_files/" + results_dir # default if no path is given
             
         remapped_file = merge_file.split(".nc")[0] + "-remapped.nc"
-        os.system("cdo -remapbil," + remapping_file_path + "/" + variables[var]["remapping-file"] + " " + merge_file + " " + remapped_file)
+        remapping_file = "grid_" + var + ".txt"
+
+        os.system("cdo -remapbil," + remapping_file_path + "/" + remapping_file + " " + merge_file + " " + remapped_file)
     except:
         pass
+
+import process_BED
+process_BED.process_BED(variables, results_dir, from_date, to_date)
