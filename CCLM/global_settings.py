@@ -51,7 +51,7 @@ time_series_operators = [""]
 # To customize the plotting you can import the PlotConfig class, see below for usage examples.
 # If you leave that out, the plots will have gneric color maps and values ranges.
 import sys
-sys.path.append('../auxiliary')
+sys.path.append('../../auxiliary') # is executed in postprocess/MOM5/<task_name>
 from plot_config import PlotConfig
 
 # You can also pass transformation functions to the PlotConfig. The arguments must be variable in units.
