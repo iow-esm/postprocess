@@ -75,6 +75,7 @@ def process_BED(variables, results_dir, from_date, to_date):
 
             try:
                 station_names = variables[var]["stations"]["alternative-names"]
+                station_names.append(station)
                 for name in station_names:
                     for rf in ref_files:
                         if name in rf:

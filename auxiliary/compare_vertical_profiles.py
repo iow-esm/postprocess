@@ -46,9 +46,16 @@ ref_dir = pwd+"/../process_reference/{results_dir}"
 for var in variables.keys():
 
     try:
-        variables[var]['BED-reference-file-pattern']
+        if variables[var]['dimension'] != 4:
+            continue
     except:
         continue
+
+    try:
+        variables[var]['BED-reference-file-pattern']
+        bed_ref = True
+    except:
+        bed_ref = False
 
     seasons = variables[var]["seasons"]
     stations = variables[var]["stations"]
@@ -58,13 +65,15 @@ for var in variables.keys():
     for i, station in enumerate(stations):
         for j, season in enumerate(seasons.keys()):
             
-            ds = xr.open_dataset(ref_dir+"/"+var+"-"+station+"-"+season+".nc")
-            plot_vertical_profile.plot_vertical_profile(axs[i,j], ds[var].data, ds.depth.data, ds[var+"_STD"].data, smooth=True, label = "reference", color="grey")
-
+            if bed_ref:
+                ds = xr.open_dataset(ref_dir+"/"+var+"-"+station+"-"+season+".nc")
+                plot_vertical_profile.plot_vertical_profile(axs[i,j], ds[var].data, ds.depth.data, ds[var+"_STD"].data, smooth=False, label = "reference", color="grey", marker = "o")
+                ds.close()
+                
             for model in model_dirs.keys():
                 ds = xr.open_dataset(model_dirs[model]+"/"+var+"-"+station+"-"+season+".nc")
                 plot_vertical_profile.plot_vertical_profile(axs[i,j], np.squeeze(ds[var].data), ds[variables[var]["plot-config"].vert_name].data, np.squeeze(ds[var+"_STD"].data), label = model)
-
+                
             axs[i,j].set_xlim([variables[var]["plot-config"].min_value, variables[var]["plot-config"].max_value])
             
             if i == 0:
@@ -76,6 +85,8 @@ for var in variables.keys():
                 axs[i,j].yaxis.set_label_position("right")
             if i == (len(stations) - 1):
                 axs[i,j].set_xlabel(var+" ["+ds[var].units+"]")
+
+            ds.close()
 
     axs[0,0].legend()
     fig.tight_layout()  

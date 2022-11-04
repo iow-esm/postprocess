@@ -8,6 +8,7 @@ def plot_vertical_profile(ax,
                           linestyle = "-",
                           linewidth=3,
                           color = None,
+                          marker = None
                           ):
             
     import matplotlib.pyplot as plt
@@ -17,9 +18,9 @@ def plot_vertical_profile(ax,
     ax.grid(axis='x', linestyle='--')
 
     if smooth: 
-        p = ax.plot(data, -depths, marker = "o", linestyle="", label=label, color=color)
+        p = ax.plot(data, -depths, marker = marker, linestyle="", label=label, color=color)
     else:
-        p = ax.plot(data, -depths, marker = "", linestyle=linestyle, linewidth=linewidth, label=label, color=color)
+        p = ax.plot(data, -depths, marker = marker, linestyle=linestyle, linewidth=linewidth, label=label, color=color)
         
     if smooth:    
         spl = make_interp_spline(depths, data, k=3)  # type: BSpline
