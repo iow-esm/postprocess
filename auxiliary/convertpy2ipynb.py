@@ -1,16 +1,17 @@
-def convertpy2ipynb(script_name):
+def convertpy2ipynb(script_name, cell_type = "code"):
 
     with open(script_name, "r") as f:
         lines = f.readlines()
 
-    header = """
-    {
+    header = f"""
+    {{
     "cells": [
-    {
-    "cell_type": "code",
-    "execution_count": null,
-    "metadata": {},
+    {{
+    "cell_type": "{cell_type}",
     "outputs": [],
+    "execution_count": null,
+    "metadata": {{}},
+
     "source": [
     """
     source = ["    \""+line.strip("\n").replace("\"","\\\"")+"\\n\",\n" for line in lines]
