@@ -25,9 +25,6 @@ sys.path.append('../')
 import global_settings
 variables = global_settings.variables
 
-sys.path.append(pwd+"/../../auxiliary")
-import plot_vertical_profile
-
 os.chdir(pwd+"/{results_dir}")
 
 import matplotlib.pyplot as plt
@@ -40,6 +37,15 @@ model_dirs = {{"model1" : pwd+"/../calculate_anomalies/{results_dir}"}}
 ref_dir = pwd+"/../process_reference/{results_dir}"
 
 models = list(model_dirs.keys())
+if len(models) > 1:
+    compare = True
+    errors = {{}}
+    stds = {{}}
+    import colorsys
+    HSV_tuples = [(x*1.0/(len(models)), 0.5, 0.7) for x in range(len(models))]
+    RGB_tuples = list(map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples))    
+else:
+    compare = False
 
 for var in variables.keys():
 
@@ -67,6 +73,11 @@ for var in variables.keys():
     fig, axs = plt.subplots(len(models), len(seasons), figsize=(4*len(seasons), 4*len(models)), sharex='col', sharey='row', squeeze=0, gridspec_kw={{"width_ratios": (len(seasons)-1)*[1] + [1.25]}})
 
     for i, model in enumerate(models):
+
+        if compare:
+            errors[model] = []
+            stds[model] = []
+
         for j, season in enumerate(seasons):
             
             ds = xr.open_dataset(model_dirs[model]+"/"+var+"-"+season+".nc")
@@ -103,9 +114,31 @@ for var in variables.keys():
 
             axs[i,j].grid(linestyle='--', alpha=0.6)
 
+            if compare:
+                dummy = ds_var.values.ravel()
+                dummy = np.abs(dummy[~np.isnan(dummy)])
+                errors[model].append(np.mean(dummy))
+                stds[model].append(np.std(dummy))
+
+            ds.close()
+
     fig.tight_layout()  
     plt.subplots_adjust(wspace=0, hspace=0)
     fig.savefig(var+".png", dpi=100)
+
+    if not compare:
+        continue
+        
+    fig, axs = plt.subplots(1, len(seasons), figsize=(4*len(seasons), 4), sharey='row', squeeze=0)
+    
+    for j, season in enumerate(seasons):
+        for i, model in enumerate(models):
+            axs[0,j].bar(model, errors[model][j], yerr=stds[model][j], color=RGB_tuples[i], ecolor=RGB_tuples[i], label=model)
+            axs[0,j].plot([i,len(models)-1+0.4],[errors[model][j],errors[model][j]], color=RGB_tuples[i], alpha=0.5, linestyle="--")
+            
+    fig.tight_layout()  
+    plt.subplots_adjust(wspace=0, hspace=0)
+    fig.savefig(var+"2.png", dpi=100)
 """
 
 f = open(pwd+"/"+results_dir+"/compare_2D_anomalies.py", "w")
