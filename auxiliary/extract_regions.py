@@ -21,14 +21,7 @@ dirs = get_all_dirs_from_to.get_all_dirs_from_to(out_dir, from_date, to_date)
 import create_results_dir
 results_dir = create_results_dir.create_results_dir(out_dir, from_date, to_date)
 
-def convert_to_decimal(value):
-    if ":" not in value:
-        return value
-    
-    tmp = value.split(":")
-    decimal_value = float(tmp[0]) + float(tmp[1])/60.0 + float(tmp[2])/3600.0
-    
-    return str(decimal_value)
+from helpers import convert_to_decimal
 
 # go over all variables from where we extract (as defined in the local config)
 for var in variables.keys():
@@ -64,9 +57,25 @@ for var in variables.keys():
     
 
     for station in stations.keys():
-        lonlatbox = convert_to_decimal(stations[station]["lon-min"]) + "," + convert_to_decimal(stations[station]["lon-max"]) + "," + convert_to_decimal(stations[station]["lat-min"]) + "," + convert_to_decimal(stations[station]["lat-max"])
-        command = "cdo -fldmean -sellonlatbox," + lonlatbox + " " + cat_file + " " + results_dir + "/" + var + "-" + station + ".nc"
-        os.system(command)
+
+        try:
+            maskfile = stations[station]["maskfile"]
+        except:
+            maskfile = None
+
+        if maskfile is None:
+            lonlatbox = convert_to_decimal(stations[station]["lon-min"]) + "," + convert_to_decimal(stations[station]["lon-max"]) + "," + convert_to_decimal(stations[station]["lat-min"]) + "," + convert_to_decimal(stations[station]["lat-max"])
+            command = "cdo -fldmean -sellonlatbox," + lonlatbox + " " + cat_file + " " + results_dir + "/" + var + "-" + station + ".nc"
+            os.system(command)
+        else:
+            try:
+                if variables[var]["task"] == "process_reference":
+                    maskfile = "-remapnn,"+cat_file+" "+maskfile
+            except:
+                pass
+
+            command = "cdo -fldmean -mul " + cat_file + " " + maskfile + " " + results_dir + "/" + var + "-" + station + ".nc"
+            os.system(command)
         
         for operator in operators:
             if operator == "":

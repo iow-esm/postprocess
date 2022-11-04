@@ -21,14 +21,7 @@ dirs = get_all_dirs_from_to.get_all_dirs_from_to(out_dir, from_date, to_date)
 import create_results_dir
 results_dir = create_results_dir.create_results_dir(out_dir, from_date, to_date)
 
-def convert_to_decimal(value):
-    if ":" not in value:
-        return value
-    
-    tmp = value.split(":")
-    decimal_value = float(tmp[0]) + float(tmp[1])/60.0 + float(tmp[2])/3600.0
-    
-    return str(decimal_value)
+from helpers import convert_to_decimal
 
 # go over all variables from where we extract (as defined in the local config)
 for var in variables.keys():
