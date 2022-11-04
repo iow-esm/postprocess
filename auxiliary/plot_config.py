@@ -38,3 +38,13 @@ class PlotConfig:
         linestyle, symmetric)
         
         return c
+
+    def __str__(self):
+        s = ""
+        for a in dir(self):
+            if a.startswith("__") or callable(getattr(self, a)):
+                continue
+            s += a+": "+str(getattr(self, a))+", "
+
+        return s[:-2]
+
