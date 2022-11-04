@@ -38,7 +38,7 @@ for var in variables.keys():
     merge_file = results_dir + "/" + var + ".nc"
     
     try:
-        additional_operators = variables[var]["additional-operators"]
+        additional_operators = variables[var]["reference-additional-operators"]
     except:
         additional_operators = ""
         
