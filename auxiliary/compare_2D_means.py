@@ -32,39 +32,39 @@ import numpy as np
 import xarray as xr
 
 # extend this dictionary if necessary
-model_dirs = {{"model1" : pwd+"/../calculate_anomalies/{results_dir}"}}
-# change the reference directory if nercessary
-ref_dir = pwd+"/../process_reference/{results_dir}"
 
-models = list(model_dirs.keys())
-if len(models) > 1:
-    compare = True
-    errors = {{}}
-    stds = {{}}
-    import colorsys
-    HSV_tuples = [(x*1.0/(len(models)), 0.5, 0.7) for x in range(len(models))]
-    RGB_tuples = list(map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples))    
-else:
-    compare = False
+model_dirs = {{"model1" : pwd+"/../seasonal_mean/{results_dir}"}}
 
 for var in variables.keys():
 
     try:
-        variables[var]['reference-file-pattern']
+        if variables[var]["dimension"] != 3:
+            continue
     except:
-        continue
+        pass
+
+    try:
+        variables[var]['reference-file-pattern']
+        model_dirs["reference"] = pwd+"/../seasonal_mean/{results_dir}"
+    except:
+        try:
+            del model_dirs["reference"]
+        except:
+            pass
+
+    models = list(model_dirs.keys())
 
     seasons = list(variables[var]["seasons"].keys())
 
-    vmin = variables[var]["plot-config-anomaly"].min_value
-    vmax = variables[var]["plot-config-anomaly"].max_value
+    vmin = variables[var]["plot-config"].min_value
+    vmax = variables[var]["plot-config"].max_value
 
-    if variables[var]["plot-config-anomaly"].delta_value is not None:
-        nlevels = int((vmax - vmin)/variables[var]["plot-config-anomaly"].delta_value)
+    if variables[var]["plot-config"].delta_value is not None:
+        nlevels = int((vmax - vmin)/variables[var]["plot-config"].delta_value)
     else:
         nlevels = 13
 
-    cmap = plt.get_cmap(variables[var]["plot-config-anomaly"].color_map, nlevels)
+    cmap = plt.get_cmap(variables[var]["plot-config"].color_map, nlevels)
 
     ctr_plot_cfg = {{"vmin" : vmin, "vmax" : vmax, "levels" : np.linspace(vmin,vmax,nlevels+1), "linewidths" : 0.75, "colors" : "black",  "linestyles" : "-"}}
     coast_plot_cfg = {{"levels" : [0.1], "linewidths" : 1.5, "colors" : "black"}}
@@ -74,13 +74,13 @@ for var in variables.keys():
 
     for i, model in enumerate(models):
 
-        if compare:
-            errors[model] = []
-            stds[model] = []
-
         for j, season in enumerate(seasons):
-            
-            ds = xr.open_dataset(model_dirs[model]+"/"+var+"-"+season+".nc")
+
+            if model == "reference":
+                ds = xr.open_dataset(model_dirs[model]+"/"+var+"-reference-"+season+"-remapped.nc")
+            else:
+                ds = xr.open_dataset(model_dirs[model]+"/"+var+"-"+season+".nc")
+
             ds_var = ds.data_vars[var]
 
             try:
@@ -95,9 +95,9 @@ for var in variables.keys():
 
             ds_var.plot(ax=axs[i,j], **cbar_params, **data_plot_cfg)
             
-            if variables[var]["plot-config-anomaly"].contour:
+            if variables[var]["plot-config"].contour:
                 np.squeeze(ds_var).plot.contour(ax=axs[i,j], **ctr_plot_cfg)
-
+            
             coast = np.where((~ds_var.isnull()), 1.0, 0.0)
             ds_var.values = coast
             np.squeeze(ds_var).plot.contour(ax=axs[i,j], **coast_plot_cfg)
@@ -115,38 +115,20 @@ for var in variables.keys():
 
             axs[i,j].grid(linestyle='--', alpha=0.6)
 
-            if compare:
-                dummy = ds_var.values.ravel()
-                dummy = np.abs(dummy[~np.isnan(dummy)])
-                errors[model].append(np.mean(dummy))
-                stds[model].append(np.std(dummy))
-
             ds.close()
 
     fig.tight_layout()  
     plt.subplots_adjust(wspace=0, hspace=0)
     fig.savefig(var+".png", dpi=100)
 
-    if not compare:
-        continue
-        
-    fig, axs = plt.subplots(1, len(seasons), figsize=(4*len(seasons), 4), sharey='row', squeeze=0)
-    
-    for j, season in enumerate(seasons):
-        for i, model in enumerate(models):
-            axs[0,j].bar(model, errors[model][j], yerr=stds[model][j], color=RGB_tuples[i], ecolor=RGB_tuples[i], label=model)
-            axs[0,j].plot([i,len(models)-1+0.4],[errors[model][j],errors[model][j]], color=RGB_tuples[i], alpha=0.5, linestyle="--")
-            
-    fig.tight_layout()  
-    plt.subplots_adjust(wspace=0, hspace=0)
-    fig.savefig(var+"2.png", dpi=100)
+
 """
 
-f = open(pwd+"/"+results_dir+"/compare_2D_anomalies.py", "w")
+f = open(pwd+"/"+results_dir+"/compare_2D_means.py", "w")
 f.write(script)
 f.close()
 
 exec(script)
 
 import convertpy2ipynb
-convertpy2ipynb.convertpy2ipynb(pwd+"/"+results_dir+"/compare_2D_anomalies.py")
+convertpy2ipynb.convertpy2ipynb(pwd+"/"+results_dir+"/compare_2D_means.py")

@@ -34,32 +34,35 @@ for kind in kinds:
     # extend this dictionary if necessary
     model_dirs = {{"model1" : pwd+"/../extract_"+kind+"/{results_dir}"}}
     models = list(model_dirs.keys())
-    ref_dir = pwd+"/../extract_"+kind+"/{results_dir}"
 
     for var in variables.keys():
 
         try:
-            variables[var]['reference-file-pattern']
+            if variables[var]["dimension"] > 3:
+                continue
         except:
-            continue
+            pass
 
         operators = variables[var]["time-series-operators"]
         data = variables[var][kind]
 
-        fig, axs = plt.subplots(len(data), len(operators), figsize=(4*len(operators), 4*len(data)), sharex='col', sharey='row', squeeze=0)
+        fig, axs = plt.subplots(len(data), len(operators), figsize=(5*len(operators), 2*len(data)), sharex='col', sharey='row', squeeze=0)
 
         for i, dat in enumerate(data):
             for j, operator in enumerate(operators):
 
                 for model in model_dirs.keys():
                     ds = xr.open_dataset(model_dirs[model]+"/"+var+"-"+dat+operator+".nc")
-                    axs[i,j].plot(ds["time"].data, np.squeeze(ds[var].data), label=model)
+                    d = np.squeeze(ds[var].data)
+                    t = ds["time"].data
+                    p = axs[i,j].plot(t, d, label=model)
+                    try:
+                        std = np.squeeze(ds[var+"_STD"].data)
+                        axs[i,j].fill_between(t, d - 0.5*std, d + 0.5*std, color=p[-1].get_color(), alpha=0.3)
+                    except:
+                        print("Could not pplot standard deviation for variable "+var)
 
-                    ds.close()
 
-                ds = xr.open_dataset(ref_dir+"/"+var+"-reference-"+dat+operator+".nc")
-                axs[i,j].plot(ds["time"].data, np.squeeze(ds[var].data), label="reference")                
-                
                 if i == 0:
                     axs[i,j].set_title(operator[1:], fontweight="bold")
                 if j == 0:
@@ -72,10 +75,42 @@ for kind in kinds:
 
                 ds.close()
 
+                axs[i,j].grid(linestyle='--', alpha=0.6)
+
+                try:
+                    variables[var]['reference-file-pattern']
+                except:
+                    continue
+            
+                try:
+                    ref_dir = pwd+"/../extract_"+kind+"/{results_dir}"
+                    ds = xr.open_dataset(ref_dir+"/"+var+"-reference-"+dat+operator+".nc")
+                    d = np.squeeze(ds[var].data)
+                    t = ds["time"].data
+                    p = axs[i,j].plot(t, d, label="reference", color="grey", linewidth=3, zorder=0) 
+                    try:
+                        std = np.squeeze(ds[var+"_STD"].data)
+                        axs[i,j].fill_between(t, d - 0.5*std, d + 0.5*std, color=p[-1].get_color(), alpha=0.3)
+                    except:
+                        print("Could not pplot standard deviation for variable "+var)
+                    ds.close()
+                except:
+                    print("Could not plot reference for variable "+var)
+
+                try:
+                    diff_dir = pwd+"/../calculate_anomalies/{results_dir}"
+                    ds = xr.open_dataset(diff_dir+"/"+var+"-"+dat+operator+".nc")
+                    d = np.squeeze(ds[var].data)
+                    t = ds["time"].data
+                    axs[i,j].plot(t, d, label="anomaly", color="red", linestyle="--", linewidth=1)
+                    ds.close()
+                except:
+                    print("Could not plot anomaly for variable "+var)
+
         axs[0,0].legend()
         fig.tight_layout()  
         plt.subplots_adjust(wspace=0, hspace=0)
-        fig.savefig(var+".png", dpi=100)
+        fig.savefig(var+"-"+kind+".png", dpi=100)
 """
 
 f = open(pwd+"/"+results_dir+"/compare_time_series.py", "w")

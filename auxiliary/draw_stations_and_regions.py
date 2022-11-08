@@ -37,7 +37,7 @@ for var in variables.keys():
     stations = variables[var]["stations"]
     regions = variables[var]["regions"]
 
-    fig, ax = plt.subplots(1, 1,  figsize=(10, 6))
+    fig, ax = plt.subplots(1, 1,  figsize=(6, 4))
     
     nregions = len(regions.keys())
     HSV_tuples = [(x*1.0/nregions, 0.5, 0.7) for x in range(nregions)]

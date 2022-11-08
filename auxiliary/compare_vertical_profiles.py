@@ -58,18 +58,21 @@ for var in variables.keys():
         bed_ref = False
 
     seasons = variables[var]["seasons"]
-    stations = variables[var]["stations"]
+    stations = {{**variables[var]["stations"], **variables[var]["regions"]}}
 
-    fig, axs = plt.subplots(len(stations), len(seasons), figsize=(3*len(seasons), 5*len(stations)), sharex=True, sharey='row', squeeze=0)
+    fig, axs = plt.subplots(len(stations), len(seasons), figsize=(3*len(seasons), 4*len(stations)), sharex=True, sharey='row', squeeze=0)
 
     for i, station in enumerate(stations):
         for j, season in enumerate(seasons.keys()):
             
             if bed_ref:
-                ds = xr.open_dataset(ref_dir+"/"+var+"-"+station+"-"+season+".nc")
-                plot_vertical_profile.plot_vertical_profile(axs[i,j], ds[var].data, ds.depth.data, ds[var+"_STD"].data, smooth=False, label = "reference", color="grey", marker = "o")
-                ds.close()
-                
+                try:
+                    ds = xr.open_dataset(ref_dir+"/"+var+"-"+station+"-"+season+".nc")
+                    plot_vertical_profile.plot_vertical_profile(axs[i,j], ds[var].data, ds.depth.data, ds[var+"_STD"].data, smooth=False, label = "reference", color="grey", marker = "o")
+                    ds.close()
+                except:
+                    print("BED reference is configured but could not find or plot data.")
+
             for model in model_dirs.keys():
                 ds = xr.open_dataset(model_dirs[model]+"/"+var+"-"+station+"-"+season+".nc")
                 plot_vertical_profile.plot_vertical_profile(axs[i,j], np.squeeze(ds[var].data), ds[variables[var]["plot-config"].vert_name].data, np.squeeze(ds[var+"_STD"].data), label = model)

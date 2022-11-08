@@ -14,10 +14,11 @@ import glob
 import os
 
 tasks = {  
+    "compare_2D_means" : {"name" : "2D means"},
+    "compare_2D_anomalies" : {"name" : "2D anomalies"},
     "draw_stations_and_regions" : {"name" : "Stations and Regions"},
-    "compare_2D_anomalies" : {"name" : "2D plots"},
-    "compare_vertical_profiles" : {"name" : "Vertical profiles"},
     "compare_time_series" : {"name" : "Time series"},
+    "compare_vertical_profiles" : {"name" : "Vertical profiles"},
 }
 
 
