@@ -25,6 +25,9 @@ sys.path.append('../')
 import global_settings
 variables = global_settings.variables
 
+sys.path.append('../../auxiliary')
+from helpers import plot_coast, load_dataset, unload_dataset
+
 os.chdir(pwd+"/{results_dir}")
 
 import matplotlib.pyplot as plt
@@ -67,7 +70,6 @@ for var in variables.keys():
     cmap = plt.get_cmap(variables[var]["plot-config"].color_map, nlevels)
 
     ctr_plot_cfg = {{"vmin" : vmin, "vmax" : vmax, "levels" : np.linspace(vmin,vmax,nlevels+1), "linewidths" : 0.75, "colors" : "black",  "linestyles" : "-"}}
-    coast_plot_cfg = {{"levels" : [0.1], "linewidths" : 1.5, "colors" : "black"}}
     data_plot_cfg = {{"vmin" : vmin, "vmax" : vmax, "cmap" : cmap}}
 
     fig, axs = plt.subplots(len(models), len(seasons), figsize=(4*len(seasons), 4*len(models)), sharex='col', sharey='row', squeeze=0, gridspec_kw={{"width_ratios": (len(seasons)-1)*[1] + [1.25]}})
@@ -77,9 +79,11 @@ for var in variables.keys():
         for j, season in enumerate(seasons):
 
             if model == "reference":
-                ds = xr.open_dataset(model_dirs[model]+"/"+var+"-reference-"+season+"-remapped.nc")
+                nc_file = model_dirs[model]+"/"+var+"-reference-"+season+"-remapped.nc"
             else:
-                ds = xr.open_dataset(model_dirs[model]+"/"+var+"-"+season+".nc")
+                nc_file = model_dirs[model]+"/"+var+"-"+season+".nc"
+                
+            ds = load_dataset(nc_file)
 
             ds_var = ds.data_vars[var]
 
@@ -93,15 +97,13 @@ for var in variables.keys():
             else:
                 cbar_params = {{"add_colorbar" : False}}
 
+            plot_coast(axs[i,j])
+
             ds_var.plot(ax=axs[i,j], **cbar_params, **data_plot_cfg)
             
             if variables[var]["plot-config"].contour:
                 np.squeeze(ds_var).plot.contour(ax=axs[i,j], **ctr_plot_cfg)
-            
-            coast = np.where((~ds_var.isnull()), 1.0, 0.0)
-            ds_var.values = coast
-            np.squeeze(ds_var).plot.contour(ax=axs[i,j], **coast_plot_cfg)
-            
+
             if i == 0:
                 axs[i,j].set_title(season, fontweight='bold')
             else:
@@ -115,7 +117,7 @@ for var in variables.keys():
 
             axs[i,j].grid(linestyle='--', alpha=0.6)
 
-            ds.close()
+            unload_dataset(ds)
 
     fig.tight_layout()  
     plt.subplots_adjust(wspace=0, hspace=0)

@@ -68,13 +68,7 @@ for var in variables.keys():
             command = "cdo -fldmean -sellonlatbox," + lonlatbox + " " + cat_file + " " + results_dir + "/" + var + "-" + station + ".nc"
             os.system(command)
         else:
-            try:
-                if variables[var]["task"] == "process_reference":
-                    maskfile = "-remapnn,"+cat_file+" "+maskfile
-            except:
-                pass
-
-            command = "cdo -fldmean -mul " + cat_file + " " + maskfile + " " + results_dir + "/" + var + "-" + station + ".nc"
+            command = "cdo -fldmean -mul " + cat_file + " -remapnn,"+cat_file+" "+maskfile + " " + results_dir + "/" + var + "-" + station + ".nc"
             os.system(command)
         
         for operator in operators:

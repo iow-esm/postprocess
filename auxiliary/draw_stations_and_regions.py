@@ -21,7 +21,7 @@ import global_settings
 variables = global_settings.variables
 
 sys.path.append('../../auxiliary')
-from helpers import convert_to_decimal
+from helpers import convert_to_decimal, plot_coast
 
 os.chdir(pwd+"/{results_dir}")
 
@@ -75,15 +75,19 @@ for var in variables.keys():
                 print("Configured region: "+str(regions[regions])+" cannot be processed!")
                 continue
 
-    for station in stations.keys():
+    for i, station in enumerate(stations.keys()):
         try:
             x = float(convert_to_decimal(stations[station]["lon"]))
             y = float(convert_to_decimal(stations[station]["lat"]))
-            ax.scatter(x, y, label=station, color="red", zorder=nregions+1)
-            ax.text(x, y, station, zorder=nregions+1)
+            ax.scatter(x, y, label=station, color="red", zorder=200, marker="o")
+            ax.text(x, y, str(i+1), zorder=200)
+            proxy.append(plt.Circle((0,0), color = "red"))
+            proxy_names.append(str(i+1)+": "+station)
         except:
             print("Configured station: "+str(station[stations])+" cannot be processed!")
             continue    
+
+    plot_coast(ax)
 
     ax.set_title("Stations and regions for variable "+var)
     ax.legend(proxy, proxy_names, loc='center left', bbox_to_anchor=(1, 0.5))

@@ -40,22 +40,42 @@ script = f"""# Validation report
 |Author:                        |`{os.getlogin()}`|
 
 
+## Analyzed variables
+
+"""
+
+for i, var in enumerate(variables.keys()):
+    script += f"""
+[**{i+1}. {var} ->**](#{var})
+"""
+
+script += f"""
+
+
 ## Results
 
 """
+
 for var in variables.keys():
     script += f"""
+
+
 ### {var}
+
+<hr style="border:2px solid gray">
 
 <details>
 
-#### [Postprocess settings](../../../global_settings.py)
+#### Postprocess settings
+
+[**Go to settings ->**](../../../global_settings.py)
 
     """
     script += "\n"
     for a in variables[var].keys():
         script += "##### "+a+"\n"
         script += "`"+str(variables[var][a])+"`\n"
+        script += "\n---\n"
     script += "\n"
 
     script += """
@@ -66,7 +86,12 @@ for var in variables.keys():
     for task in tasks.keys():
     
         script += f"""
-### [{tasks[task]["name"]}](../../../{task}/{results_dir}/{task}.ipynb)
+### {tasks[task]["name"]}
+
+***
+ 
+[**Go to notebook ->**](../../../{task}/{results_dir}/{task}.ipynb)
+
         """
 
         for fig in glob.glob("../"+task+"/"+results_dir+"/"+var+"*.png"):
