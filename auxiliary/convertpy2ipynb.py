@@ -14,7 +14,7 @@ def convertpy2ipynb(script_name, cell_type = "code"):
 
     "source": [
     """
-    source = ["    \""+line.strip("\n").replace("\"","\\\"")+"\\n\",\n" for line in lines]
+    source = ["    \""+line.strip("\n").replace("\\", "\\\\").replace("\"", "\\\"")+"\\n\",\n" for line in lines]
     footer = """
     ]
     }
