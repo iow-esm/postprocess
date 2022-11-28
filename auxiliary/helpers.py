@@ -16,9 +16,6 @@ def plot_coast(ax):
 
     import xarray as xr
     import numpy as np
-    import os
-
-    print(aux_path)
 
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
@@ -42,8 +39,7 @@ def load_dataset(nc_file):
     if hasattr(ds, "rotated_pole"):
 
         remapped_file = "tmp-remapped.nc"
-        cmd = "cdo remapbil,"+aux_path+"/coast_grid.txt"+" "+nc_file+" "+remapped_file
-        print(cmd)
+        cmd = "source "+aux_path+"/../load_modules.sh; cdo remapbil,"+aux_path+"/coast_grid.txt"+" "+nc_file+" "+remapped_file
         os.system(cmd)
         ds.close()
         ds = xr.open_dataset(remapped_file)
@@ -58,3 +54,269 @@ def unload_dataset(ds):
     remapped_file = "tmp-remapped.nc"
     if glob.glob(remapped_file) != []:
         os.system("rm "+remapped_file)
+
+
+def get_month_names(numbers):
+    import numpy as np
+    month_names = { 1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr", 5: "May", 6: "Jun", 7: "Jul", 8: "Aug", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec"}
+
+    names = []
+    for n in numbers:
+        names.append(month_names[n])
+    
+    return np.array(names)
+
+def process_time_axis(time, operator):
+    years = time.astype('datetime64[Y]').astype(int) + 1970
+    months = time.astype('datetime64[M]').astype(int) % 12 + 1
+    days = time - time.astype('datetime64[M]') + 1
+
+    if operator == "-ymonmean":
+        t = get_month_names(months)
+    else:
+        t = time
+
+    return t
+
+def find_other_models(var, task, from_date, to_date):
+    model_dirs = {}
+    try:
+        other_models = var['other-models']
+        for om in other_models.keys():
+            model_dirs[om] = other_models[om]["root"]+"/"+task+"/results/"+other_models[om]["output_name"]
+            if {from_date} != -1 and {to_date} != -1:
+                model_dirs[om] += "-"+str(from_date)+"_"+str(to_date)
+    except:
+        pass    
+
+    return model_dirs
+
+def get_n_colors(n, cmap="tab10"):
+    import numpy as np
+    import matplotlib
+
+    if cmap == "tab10":
+        colors = matplotlib.cm.get_cmap(cmap)
+        colors = colors(np.linspace(0.0, 1.1, 11, endpoint=False))
+        c = []
+        for i in range(n):
+            c.append(colors[i%10])
+        return c
+
+    if cmap == "hsv":
+        import colorsys
+        HSV_tuples = [(x*1.0/n, 0.5, 0.7) for x in range(n)]
+        return list(map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples))  
+    
+    colors = matplotlib.cm.get_cmap(cmap)
+    return colors(np.linspace(0.0, 1.0, n, endpoint=True))
+
+def get_anomaly_plot_config(var, dataset):
+
+    from matplotlib import cm
+    from matplotlib.colors import ListedColormap
+    import numpy as np
+
+    vmin = var["plot-config-anomaly"].min_value
+    vmax = var["plot-config-anomaly"].max_value
+
+    if var["plot-config-anomaly"].delta_value is not None:
+        d = var["plot-config-anomaly"].delta_value
+        levels = np.arange(vmin,vmax+d,d)
+        levels = levels[np.abs(levels)>1.0e-15].tolist()
+        s = len(levels)//14 + 1
+        ticks = list(set(sorted(levels[::s]+[0])))
+    else:
+        levels = np.linspace(vmin,vmax,13).tolist()
+        ticks = list(set(sorted(levels+[0])))  
+
+    cmap = cm.get_cmap(var["plot-config-anomaly"].color_map, 256)
+    color_values = ((np.array(levels)-min(levels))/(max(levels)-min(levels))).tolist()
+    
+    if np.max(np.squeeze(dataset)) > vmax:
+        color_values += [1.1]
+    if np.min(np.squeeze(dataset)) < vmin:
+        color_values += [-0.1]
+        
+    color_values = sorted(color_values + [0.5])
+    newcolors = cmap(color_values)
+    cmap = ListedColormap(newcolors)
+
+    try:
+        units = dataset.units
+    except:
+        units = "a.u."    
+
+    
+    data_plot_cfg = {"levels" : levels, "cmap" : cmap, "vmin" : vmin, "vmax" : vmax}
+    cbar_cfg = {"cbar_kwargs" : {"ticks" : ticks, "label" : r'$\Delta$'+var["plot-config-anomaly"].variable+" ["+units+"]"}}
+
+    if var["plot-config-anomaly"].contour:
+        ctr_plot_cfg = {"levels" : levels, "linewidths" : 0.75, "colors" : "black",  "linestyles" : "-"}
+    else:
+        ctr_plot_cfg = {}
+
+    return data_plot_cfg, cbar_cfg, ctr_plot_cfg                       
+
+#!/usr/bin/env python
+# Copyright: This document has been placed in the public domain.
+
+"""
+Taylor diagram (Taylor, 2001) implementation.
+
+Note: If you have found these software useful for your research, I would
+appreciate an acknowledgment.
+"""
+
+__version__ = "Time-stamp: <2018-12-06 11:43:41 ycopin>"
+__author__ = "Yannick Copin <yannick.copin@laposte.net>"
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+class TaylorDiagram(object):
+    """
+    Taylor diagram.
+
+    Plot model standard deviation and correlation to reference (data)
+    sample in a single-quadrant polar plot, with r=stddev and
+    theta=arccos(correlation).
+    """
+
+    def __init__(self, refdata, ax,  *args, **kwargs):
+
+        # memorize reference data
+        self.refdata = refdata
+        self.ax = ax
+
+        refstd = refdata.std(ddof=1) 
+        rlim = [0.0, 1.2*refstd]
+        thetalim = [0.0, 0.5*np.pi]
+
+        # Add reference point and stddev contour
+        try:
+            kwargs["marker"]
+        except:
+            kwargs["marker"] = 'o'
+        try:
+            kwargs["color"]
+        except:
+            kwargs["color"] = "black"
+        try:
+            kwargs["ms"]
+        except:
+            kwargs["ms"] = 10     
+        try:
+            kwargs["label"]
+        except:
+            kwargs["label"] = "reference"                     
+
+        ax.plot([0], refstd, *args, ls='', zorder=0, **kwargs)
+
+        #t = np.linspace(0, thetalim[1])
+        #r = np.zeros_like(t) + refstd
+        #ax.plot(t, r, 'k--', label='_')
+
+        #xticks = [1.0, 0.99, 0.95, 0.9, 0.8, 0.7, 0.6, 0.4, 0.2, 0.0]
+        #ax.set_xticks(np.arccos(xticks))
+        #ax.set_xticklabels(xticks)
+
+        #if refstd > 100.0 or refstd < 0.1:
+        #    fmt = '%3.2e'
+        #else:
+        #    fmt = '%3.2f'
+
+        #ax.clabel(contours, inline=False, fmt=fmt, colors="black")
+
+        ax.grid(True, linestyle="--")
+
+        #ax.set_rorigin(0)
+
+        #ax.text(0.5*thetalim[1], 1.01*rlim[1],"Correlation", rotation=-45)
+        
+        ax.set_xlabel("St. dev.")
+        ax.xaxis.set_label_coords(0.5, -0.1)
+
+        #ax.set_ylabel("Correlation")
+        #ax.xaxis.set_label_coords(0.707, 0.707)
+
+        ax.set_xlim(thetalim)
+        ax.set_ylim(rlim)
+
+        self.rlim = rlim
+        self.thetalim = thetalim
+
+        self.model_std = {"reference" : refstd}
+        self.corrcoef = {"reference" : 1.0}
+        self.rms = {"reference" : 0.0}
+
+    def add_sample(self, model_data, *args, **kwargs):
+        """
+        Add sample to the Taylor
+        diagram. *args* and *kwargs* are directly propagated to the
+        `Figure.plot` command.
+        """
+
+        try:
+            label = kwargs["label"]
+        except:
+            label = "model"+str(len(self.model_std.keys())) 
+
+        model_std = model_data.std(ddof=1)
+        corrcoef = np.corrcoef(model_data, self.refdata)[0, 1]
+        rms = np.sqrt(self.model_std["reference"]**2 + model_std**2 - 2.0*self.model_std["reference"]*model_std*np.cos(np.arccos(corrcoef)))
+
+        self.ax.plot(np.arccos(corrcoef), model_std,
+                          *args, **kwargs)  # (theta, radius)
+
+        if model_std > self.rlim[1]:
+            self.rlim = [0, 1.2 * model_std]
+            self.ax.set_ylim(*self.rlim)
+
+        if np.arccos(corrcoef) > self.thetalim[1]:
+            self.thetalim[1] = 1.2 * np.arccos(corrcoef)
+            self.ax.set_xlim(*self.thetalim)                       
+
+        self.model_std[label] = model_std
+        self.corrcoef[label] = corrcoef
+        self.rms[label] = rms
+        #self.ax.set_ylim(rlim) 
+
+
+    def get_samples(self):
+        return self.model_std, self.corrcoef, self.rms
+
+    def finalize(self):
+        self.ax.text(0.5*(self.thetalim[1]-self.thetalim[0]), (1.0+0.03*(self.thetalim[1]-self.thetalim[0])**2)*self.rlim[1],"Correlation", rotation=0.5*(self.thetalim[1]-self.thetalim[0])*180.0/np.pi-90.0)
+
+        rs, ts = np.meshgrid(np.linspace(*self.rlim), np.linspace(*self.thetalim))
+
+        rms = np.sqrt(self.model_std["reference"]**2 + rs**2 - 2.0*self.model_std["reference"]*rs*np.cos(ts))
+
+        self.ax.contourf(ts, rs, rms, 9, alpha=0.3, cmap="RdYlGn_r")
+        contours = self.ax.contour(ts, rs, rms, 9, linestyles="--", linewidths=1, alpha=0.5, colors="grey")
+
+        if self.model_std["reference"] > 100.0 or self.model_std["reference"] < 0.1:
+            fmt = '%3.2e'
+        else:
+            fmt = '%3.2f'
+
+        self.ax.clabel(contours, inline=False, fmt=fmt, colors="black")
+
+        t = np.linspace(*self.thetalim)
+        r = np.zeros_like(t) + self.model_std["reference"]
+        self.ax.plot(t, r, 'k--', label='_')
+
+        xticks = [1.0, 0.99, 0.95, 0.9, 0.8, 0.7, 0.6, 0.4, 0.2, 0.0]
+
+        if self.thetalim[1] > 0.5*np.pi:
+            for x in [-0.2, -0.4, -0.6, -0.8, -0.9, -0.95, -0.99 -1.0]:
+
+                if np.arccos(x) > self.thetalim[1]:
+                    break
+
+                xticks += [x]
+
+        self.ax.set_xticks(np.arccos(xticks))
+        self.ax.set_xticklabels(xticks)
