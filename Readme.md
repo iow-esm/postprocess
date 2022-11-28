@@ -28,7 +28,7 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
 
 | date        | author(s)   | link                                                                            |
 |---          |---          |---                                                                              |
-| 2022-09-01  | SK          | XXX |   
+| 2022-11-28  | SK          | XXX |   
 
 <details>
 
@@ -42,6 +42,10 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
     with integer value, e.g 3 or 4 for 3- or 4-dimensional field, respectively
   * default dimension is assumed to be 3 (backward compatible)
 * seasonal means provide now standard deviation variables
+* added Taylor diagrams
+* main task is now create_validation_report
+  * validation report is Jupyter notebook containing figures 
+    and links to other notebooks that create these figures
     
 ### dependencies
 * python environment as anaconda3 or miniconda3
