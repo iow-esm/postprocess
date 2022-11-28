@@ -21,7 +21,7 @@ import global_settings
 variables = global_settings.variables
 
 sys.path.append('../../auxiliary')
-from helpers import convert_to_decimal, plot_coast
+from helpers import convert_to_decimal, plot_coast, get_n_colors
 
 os.chdir(pwd+"/{results_dir}")
 
@@ -29,8 +29,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
-import colorsys
-  
+hatches = ['++', '', 'xx', '', 'oo', '', 'OO', '', '..', '', '**', '']
+linestyles = ['-', '--', '-', ':', '-', '-.']
 
 for var in variables.keys():
 
@@ -39,9 +39,7 @@ for var in variables.keys():
 
     fig, ax = plt.subplots(1, 1,  figsize=(6, 4))
     
-    nregions = len(regions.keys())
-    HSV_tuples = [(x*1.0/nregions, 0.5, 0.7) for x in range(nregions)]
-    RGB_tuples = list(map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples))  
+    RGB_tuples = get_n_colors(len(regions.keys())+1, cmap="rainbow")  
     
     proxy = []
     proxy_names = []
@@ -61,30 +59,41 @@ for var in variables.keys():
             x = [corners["lon-min"], corners["lon-max"], corners["lon-max"], corners["lon-min"], corners["lon-min"]]
             y = [corners["lat-min"], corners["lat-min"], corners["lat-max"], corners["lat-max"], corners["lat-min"]]
 
-            ax.fill(x, y, 'b', alpha=0.6, color=RGB_tuples[i], label=region, zorder=i)
-            proxy.append(plt.Rectangle((0,0),1,1,fc = RGB_tuples[i], alpha=0.6))
+            ax.fill(x, y, 'b', alpha=1.0, color=RGB_tuples[i], label=region, zorder=i)
+            proxy.append(plt.Rectangle((0,0),1,1,fc = RGB_tuples[i], alpha=1.0))
             proxy_names.append(region)
         except:
             try:
                 ds = xr.open_dataset(regions[region]["maskfile"])
-                ds_var = ds.data_vars["mask"]
-                np.squeeze(ds_var).plot.contourf(ax=ax, levels = [0.1, 1.1], colors=[RGB_tuples[i], RGB_tuples[i]], alpha=0.6, add_colorbar=False, zorder=i)
-                proxy.append(plt.Rectangle((0,0),1,1,fc = RGB_tuples[i], alpha=0.6))
+                ds_var = ds["mask"]
+                #np.squeeze(ds_var).plot.contourf(ax=ax, levels = [0.1, 1.1], colors=[RGB_tuples[i], RGB_tuples[i]], hatches=hatches[i%len(hatches)], alpha=0.3, add_colorbar=False, zorder=i)
+                if True:
+                    np.squeeze(ds_var).plot.contourf(ax=ax, levels = [0.1, 1.1], colors=[RGB_tuples[i], RGB_tuples[i]], alpha=1.0, add_colorbar=False, zorder=i)
+                    proxy.append(plt.Rectangle((0,0),1,1,fc = RGB_tuples[i]))
+                else:
+                    borders = np.where((~ds_var.isnull()), 1.0, 0.0)
+                    ds_var.values = borders
+                    borders_plot_cfg = {{"levels" : [0.1], "linewidths" : [3.0], "colors" : [RGB_tuples[i]], "linestyles" : ["-"]}}
+                    np.squeeze(ds_var).plot.contour(ax=ax, **borders_plot_cfg, zorder=i)
+                #proxy.append(plt.Rectangle((0,0),1,1,fc = RGB_tuples[i], hatch=hatches[i%len(hatches)], alpha=0.6))
+                #proxy.append(plt.Rectangle((0,0),1,1,fc = RGB_tuples[i], edgecolor=RGB_tuples[i], linestyle=linestyles[i%len(linestyles)], alpha=0.3, linewidth = 2.0*(len(regions.keys())-1-i)/(len(regions.keys())-1)))
+                    proxy.append(plt.Rectangle((0,0),1,1,color = RGB_tuples[i], fill=False))
                 proxy_names.append(region)
+                ds.close()
             except:
-                print("Configured region: "+str(regions[regions])+" cannot be processed!")
+                print("Configured region: "+str(regions[region])+" cannot be processed!")
                 continue
 
     for i, station in enumerate(stations.keys()):
         try:
             x = float(convert_to_decimal(stations[station]["lon"]))
             y = float(convert_to_decimal(stations[station]["lat"]))
-            ax.scatter(x, y, label=station, color="red", zorder=200, marker="o")
-            ax.text(x, y, str(i+1), zorder=200)
-            proxy.append(plt.Circle((0,0), color = "red"))
+            ax.scatter(x, y, label=station, color=RGB_tuples[-1], zorder=200, marker="o")
+            ax.text(x, y, str(i+1), zorder=200, fontweight="bold")
+            proxy.append(plt.Circle((0,0), color = RGB_tuples[-1]))
             proxy_names.append(str(i+1)+": "+station)
         except:
-            print("Configured station: "+str(station[stations])+" cannot be processed!")
+            print("Configured station: "+str(stations[station])+" cannot be processed!")
             continue    
 
     plot_coast(ax)

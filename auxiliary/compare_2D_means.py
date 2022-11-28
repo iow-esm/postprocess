@@ -13,7 +13,7 @@ import create_results_dir
 
 results_dir = create_results_dir.create_results_dir(out_dir, from_date, to_date)
 
-script = f"""import sys
+script = fr"""import sys
 import os
 
 # modify the working directory if necessary
@@ -26,7 +26,7 @@ import global_settings
 variables = global_settings.variables
 
 sys.path.append('../../auxiliary')
-from helpers import plot_coast, load_dataset, unload_dataset
+from helpers import plot_coast, load_dataset, unload_dataset, find_other_models, get_n_colors
 
 os.chdir(pwd+"/{results_dir}")
 
@@ -36,7 +36,7 @@ import xarray as xr
 
 # extend this dictionary if necessary
 
-model_dirs = {{"model1" : pwd+"/../seasonal_mean/{results_dir}"}}
+model_directories = {{"model1" : pwd+"/../seasonal_mean/{results_dir}"}}
 
 for var in variables.keys():
 
@@ -45,6 +45,8 @@ for var in variables.keys():
             continue
     except:
         pass
+
+    model_dirs = {{**model_directories, **find_other_models(variables[var], "seasonal_mean", {from_date}, {to_date})}}
 
     try:
         variables[var]['reference-file-pattern']
@@ -57,20 +59,24 @@ for var in variables.keys():
 
     models = list(model_dirs.keys())
 
+    RGB_tuples = get_n_colors(len(models))   
+
     seasons = list(variables[var]["seasons"].keys())
 
     vmin = variables[var]["plot-config"].min_value
     vmax = variables[var]["plot-config"].max_value
 
     if variables[var]["plot-config"].delta_value is not None:
-        nlevels = int((vmax - vmin)/variables[var]["plot-config"].delta_value)
+        d = variables[var]["plot-config"].delta_value
+        levels = np.arange(vmin,vmax+d,d)
+        s = len(levels)//14 + 1
+        ticks = levels[::s]
     else:
-        nlevels = 13
+        levels = np.linspace(vmin,vmax,13).tolist()
+        ticks = levels
 
-    cmap = plt.get_cmap(variables[var]["plot-config"].color_map, nlevels)
-
-    ctr_plot_cfg = {{"vmin" : vmin, "vmax" : vmax, "levels" : np.linspace(vmin,vmax,nlevels+1), "linewidths" : 0.75, "colors" : "black",  "linestyles" : "-"}}
-    data_plot_cfg = {{"vmin" : vmin, "vmax" : vmax, "cmap" : cmap}}
+    ctr_plot_cfg = {{"vmin" : vmin, "vmax" : vmax, "levels" : levels, "linewidths" : 0.75, "colors" : "black",  "linestyles" : "-"}}
+    data_plot_cfg = {{"vmin" : vmin, "vmax" : vmax, "cmap" : variables[var]["plot-config"].color_map, "levels" : levels}}
 
     fig, axs = plt.subplots(len(models), len(seasons), figsize=(4*len(seasons), 4*len(models)), sharex='col', sharey='row', squeeze=0, gridspec_kw={{"width_ratios": (len(seasons)-1)*[1] + [1.25]}})
 
@@ -80,8 +86,10 @@ for var in variables.keys():
 
             if model == "reference":
                 nc_file = model_dirs[model]+"/"+var+"-reference-"+season+"-remapped.nc"
+                color = "black"
             else:
                 nc_file = model_dirs[model]+"/"+var+"-"+season+".nc"
+                color = RGB_tuples[i]
                 
             ds = load_dataset(nc_file)
 
@@ -93,7 +101,7 @@ for var in variables.keys():
                 units = "a.u."
 
             if j == len(seasons)-1:
-                cbar_params = {{"add_colorbar" : True, "cbar_kwargs" : {{"label" : ""}}}}
+                cbar_params = {{"add_colorbar" : True, "cbar_kwargs" : {{"label" : var+" ["+units+"]", "ticks" : ticks}}}}
             else:
                 cbar_params = {{"add_colorbar" : False}}
 
@@ -111,6 +119,10 @@ for var in variables.keys():
 
             if j != 0:
                 axs[i,j].set_ylabel("")
+            else:
+                ylabel = axs[i,j].get_ylabel()
+                axs[i,j].set_ylabel(r"$\bf{{"+model+"}}$"+"\n"+ylabel)
+                axs[i,j].yaxis.label.set_color(color)
                 
             if i != len(models)-1:
                 axs[i,j].set_xlabel("")
