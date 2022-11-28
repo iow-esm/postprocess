@@ -83,10 +83,10 @@ for var in variables.keys():
                 os.system(command)
                 
                 command = "for var in `cdo showname " + std_file + " 2> /dev/null | grep -v \"showname:\"`; do "
-                command += "cdo chname,$var,${var}_STD " + std_file + " tmp.nc; mv tmp.nc " + std_file + "; done"
+                command += "cdo chname,$var,${var}_STD " + std_file + " "+results_dir+"/tmp.nc; mv " +results_dir+"/tmp.nc " + std_file + "; done"
                 os.system(command)
                 
-                command = "cdo merge " + std_file + " " + mean_file + " tmp.nc; mv tmp.nc " + mean_file    
+                command = "cdo merge " + std_file + " " + mean_file + " "+results_dir+"/tmp.nc; mv "+results_dir+"/tmp.nc " + mean_file    
                 os.system(command)
                 
                 command = "rm " + std_file
@@ -104,10 +104,10 @@ for var in variables.keys():
     os.system(command)
     
     command = "for var in `cdo showname " + results_dir + "/" + var + "_STD.nc 2> /dev/null | grep -v \"showname:\"`; do "
-    command += "cdo chname,$var,${var}_STD " + results_dir + "/" + var + "_STD.nc tmp.nc; mv tmp.nc " + results_dir + "/" + var + "_STD.nc; done"
+    command += "cdo chname,$var,${var}_STD " + results_dir + "/" + var + "_STD.nc "+results_dir+"/tmp.nc; mv "+results_dir+"/tmp.nc " + results_dir + "/" + var + "_STD.nc; done"
     os.system(command)
     
-    command = "cdo merge " + results_dir + "/" + var + "_STD.nc " + results_dir + "/" + var + "-ensmean.nc tmp.nc; mv tmp.nc " + results_dir + "/" + var + "-ensmean.nc"    
+    command = "cdo merge " + results_dir + "/" + var + "_STD.nc " + results_dir + "/" + var + "-ensmean.nc "+results_dir+"/tmp.nc; mv "+results_dir+"/tmp.nc " + results_dir + "/" + var + "-ensmean.nc"    
     os.system(command)
     
     command = "rm " + results_dir + "/" + var + "_STD.nc"

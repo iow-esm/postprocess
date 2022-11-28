@@ -56,7 +56,7 @@ for var in variables.keys():
             cmd += "cdo -chname,$var,${var}_STD -timstd -selmon," + numbers + " " + cat_file + " " + output_file+"_STD; "
         else:
             cmd += "cdo -chname,$var,${var}_STD -timstd " + cat_file + " " + output_file+"_STD; "
-        cmd += "cdo merge "+output_file+" "+output_file+"_STD tmp.nc; rm "+output_file+"_STD; mv tmp.nc "+output_file+"; done"
+        cmd += "cdo merge "+output_file+" "+output_file+"_STD "+results_dir+"/tmp.nc; rm "+output_file+"_STD; mv "+results_dir+"/tmp.nc "+output_file+"; done"
         os.system(cmd)
 
         try:

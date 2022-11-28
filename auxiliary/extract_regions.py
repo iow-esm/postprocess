@@ -68,7 +68,9 @@ for var in variables.keys():
             command = "cdo -fldmean -sellonlatbox," + lonlatbox + " " + cat_file + " " + results_dir + "/" + var + "-" + station + ".nc"
             os.system(command)
         else:
-            command = "cdo -fldmean -mul " + cat_file + " -remapnn,"+cat_file+" "+maskfile + " " + results_dir + "/" + var + "-" + station + ".nc"
+            command = "cp "+cat_file+" "+cat_file+"2; "
+            command += "cdo -fldmean -div " + cat_file + " -remapnn,"+cat_file+"2 "+maskfile + " " + results_dir + "/" + var + "-" + station + ".nc"
+            command += "; rm "+cat_file+"2"
             os.system(command)
         
         for operator in operators:
@@ -92,10 +94,10 @@ for var in variables.keys():
                 os.system(command)
                 
                 command = "for var in `cdo showname " + std_file + " 2> /dev/null | grep -v \"showname:\"`; do "
-                command += "cdo chname,$var,${var}_STD " + std_file + " tmp.nc; mv tmp.nc " + std_file + "; done"
+                command += "cdo chname,$var,${var}_STD " + std_file + " "+results_dir+"/tmp.nc; mv "+results_dir+"/tmp.nc " + std_file + "; done"
                 os.system(command)
                 
-                command = "cdo merge " + std_file + " " + mean_file + " tmp.nc; mv tmp.nc " + mean_file    
+                command = "cdo merge " + std_file + " " + mean_file + " "+results_dir+"/tmp.nc; mv "+results_dir+"/tmp.nc " + mean_file    
                 os.system(command)
                 
                 command = "rm " + std_file
