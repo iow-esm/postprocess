@@ -11,6 +11,9 @@ cd ../compare_2D_anomalies
 cd ../compare_time_series
 ./postprocess.sh ${out_dir} ${from_date} ${to_date} 
 
+cd ../create_taylor_diagrams
+./postprocess.sh ${out_dir} ${from_date} ${to_date} 
+
 cd ../draw_stations_and_regions
 ./postprocess.sh ${out_dir} ${from_date} ${to_date} 
 
