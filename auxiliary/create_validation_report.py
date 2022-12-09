@@ -62,6 +62,8 @@ script = f"""# Validation report
 |Author:                        |`{os.getlogin()}`|
 
 
+
+
 ### Performed tasks
 
 """
@@ -129,11 +131,17 @@ for var in variables.keys():
 
         """
 
-        for fig in glob.glob("../"+task+"/"+results_dir+"/"+var+"*.png"):
+        for fig in glob.glob("../"+task+"/"+results_dir+"/"+var+".png"):
             script += f"""
 ![{fig.split("/")[-4:]}](../../{fig})  
 
         """
+
+        for fig in glob.glob("../"+task+"/"+results_dir+"/"+var+"-*.png"):
+            script += f"""
+![{fig.split("/")[-4:]}](../../{fig})  
+
+        """        
 
 f = open(pwd+"/"+results_dir+"/validation_report.md", "w")
 f.write(script)
