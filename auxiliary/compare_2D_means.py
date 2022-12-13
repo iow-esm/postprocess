@@ -26,7 +26,7 @@ import global_settings
 variables = global_settings.variables
 
 sys.path.append('../../auxiliary')
-from helpers import plot_coast, load_dataset, unload_dataset, find_other_models, get_n_colors
+from helpers import plot_coast, load_dataset, unload_dataset, find_other_models, get_n_colors, process_plot_config
 
 os.chdir(pwd+"/{results_dir}")
 
@@ -63,21 +63,6 @@ for var in variables.keys():
 
     seasons = list(variables[var]["seasons"].keys())
 
-    vmin = variables[var]["plot-config"].min_value
-    vmax = variables[var]["plot-config"].max_value
-
-    if variables[var]["plot-config"].delta_value is not None:
-        d = variables[var]["plot-config"].delta_value
-        levels = np.arange(vmin,vmax+d,d)
-        s = len(levels)//14 + 1
-        ticks = levels[::s]
-    else:
-        levels = np.linspace(vmin,vmax,13).tolist()
-        ticks = levels
-
-    ctr_plot_cfg = {{"vmin" : vmin, "vmax" : vmax, "levels" : levels, "linewidths" : 0.75, "colors" : "black",  "linestyles" : "-"}}
-    data_plot_cfg = {{"vmin" : vmin, "vmax" : vmax, "cmap" : variables[var]["plot-config"].color_map, "levels" : levels}}
-
     fig, axs = plt.subplots(len(models), len(seasons), figsize=(4*len(seasons), 4*len(models)), sharex='col', sharey='row', squeeze=0, gridspec_kw={{"width_ratios": (len(seasons)-1)*[1] + [1.25]}})
 
     for i, model in enumerate(models):
@@ -94,22 +79,24 @@ for var in variables.keys():
             ds = load_dataset(nc_file)
 
             ds_var = ds.data_vars[var]
-
+            
             try:
-                units = ds_var.units
+                plot_config = variables[var]["plot-config"]
             except:
-                units = "a.u."
+                plot_config = None
 
+            data_plot_cfg, cbar_params, ctr_plot_cfg = process_plot_config(plot_config, ds_var)
+             
             if j == len(seasons)-1:
-                cbar_params = {{"add_colorbar" : True, "cbar_kwargs" : {{"label" : var+" ["+units+"]", "ticks" : ticks}}}}
+                cbar_params = {{"add_colorbar" : True, **cbar_params}}
             else:
-                cbar_params = {{"add_colorbar" : False}}
+                cbar_params = {{"add_colorbar" : False}}                
 
             plot_coast(axs[i,j])
 
             ds_var.plot(ax=axs[i,j], **cbar_params, **data_plot_cfg)
             
-            if variables[var]["plot-config"].contour:
+            if ctr_plot_cfg != {{}}:
                 np.squeeze(ds_var).plot.contour(ax=axs[i,j], **ctr_plot_cfg)
 
             if i == 0:

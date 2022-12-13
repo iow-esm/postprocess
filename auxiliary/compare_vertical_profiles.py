@@ -30,9 +30,7 @@ variables = global_settings.variables
 
 
 sys.path.append(pwd+"/../../auxiliary")
-import plot_vertical_profile
-
-from helpers import find_other_models, get_n_colors
+from helpers import find_other_models, get_n_colors, process_plot_config
 
 os.chdir(pwd+"/{results_dir}")
 
@@ -45,65 +43,112 @@ model_directories = {{"model1" : pwd+"/../seasonal_mean/{results_dir}"}}
 # change the reference directory if nercessary
 ref_dir = pwd+"/../process_reference/{results_dir}"
 
-for var in variables.keys():
+kinds = ["stations", "regions"]
 
-    try:
-        if variables[var]['dimension'] != 4:
+for kind in kinds:
+
+    for var in variables.keys():
+
+        try:
+            if variables[var]['dimension'] != 4:
+                continue
+        except:
             continue
-    except:
-        continue
 
-    try:
-        variables[var]['BED-reference-file-pattern']
-        bed_ref = True
-    except:
-        bed_ref = False
+        try:
+            variables[var]['BED-reference-file-pattern']
+            bed_ref = True
+        except:
+            bed_ref = False
+        
+        try:
+            variables[var]['reference-file-pattern']
+            ref = True
+        except:
+            ref = False
 
-    seasons = variables[var]["seasons"]
-    stations = {{**variables[var]["stations"], **variables[var]["regions"]}}
+        seasons = variables[var]["seasons"]
 
-    fig, axs = plt.subplots(len(stations), len(seasons), figsize=(3*len(seasons), 4*len(stations)), sharex=True, sharey='row', squeeze=0)
+        stations = variables[var][kind]
+        if len(stations) == 0:
+            continue
 
-    model_dirs = {{**model_directories, **find_other_models(variables[var], "seasonal_mean", {from_date}, {to_date})}}
-    models = model_dirs.keys()
+        fig, axs = plt.subplots(len(stations), len(seasons), figsize=(3*len(seasons), 4*len(stations)), sharex=True, sharey='row', squeeze=0)
 
-    RGB_tuples = get_n_colors(len(models))  
+        model_dirs = {{**model_directories, **find_other_models(variables[var], "seasonal_mean", {from_date}, {to_date})}}
+        models = model_dirs.keys()
 
-    for i, station in enumerate(stations):
-        for j, season in enumerate(seasons.keys()):
-            
-            if bed_ref:
-                try:
-                    ds = xr.open_dataset(ref_dir+"/"+var+"-"+station+"-"+season+".nc")
-                    plot_vertical_profile.plot_vertical_profile(axs[i,j], ds[var].data, ds.depth.data, ds[var+"_STD"].data, smooth=False, label = "reference", color="grey", marker = "o")
+        RGB_tuples = get_n_colors(len(models))  
+
+        for i, station in enumerate(stations):
+            for j, season in enumerate(seasons.keys()):
+                
+                if bed_ref:
+                    try:
+                        ds = xr.open_dataset(ref_dir+"/"+var+"-"+station+"-"+season+".nc")
+                        std = np.squeeze(ds[var+"_STD"].data)
+                        np.squeeze(ds[var]).plot(y=ds[var].squeeze().dims[0], ax=axs[i,j], color="grey", linewidth=3, label = "BED", marker = "o")
+                        
+                        axs[i,j].fill_betweenx(ds[ds[var].squeeze().dims[0]].data, ds[var].squeeze().data - 2.0*std, ds[var].squeeze().data + 2.0*std, alpha=0.3, color="grey") 
+                        ds.close()
+                    except:
+                        print("BED reference is configured but could not find or plot data.")
+
+                if ref:
+                    try:
+                        ds = xr.open_dataset(model_dirs[model]+"/"+var+"-reference-"+station+"-"+season+".nc")
+                        std = np.squeeze(ds[var+"_STD"].data)
+                        np.squeeze(ds[var]).plot(y=ds[var].squeeze().dims[0], ax=axs[i,j], color="black", linewidth=3, label = "reference")
+
+                        axs[i,j].fill_betweenx(ds[ds[var].squeeze().dims[0]].data, ds[var].squeeze().data - 2.0*std, ds[var].squeeze().data + 2.0*std, alpha=0.3, color="black")    
+                        ds.close()
+                    except:
+                        print("Reference is configured but could not find or plot data.")                    
+
+                for k, model in enumerate(models):
+                    ds = xr.open_dataset(model_dirs[model]+"/"+var+"-"+station+"-"+season+".nc")
+
+                    if len(models) > 2:
+                        std = None
+                    else:
+                        std = np.squeeze(ds[var+"_STD"].data)
+
+                    np.squeeze(ds[var]).plot(y=ds[var].squeeze().dims[0], ax=axs[i,j], color=RGB_tuples[k], linewidth=3, label = model)
+
+                    if std is not None:
+                        axs[i,j].fill_betweenx(ds[ds[var].squeeze().dims[0]].data, ds[var].squeeze().data - 2.0*std, ds[var].squeeze().data + 2.0*std, alpha=0.3, color=RGB_tuples[k])
+
                     ds.close()
+
+                try:
+                    plot_config = variables[var]["plot-config"]
                 except:
-                    print("BED reference is configured but could not find or plot data.")
+                    plot_config = None
 
-            for k, model in enumerate(models):
-                ds = xr.open_dataset(model_dirs[model]+"/"+var+"-"+station+"-"+season+".nc")
-
-                if len(models) > 2:
-                    std = None
+                data_plot_cfg, _, _ = process_plot_config(plot_config, ds[var])
+                axs[i,j].set_xlim(data_plot_cfg["vmin"], data_plot_cfg["vmax"])
+                
+                if i == 0:
+                    axs[i,j].set_title(season, fontweight="bold")
                 else:
-                    std = np.squeeze(ds[var+"_STD"].data)
+                    axs[i,j].set_title("") 
 
-                plot_vertical_profile.plot_vertical_profile(axs[i,j], np.squeeze(ds[var].data), ds[variables[var]["plot-config"].vert_name].data, std=std, color=RGB_tuples[k], label = model)
-                ds.close()
+                if j == 0:
+                    ylabel =  axs[i,j].get_ylabel()            
+                    axs[i,j].set_ylabel(r"$\bf{{"+station.replace("_","\_")+"}}$"+"\n"+ylabel)
+                else:
+                    axs[i,j].set_ylabel("")
 
-            axs[i,j].set_xlim([variables[var]["plot-config"].min_value, variables[var]["plot-config"].max_value])
-            
-            if i == 0:
-                axs[i,j].set_title(season, fontweight="bold")
-            if j == 0:
-                axs[i,j].set_ylabel(r"$\bf{{"+station.replace("_","\_")+"}}$"+"\n"+variables[var]["plot-config"].vert_name+" ["+ds[variables[var]["plot-config"].vert_name].units+"]")
-            if i == (len(stations) - 1):
-                axs[i,j].set_xlabel(var+" ["+ds[var].units+"]")
+                if i == (len(stations) - 1):
+                    axs[i,j].set_xlabel(var+" ["+ds[var].units+"]")
 
-    axs[0,0].legend()
-    fig.tight_layout()  
-    plt.subplots_adjust(wspace=0, hspace=0)
-    fig.savefig(var+".png", dpi=100)
+                axs[i,j].invert_yaxis()
+                axs[i,j].grid(linestyle='--', alpha=0.6)
+
+        axs[0,0].legend()
+        fig.tight_layout()  
+        plt.subplots_adjust(wspace=0, hspace=0)
+        fig.savefig(var+"-"+kind+".png", dpi=100)
 """
 
 f = open(pwd+"/"+results_dir+"/compare_vertical_profiles.py", "w")

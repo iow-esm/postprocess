@@ -26,7 +26,7 @@ import global_settings
 variables = global_settings.variables
 
 sys.path.append('../../auxiliary')
-from helpers import plot_coast, load_dataset, unload_dataset, get_n_colors, find_other_models, get_anomaly_plot_config
+from helpers import plot_coast, load_dataset, unload_dataset, get_n_colors, find_other_models, process_plot_config
 
 os.chdir(pwd+"/{results_dir}")
 
@@ -48,6 +48,12 @@ for var in variables.keys():
         variables[var]['reference-file-pattern']
     except:
         continue
+
+    try:
+        if variables[var]["dimension"] != 3:
+            continue
+    except:
+        pass    
 
     model_dirs = {{**model_directories, **find_other_models(variables[var], "calculate_anomalies", {from_date}, {to_date})}}
 
@@ -81,16 +87,22 @@ for var in variables.keys():
             ds_var = ds.data_vars[var]
 
             try:
-                units = ds_var.units
+                plot_config = variables[var]["plot-config-anomaly"]
             except:
-                units = "a.u." 
+                plot_config = None
 
-            data_plot_cfg, cbar_params, ctr_plot_cfg = get_anomaly_plot_config(variables[var], ds_var)
+            data_plot_cfg, cbar_params, ctr_plot_cfg = process_plot_config(plot_config, ds_var)
              
             if j == len(seasons)-1:
                 cbar_params = {{"add_colorbar" : True, **cbar_params}}
+                cbar_params["cbar_kwargs"]["label"] = r'$\Delta$'+ds_var.name+" ["+units+"]"
             else:
                 cbar_params = {{"add_colorbar" : False}}
+
+            try:
+                units = ds_var.units
+            except:
+                units = "a.u."       
 
             ds_var.plot(ax=axs[i,j], **cbar_params, **data_plot_cfg)
             
@@ -149,6 +161,7 @@ for var in variables.keys():
     fig.tight_layout()  
     plt.subplots_adjust(wspace=0, hspace=0)
     fig.savefig(var+".png", dpi=100)
+    plt.close()
 
     if not compare:
         continue
@@ -195,6 +208,7 @@ for var in variables.keys():
     fig.tight_layout()  
     plt.subplots_adjust(top=0.95, wspace=0, hspace=0)
     fig.savefig(var+"_mean_errors.png", dpi=100)
+    plt.close()
 """
 
 f = open(pwd+"/"+results_dir+"/compare_2D_anomalies.py", "w")

@@ -14,26 +14,86 @@ import glob
 import os
 
 tasks = {  
-    "compare_2D_means" : {"name" : "2D means"},
-    "compare_2D_anomalies" : {"name" : "2D anomalies"},
-    "draw_stations_and_regions" : {"name" : "Stations and Regions"},
+    "compare_2D_means" : {
+        "name" : "Two-dimensional seasonal means",
+        "text" : 
+        (r"This task generates figures containing two-dimensional seasonal means $\langle \phi \rangle_S(x,y)$ for a season $s$ and a three-dimensional variable $\phi(x,y,t)$, i.e."
+         r"$$ \langle \phi \rangle_S(x,y) = \frac{1}{N_S} \sum_{t\in S} \phi(x,y,t), $$"
+         f"where $t$ are all time steps that are contained in season $S$. The number of these time steps is given by $N_S$, where the considered time period is from `{from_date}` to `{to_date}`."
+         ),
+        "caption-template" : 
+        ("<b> Seasonal means for variable {var_name}. </b>"
+         "The rows correspond to different models whereas the columns reflect the various seaons that are considered."
+         "The $x$ and $y$ axis measure the longitudes and latitudes, respectively."
+         ),
+    },
+
+    "compare_2D_anomalies" : {
+        "name" : "Two-dimensional seasonal anomalies",
+        "text" : 
+        (r"This task generates figures containing two-dimensional seasonal anomalies $\langle \Delta \phi \rangle_S(x,y)$ for a season $s$, "
+         r"a three-dimensional variable $\phi(x,y,t)$ and a three-dimensional reference field $\phi_{\mathrm{ref}}(x,y,t)$ i.e."
+         r"$$ \langle \phi \rangle_S(x,y) = \frac{1}{N_S} \sum_{t\in S} \phi(x,y,t) - \phi_{\mathrm{ref}}(x,y,t) = \langle \phi \rangle_S(x,y) - \langle \phi_{\mathrm{ref}} \rangle_S(x,y) , $$"
+         f"where $t$ are all time steps that are contained in season $S$. The number of these time steps is given by $N_S$, where the considered time period is from `{from_date}` to `{to_date}`."
+         ),
+         "caption-template" : 
+        ("<b> Seasonal anomalies for variable {var_name}. </b>"
+         "The rows correspond to different models whereas the columns reflect the various seaons that are considered."
+         "The $x$ and $y$ axis measure the longitudes and latitudes, respectively."
+         ),
+    },
+
+    "draw_stations_and_regions" : {
+        "name" : "Stations and Regions",
+        "text" : 
+        ("This task generates an image with the configured staitons and regions for which time series data is generated."
+         "For regions the time series is generated as the spatial mean over this region."
+         "Whereas for stations a remapping to the nearest neighboring grid cell is performed."
+         ),  
+        "caption-template" : 
+        ("<b> Stations and regions for variable {var_name}. </b>"
+         "Colored areas depict the different regions. The dots are located at the station's coordinates."
+         ),
+    },
+
     "compare_time_series" : {"name" : "Time series"},
+
     "create_taylor_diagrams" : {
         "name" : "Taylor Diagrams",
-        "text" : r"""
-Taylor diagrams are mathematical diagrams designed to graphically indicate which of several approximate representations (or models) of a system, 
-process, or phenomenon is most realistic. 
-This diagram, invented by Karl E. Taylor in 1994 ([published in 2001](doi:10.1029/2000JD900719)) facilitates the comparative assessment of different models. 
-It is used to quantify the degree of correspondence between the modeled and observed behavior in terms of three statistics: 
-the Pearson correlation coefficient, the root-mean-square error (RMSE) error, and the standard deviation. 
+        "text" : 
+        ("Taylor diagrams graphically indicate which of several model data represents best a given reference data." 
+         "In order to quantify the degree of correspondence between the modeled and observed behavior in terms of three statistics:" 
+         "the Pearson correlation coefficient, the root-mean-square error (RMSE) error, and the standard deviation."
+         f"Here both data, model and reference, consist of the same number of samples that correspond to a time series starting from `{from_date}` and ending at `{to_date}`."
+         ),
 
-(__Text taken from: [https://en.wikipedia.org/wiki/Taylor_diagram](https://en.wikipedia.org/wiki/Taylor_diagram)__)
+        "caption-template" : 
+        ("<b> Taylor diagrams for variable {var_name}. </b>"
+         "Colored stars stand for the model result and the black circle is the reference."
+         "The standard deviation of the data is measured on the radial axis whereas the correaltion to the reference is given by the angle;"
+         "depicted is the arcus cosine of the angle."
+         "The colormap refers to the root means square error of the model data with respect to the reference data."
+         "The rows correspond to the different regions and stations whereas the columns are related to the different kind of time series."
+         ),
+    },
 
-The tables depicted below the taylor diagrams show the **cost function** $c$, which is here defined as
-$$ c = \textrm{RMSE} / \sigma_{ref}, $$
-where $\textrm{RMSE}$ is the root mean square error of each model and $\sigma_{ref}$ is the standard deviation of the reference data.
-"""
-        },
+    "get_cost_function" : {
+        "name" : "Cost functions",
+        "text" : 
+        ("The cost function $c$ as it is defined here, further summarizes the information given in a Taylor diagram."
+         r"It measures the root means square error $\epsilon = \sqrt{\frac{1}{N}\sum_{t=t_1}^{t_{N}} (\phi(t)-\phi_{\mathrm{ref}}(t))^2}$ of the model data $\phi(t)$"
+         r"in units of the standard deviation $\sigma_{\mathrm{ref}}$ of reference data $\phi_{\mathrm{ref}}(t)$, i.e."
+         r"$$ c = \epsilon / \sigma_{\mathrm{ref}}. $$"
+         r"Both data consist of $N$ samples corresponding to a time series starting from $t_1$ and ending at $t_N$."
+         ),
+        "caption-template" : 
+        ("<b> Cost functions $c$ for variable {var_name}. </b>"
+         r"The colors refer to the magnitude of the cost function: green means very good ($ 0 \leq c < 1 $),"
+         r"yellow stands for satisfactory ($ 1 < c < 2 $) and red shows bad quality ($ c \geq 2 $)."
+         "The rows correspond to the different regions and stations whereas the columns are related to the different temporal means and models."
+        ),
+    },
+
     "compare_vertical_profiles" : {"name" : "Vertical profiles"},
 }
 
@@ -62,14 +122,33 @@ script = f"""# Validation report
 |Author:                        |`{os.getlogin()}`|
 
 
+"""
 
+try:
+    description = global_settings.description
+    script += fr"""
+
+### Experiment description
+
+***
+
+{description}
+
+"""
+except:
+    pass
+
+script += """
 
 ### Performed tasks
+
+***
+
 
 """
 
 for task in tasks.keys():
-    script += "#### "+tasks[task]["name"]+"\n\n" 
+    script += "#### **"+tasks[task]["name"]+"**\n\n" 
     try:
         script += tasks[task]["text"]+"\n\n\n" 
     except:
@@ -77,33 +156,57 @@ for task in tasks.keys():
 
 script += """
 
-## Analyzed variables
-
-"""
-
-for i, var in enumerate(variables.keys()):
-    script += f"""
-[**{i+1}. {var} ->**](#{var})
-"""
-
-script += f"""
-
-
 ## Results
 
 """
 
-for var in variables.keys():
+fig_counter = 0
+for i, var in enumerate(variables.keys()):
+    try:
+        var_name = variables[var]["long-name"]+" ("+var+")"
+    except:
+        var_name = var
+
+    if "(" in var_name: # if it is a long name ensure that starts with capital letter
+        section = var_name[0].upper()+var_name[1:]
+    else:
+        section = var_name
+
     script += f"""
 
-
-### {var}
+### {section}   
 
 <hr style="border:2px solid gray">
 
-<details>
+    """
+    
+    try:
+        description = "#### **Description**\n"
+        description += variables[var]["description"]
+    except:
+        description = ""
 
-#### Postprocess settings
+    try:
+        variables[var]["reference-description"]
+        description += "\n#### **Reference description**\n"
+        description += variables[var]["reference-description"]
+    except:
+        pass
+
+
+    script += f"""
+
+{description}
+
+"""
+
+    script += f"""
+
+<details>
+<summary><b><i>Analysis</i></b></summary>
+
+<details>
+<summary><i>Postprocess settings</i></summary>
 
 [**Go to settings ->**](../../../global_settings.py)
 
@@ -122,27 +225,55 @@ for var in variables.keys():
     """
     for task in tasks.keys():
     
-        script += f"""
-### {tasks[task]["name"]}
+        figure_patterns = ["../"+task+"/"+results_dir+"/"+var+".png", "../"+task+"/"+results_dir+"/"+var+"-*.png"]
+
+        figures = ""
+
+        os.system("mkdir -p "+results_dir+"/figures/"+task)
+
+        for pattern in figure_patterns:
+
+            for fig in glob.glob(pattern):
+                fig_counter += 1
+                try:
+                    caption = tasks[task]["caption-template"].format(var_name=var_name)
+                except:
+                    caption = "<b>"+tasks[task]["name"]+".</b> Plots for variable "+var_name+"."
+
+                os.system("ln -s `realpath "+fig+"` "+results_dir+"/figures/"+task+"/")
+
+                figures += f"""
+
+<figure>
+<img src="./figures/{task}/{fig.split("/")[-1]}">
+    <figcaption align = "center"> <b> Fig. {fig_counter}: </b> {caption} </figcaption>
+</figure>  
+
+"""   
+        # if there a figures we create a subsection for this task
+        if figures != "":
+
+            script += f"""
+#### **{tasks[task]["name"]}**
 
 ***
- 
+
+<details>
+<summary><b><i>Figures</b></i></summary>
+
 [**Go to notebook ->**](../../../{task}/{results_dir}/{task}.ipynb)
 
-        """
+{figures}
 
-        for fig in glob.glob("../"+task+"/"+results_dir+"/"+var+".png"):
-            script += f"""
-![{fig.split("/")[-4:]}](../../{fig})  
+</details>
 
-        """
+"""
 
-        for fig in glob.glob("../"+task+"/"+results_dir+"/"+var+"-*.png"):
-            script += f"""
-![{fig.split("/")[-4:]}](../../{fig})  
+    script += """
 
-        """        
+</details>
 
+"""
 f = open(pwd+"/"+results_dir+"/validation_report.md", "w")
 f.write(script)
 f.close()

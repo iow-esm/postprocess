@@ -21,7 +21,7 @@ import global_settings
 variables = global_settings.variables
 
 sys.path.append('../../auxiliary')
-from helpers import get_month_names, process_time_axis,  get_n_colors, find_other_models
+from helpers import get_month_names, process_time_axis,  get_n_colors, find_other_models, better_operator_name
 
 os.chdir(pwd+"/{results_dir}")
 
@@ -94,12 +94,12 @@ for kind in kinds:
                     if len(models) < 3:
                         try:
                             std = np.squeeze(ds[var+"_STD"].data)
-                            axs[i,j].fill_between(t, d - 0.5*std, d + 0.5*std, color=p[-1].get_color(), alpha=0.2)
+                            axs[i,j].fill_between(t, d - 2.0*std, d + 2.0*std, color=p[-1].get_color(), alpha=0.2)
                         except:
                             print("Could not plot standard deviation for variable "+var)
 
                 if i == 0:
-                    axs[i,j].set_title(operator[1:], fontweight="bold")
+                    axs[i,j].set_title(better_operator_name(operator[1:]), fontweight="bold")
                 if j == 0:
                     axs[i,j].set_ylabel(r"$\bf{{"+dat.replace("_","\_")+"}}$"+"\n"+var+" ["+ds[var].units+"]")
                 if i == (len(data) - 1):
@@ -133,7 +133,7 @@ for kind in kinds:
                     p = axs[i,j].plot(t, d, label="reference", color="grey", linewidth=4, zorder=0, marker=marker) 
                     try:
                         std = np.squeeze(ds[var+"_STD"].data)
-                        axs[i,j].fill_between(t, d - 0.5*std, d + 0.5*std, color=p[-1].get_color(), alpha=0.3, zorder=0)
+                        axs[i,j].fill_between(t, d - 2.0*std, d + 2.0*std, color=p[-1].get_color(), alpha=0.3, zorder=0)
                     except:
                         print("Could not plot standard deviation for variable "+var)
                     ds.close()
@@ -142,6 +142,10 @@ for kind in kinds:
 
                 try:
                     ax2.append(axs[i,j].twinx())
+
+                    if len(ax2) > 1:
+                        ax2[-1].get_shared_y_axes().join(*ax2)
+
                     for k, model in enumerate(model_dirs.keys()):
                         diff_dir = model_dirs[model].replace("extract_"+kind, "calculate_anomalies")
                         ds = xr.open_dataset(diff_dir+"/"+var+"-"+dat+operator+".nc")
@@ -156,14 +160,13 @@ for kind in kinds:
                 ax2[-1].set_ylabel(r'$\Delta$'+var+" ["+ds[var].units+"]")
                 ax2[-1].yaxis.label.set_color('darkred')
                 
-
-                ax2[0].get_shared_y_axes().join(*ax2)
                 if i == 0:
                     ax2[-1].legend()
+                
                 for a in ax2:
                     a.grid(linestyle='--', alpha=0.3, color="darkred")
                     a.tick_params(axis='y', colors='darkred')
-                    
+
             if len(ax2) > 1:
                 for a in ax2[:-1]:
                     a.set_yticklabels([])
@@ -172,6 +175,7 @@ for kind in kinds:
         fig.tight_layout()  
         plt.subplots_adjust(wspace=0, hspace=0)
         fig.savefig(var+"-"+kind+".png", dpi=100)
+        plt.close()
 """
 
 f = open(pwd+"/"+results_dir+"/compare_time_series.py", "w")

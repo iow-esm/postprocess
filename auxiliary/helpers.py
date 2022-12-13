@@ -109,67 +109,73 @@ def get_n_colors(n, cmap="tab10"):
         return list(map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples))  
     
     colors = matplotlib.cm.get_cmap(cmap)
-    return colors(np.linspace(0.0, 1.0, n, endpoint=True))
+    return colors(np.linspace(0.0, 1.0, n, endpoint=True))     
 
-def get_anomaly_plot_config(var, dataset):
-
+def process_plot_config(plot_config, data_array):
     from matplotlib import cm
     from matplotlib.colors import ListedColormap
     import numpy as np
 
-    vmin = var["plot-config-anomaly"].min_value
-    vmax = var["plot-config-anomaly"].max_value
+    import plot_config as pc
 
-    if var["plot-config-anomaly"].delta_value is not None:
-        d = var["plot-config-anomaly"].delta_value
+    if plot_config is None:
+        plot_config = pc.PlotConfig()
+    else:
+        if not isinstance(plot_config, pc.PlotConfig):
+            plot_config = pc.PlotConfig(**plot_config)
+
+    if plot_config.min_value is not None:
+        vmin = plot_config.min_value
+    else:
+        vmin = np.amin(np.squeeze(data_array))
+
+    if plot_config.max_value is not None:
+        vmax = plot_config.max_value
+    else:
+        vmax = np.amax(np.squeeze(data_array))
+
+    if plot_config.symmetric:
+        vmin = min(vmin, -vmax)
+        vmax = max(-vmin, vmax)
+
+    try:
+        units = data_array.units
+    except:
+        units = "a.u."
+
+    if plot_config.delta_value is None:
+        data_plot_cfg = {"cmap" : plot_config.color_map, "vmin" : vmin, "vmax" : vmax}
+        cbar_cfg = {"cbar_kwargs" : {"label" : data_array.name+" ["+units+"]"}} 
+        ctr_plot_cfg = {}
+
+    else:
+        d = plot_config.delta_value
         levels = np.arange(vmin,vmax+d,d)
         levels = levels[np.abs(levels)>1.0e-15].tolist()
         s = len(levels)//14 + 1
         ticks = list(set(sorted(levels[::s]+[0])))
-    else:
-        levels = np.linspace(vmin,vmax,13).tolist()
-        ticks = list(set(sorted(levels+[0])))  
-
-    cmap = cm.get_cmap(var["plot-config-anomaly"].color_map, 256)
-    color_values = ((np.array(levels)-min(levels))/(max(levels)-min(levels))).tolist()
-    
-    if np.max(np.squeeze(dataset)) > vmax:
-        color_values += [1.1]
-    if np.min(np.squeeze(dataset)) < vmin:
-        color_values += [-0.1]
+        cmap = cm.get_cmap(plot_config.color_map, 256)
+        color_values = ((np.array(levels)-min(levels))/(max(levels)-min(levels))).tolist()
         
-    color_values = sorted(color_values + [0.5])
-    newcolors = cmap(color_values)
-    cmap = ListedColormap(newcolors)
+        if np.amax(np.squeeze(data_array)) > vmax:
+            color_values += [1.1]
+        if np.amin(np.squeeze(data_array)) < vmin:
+            color_values += [-0.1]
+            
+        color_values = sorted(color_values + [0.5])
+        newcolors = cmap(color_values)
+        cmap = ListedColormap(newcolors)
 
-    try:
-        units = dataset.units
-    except:
-        units = "a.u."    
+        data_plot_cfg = {"levels" : levels, "cmap" : cmap, "vmin" : vmin, "vmax" : vmax}
+        cbar_cfg = {"cbar_kwargs" : {"ticks" : ticks, "label" : data_array.name+" ["+units+"]"}}
 
-    
-    data_plot_cfg = {"levels" : levels, "cmap" : cmap, "vmin" : vmin, "vmax" : vmax}
-    cbar_cfg = {"cbar_kwargs" : {"ticks" : ticks, "label" : r'$\Delta$'+var["plot-config-anomaly"].variable+" ["+units+"]"}}
+        if plot_config.contour:
+            ctr_plot_cfg = {"levels" : levels, "linewidths" : 0.75, "colors" : "black",  "linestyles" : "-"}
+        else:
+            ctr_plot_cfg = {}
 
-    if var["plot-config-anomaly"].contour:
-        ctr_plot_cfg = {"levels" : levels, "linewidths" : 0.75, "colors" : "black",  "linestyles" : "-"}
-    else:
-        ctr_plot_cfg = {}
+    return data_plot_cfg, cbar_cfg, ctr_plot_cfg 
 
-    return data_plot_cfg, cbar_cfg, ctr_plot_cfg                       
-
-#!/usr/bin/env python
-# Copyright: This document has been placed in the public domain.
-
-"""
-Taylor diagram (Taylor, 2001) implementation.
-
-Note: If you have found these software useful for your research, I would
-appreciate an acknowledgment.
-"""
-
-__version__ = "Time-stamp: <2018-12-06 11:43:41 ycopin>"
-__author__ = "Yannick Copin <yannick.copin@laposte.net>"
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -194,58 +200,37 @@ class TaylorDiagram(object):
         rlim = [0.0, 1.2*refstd]
         thetalim = [0.0, 0.5*np.pi]
 
-        # Add reference point and stddev contour
-        try:
-            kwargs["marker"]
-        except:
-            kwargs["marker"] = 'o'
-        try:
-            kwargs["color"]
-        except:
-            kwargs["color"] = "black"
-        try:
-            kwargs["ms"]
-        except:
-            kwargs["ms"] = 10     
-        try:
-            kwargs["label"]
-        except:
-            kwargs["label"] = "reference"                     
+        if ax != None:
 
-        ax.plot([0], refstd, *args, ls='', zorder=0, **kwargs)
+            # Add reference point and stddev contour
+            try:
+                kwargs["marker"]
+            except:
+                kwargs["marker"] = 'o'
+            try:
+                kwargs["color"]
+            except:
+                kwargs["color"] = "black"
+            try:
+                kwargs["ms"]
+            except:
+                kwargs["ms"] = 10     
+            try:
+                kwargs["label"]
+            except:
+                kwargs["label"] = "reference"                     
 
-        #t = np.linspace(0, thetalim[1])
-        #r = np.zeros_like(t) + refstd
-        #ax.plot(t, r, 'k--', label='_')
+            ax.plot([0], refstd, *args, ls='', zorder=0, **kwargs)
+            ax.grid(True, linestyle="--")
+            
+            ax.set_xlabel("St. dev.")
+            ax.xaxis.set_label_coords(0.5, -0.1)
 
-        #xticks = [1.0, 0.99, 0.95, 0.9, 0.8, 0.7, 0.6, 0.4, 0.2, 0.0]
-        #ax.set_xticks(np.arccos(xticks))
-        #ax.set_xticklabels(xticks)
+            ax.set_xlim(thetalim)
+            ax.set_ylim(rlim)
 
-        #if refstd > 100.0 or refstd < 0.1:
-        #    fmt = '%3.2e'
-        #else:
-        #    fmt = '%3.2f'
-
-        #ax.clabel(contours, inline=False, fmt=fmt, colors="black")
-
-        ax.grid(True, linestyle="--")
-
-        #ax.set_rorigin(0)
-
-        #ax.text(0.5*thetalim[1], 1.01*rlim[1],"Correlation", rotation=-45)
-        
-        ax.set_xlabel("St. dev.")
-        ax.xaxis.set_label_coords(0.5, -0.1)
-
-        #ax.set_ylabel("Correlation")
-        #ax.xaxis.set_label_coords(0.707, 0.707)
-
-        ax.set_xlim(thetalim)
-        ax.set_ylim(rlim)
-
-        self.rlim = rlim
-        self.thetalim = thetalim
+            self.rlim = rlim
+            self.thetalim = thetalim
 
         self.model_std = {"reference" : refstd}
         self.corrcoef = {"reference" : 1.0}
@@ -258,25 +243,27 @@ class TaylorDiagram(object):
         `Figure.plot` command.
         """
 
+        model_std = model_data.std(ddof=1)
+        corrcoef = np.corrcoef(model_data, self.refdata)[0, 1]
+        rms = np.sqrt(self.model_std["reference"]**2 + model_std**2 - 2.0*self.model_std["reference"]*model_std*np.cos(np.arccos(corrcoef)))
+
         try:
             label = kwargs["label"]
         except:
             label = "model"+str(len(self.model_std.keys())) 
 
-        model_std = model_data.std(ddof=1)
-        corrcoef = np.corrcoef(model_data, self.refdata)[0, 1]
-        rms = np.sqrt(self.model_std["reference"]**2 + model_std**2 - 2.0*self.model_std["reference"]*model_std*np.cos(np.arccos(corrcoef)))
+        if self.ax != None:
 
-        self.ax.plot(np.arccos(corrcoef), model_std,
-                          *args, **kwargs)  # (theta, radius)
+            self.ax.plot(np.arccos(corrcoef), model_std,
+                            *args, **kwargs)  # (theta, radius)
 
-        if model_std > self.rlim[1]:
-            self.rlim = [0, 1.2 * model_std]
-            self.ax.set_ylim(*self.rlim)
+            if model_std > self.rlim[1]:
+                self.rlim = [0, 1.2 * model_std]
+                self.ax.set_ylim(*self.rlim)
 
-        if np.arccos(corrcoef) > self.thetalim[1]:
-            self.thetalim[1] = 1.2 * np.arccos(corrcoef)
-            self.ax.set_xlim(*self.thetalim)                       
+            if np.arccos(corrcoef) > self.thetalim[1]:
+                self.thetalim[1] = 1.2 * np.arccos(corrcoef)
+                self.ax.set_xlim(*self.thetalim)                       
 
         self.model_std[label] = model_std
         self.corrcoef[label] = corrcoef
@@ -288,6 +275,10 @@ class TaylorDiagram(object):
         return self.model_std, self.corrcoef, self.rms
 
     def finalize(self):
+        
+        if self.ax is None:
+            return 
+
         self.ax.text(0.5*(self.thetalim[1]-self.thetalim[0]), (1.0+0.03*(self.thetalim[1]-self.thetalim[0])**2)*self.rlim[1],"Correlation", rotation=0.5*(self.thetalim[1]-self.thetalim[0])*180.0/np.pi-90.0)
 
         rs, ts = np.meshgrid(np.linspace(*self.rlim), np.linspace(*self.thetalim))
@@ -320,3 +311,18 @@ class TaylorDiagram(object):
 
         self.ax.set_xticks(np.arccos(xticks))
         self.ax.set_xticklabels(xticks)
+
+def better_operator_name(operator):
+
+    better_names = {
+        "monmean" : "monthly means",
+        "ymonmean" : "annual cycle",
+        "yearmean" : "annual means", 
+        "daymean" : "daily means",
+        "" : "time series"
+    }
+
+    try:
+        return better_names[operator]
+    except:
+        return operator

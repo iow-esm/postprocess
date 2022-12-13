@@ -1,8 +1,8 @@
 from copy import deepcopy
 
 class PlotConfig:
-    def __init__(self, variable, title = None, min_value = None, max_value = None, delta_value = None,
-        color_map = None, contour = False, transform_variable = None, task_name = None, path = None, file = None,
+    def __init__(self, variable = None, title = None, min_value = None, max_value = None, delta_value = None,
+        color_map = "ocean", contour = True, transform_variable = None, task_name = None, path = None, file = None,
         lon_name = "lon", lat_name = "lat", vert_name = "z", width = None, height = None, 
         time_name = "time", trend=False, std_deviation=True,
         linestyle = None, symmetric = False):
