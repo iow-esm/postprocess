@@ -13,7 +13,16 @@ def create_results_dir(out_dir, from_date, to_date):
         else:
             prefix = ""
     except:
-        prefix = ""
+        try:
+            from global_settings import report_name
+            if (report_name is not None) and (report_name != ""):
+                prefix = report_name+"_"
+            else:
+                prefix = ""
+        except:
+            prefix = ""
+
+        
 
     # relate results uniquely to path to data (replace slashes by underscores)
     output_folder = out_dir.split("/output/")[-1]

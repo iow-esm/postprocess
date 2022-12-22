@@ -35,8 +35,12 @@ import numpy as np
 import xarray as xr
 
 # extend this dictionary if necessary
-
-model_directories = {{"model1" : pwd+"/../seasonal_mean/{results_dir}"}}
+try:
+    this_model = global_settings.this_model
+except:
+    this_model = "model"
+    
+model_directories = {{this_model : pwd+"/../seasonal_mean/{results_dir}"}}
 
 for var in variables.keys():
 

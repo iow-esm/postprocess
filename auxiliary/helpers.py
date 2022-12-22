@@ -83,9 +83,14 @@ def find_other_models(var, task, from_date, to_date):
     try:
         other_models = var['other-models']
         for om in other_models.keys():
-            model_dirs[om] = other_models[om]["root"]+"/"+task+"/results/"+other_models[om]["output_name"]
-            if {from_date} != -1 and {to_date} != -1:
-                model_dirs[om] += "-"+str(from_date)+"_"+str(to_date)
+            try:
+                model_dirs[om] = other_models[om]["root"]+"/"+task+"/results/"+other_models[om]["output-name"]
+                if {from_date} != -1 and {to_date} != -1:
+                    model_dirs[om] += "-"+str(from_date)+"_"+str(to_date)
+            except:
+                import os
+                cwd = os.getcwd()
+                model_dirs[om] = other_models[om]["root"]+"/"+task+"/results/"+cwd.split("/")[-1]
     except:
         pass    
 

@@ -37,7 +37,12 @@ import math
 from matplotlib.patches import Ellipse, Circle
 
 # extend this dictionary if necessary
-model_directories = {{"model1" : pwd+"/../calculate_anomalies/{results_dir}"}}
+try:
+    this_model = global_settings.this_model
+except:
+    this_model = "model"
+    
+model_directories = {{this_model : pwd+"/../calculate_anomalies/{results_dir}"}}
 # change the reference directory if nercessary
 ref_dir = pwd+"/../process_reference/{results_dir}"
 

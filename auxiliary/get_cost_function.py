@@ -39,7 +39,13 @@ kinds = ["stations", "regions"]
 for kind in kinds:
 
     # extend this dictionary if necessary
-    model_directories = {{"model1" : pwd+"/../extract_"+kind+"/{results_dir}"}}
+    # extend this dictionary if necessary
+    try:
+        this_model = global_settings.this_model
+    except:
+        this_model = "model"
+
+    model_directories = {{this_model : pwd+"/../extract_"+kind+"/{results_dir}"}}
 
     for var in variables.keys():
 

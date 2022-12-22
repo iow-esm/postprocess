@@ -39,7 +39,7 @@ for var in variables.keys():
 
     fig, ax = plt.subplots(1, 1,  figsize=(6, 4))
     
-    RGB_tuples = get_n_colors(len(regions.keys())+1, cmap="rainbow")  
+    RGB_tuples = get_n_colors(len(regions.keys())+1, cmap="Paired")  
     
     proxy = []
     proxy_names = []

@@ -13,6 +13,8 @@ from datetime import datetime
 import glob
 import os
 
+from helpers import get_n_colors
+
 tasks = {  
     "compare_2D_means" : {
         "name" : "Two-dimensional seasonal means",
@@ -33,7 +35,7 @@ tasks = {
         "text" : 
         (r"This task generates figures containing two-dimensional seasonal anomalies $\langle \Delta \phi \rangle_S(x,y)$ for a season $s$, "
          r"a three-dimensional variable $\phi(x,y,t)$ and a three-dimensional reference field $\phi_{\mathrm{ref}}(x,y,t)$ i.e."
-         r"$$ \langle \phi \rangle_S(x,y) = \frac{1}{N_S} \sum_{t\in S} \phi(x,y,t) - \phi_{\mathrm{ref}}(x,y,t) = \langle \phi \rangle_S(x,y) - \langle \phi_{\mathrm{ref}} \rangle_S(x,y) , $$"
+         r"$$ \langle \Delta \phi \rangle_S(x,y) = \frac{1}{N_S} \sum_{t\in S} \phi(x,y,t) - \phi_{\mathrm{ref}}(x,y,t) = \langle \phi \rangle_S(x,y) - \langle \phi_{\mathrm{ref}} \rangle_S(x,y) , $$"
          f"where $t$ are all time steps that are contained in season $S$. The number of these time steps is given by $N_S$, where the considered time period is from `{from_date}` to `{to_date}`."
          ),
          "caption-template" : 
@@ -56,7 +58,20 @@ tasks = {
          ),
     },
 
-    "compare_time_series" : {"name" : "Time series"},
+    "compare_time_series" : {
+        "name" : "Time series",
+        "text" : 
+        ("This task generates figures of temporal means according to the configured time-series operators, "
+         "e.g. if you specfied `time_series_operators = [\"-monmean\"]`, a plot with monthly means is generated."
+         "Please refer to the `cdo` documentation for more information on these operators."
+         "If there are more than 100 samples in the time series and it is compared to reference data, "
+         "a scatter plot is generated, where the $x$ and $y$ coordinates correspond to the reference samples and the model ones, respectively."
+         ),
+        "caption-template" : 
+        ("<b>Time series for variable {var_name}. </b>"
+         r"Shaded areas depict the $\pm 2 \sigma$ vicinity (approximately the 95% confidence interval) around the mean values."
+        ),      
+    },
 
     "create_taylor_diagrams" : {
         "name" : "Taylor Diagrams",
@@ -90,12 +105,25 @@ tasks = {
         ("<b> Cost functions $c$ for variable {var_name}. </b>"
          r"The colors refer to the magnitude of the cost function: green means very good ($ 0 \leq c < 1 $),"
          r"yellow stands for satisfactory ($ 1 < c < 2 $) and red shows bad quality ($ c \geq 2 $)."
+         "**Bold** numbers correspond to the best performing model, whereas _italic_ number refer to the worst performing model for that particular station/region and kind of time series."
          "The rows correspond to the different regions and stations whereas the columns are related to the different temporal means and models."
         ),
     },
 
-    "compare_vertical_profiles" : {"name" : "Vertical profiles"},
+    "compare_vertical_profiles" : {
+        "name" : "Vertical profiles",
+        "text" : 
+        ("This task generates vertical profiles of a four-dimensional field $\phi(x, y, z, t)$ at configured stations (using remapping to nearest neighbors) "
+         "accompanied by performing the configured seasonal means."
+         "Vertical profiles that correspong to regions are created by an additional spatial mean over the particular region."
+        ),
+        "caption-template" : 
+        ("<b> Vertical profiles for variable {var_name}. </b>"
+         r"Shaded areas depict the 95% confidence interval around the mean values."
+        ),        
+    },
 }
+
 
 
 
@@ -108,6 +136,8 @@ try:
 except:
     name = "|||"
 
+
+
 script = f"""# Validation report 
 
 ## General information
@@ -115,7 +145,7 @@ script = f"""# Validation report
 |||
 |---|---|
 {name}
-|Created at:                     |`{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}`|
+|Created at:                    |`{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}`|
 |Created for output directory:  |`{out_dir}`|
 |Start date:                    |`{from_date}`|
 |End date:                      |`{to_date}`|
@@ -124,17 +154,54 @@ script = f"""# Validation report
 
 """
 
+try: 
+    script += f"""
+    
+### Report description
+
+{global_settings.report_description}
+
+    """
+except:
+    pass
+
+float_colors = get_n_colors(1)[0]
+int_colors = []
+for i in range(3):
+    int_colors.append(int(255*float_colors[i]))
+int_colors.append(0.5*float_colors[3])
+int_colors = tuple(int_colors)
+
 try:
-    description = global_settings.description
+    this_model = global_settings.this_model
+    
     script += fr"""
 
 ### Experiment description
 
 ***
 
-{description}
+<h4 style="background-color: rgba{int_colors};"><b>{this_model}</b></h4>
 
 """
+except:
+    script += fr"""
+
+### Experiment description
+
+***
+
+<h4 style="background-color: rgba{int_colors};"><b>model1</b></h4>
+
+"""
+
+try:
+    description = global_settings.this_model_description
+    script += f"""
+
+{description}
+
+    """
 except:
     pass
 
@@ -178,21 +245,43 @@ for i, var in enumerate(variables.keys()):
 
 <hr style="border:2px solid gray">
 
+<details>
+<summary><b><i>Analysis</i></b></summary>
+
     """
     
     try:
-        description = "#### **Description**\n"
+        description = "#### **Description**\n\n"
         description += variables[var]["description"]
     except:
         description = ""
 
     try:
         variables[var]["reference-description"]
-        description += "\n#### **Reference description**\n"
+        description += "\n\n#### **Reference description**\n\n"
         description += variables[var]["reference-description"]
     except:
         pass
 
+    try:
+        other_models = variables[var]["other-models"]
+        if other_models != {}:
+            description += "\n\n#### **Comparison to other models**\n\n"
+            RGB_tuples = get_n_colors(len(other_models.keys())+1)
+            for i, om in enumerate(other_models.keys()):
+                float_colors = RGB_tuples[i+1]
+                int_colors = []
+                for i in range(3):
+                    int_colors.append(int(255*float_colors[i]))
+                int_colors.append(0.5*float_colors[3])
+                int_colors = tuple(int_colors)
+                description += f"""\n<h5 style="background-color: rgba{int_colors};"><b>{om}</b></h5>\n\n"""
+                try:
+                    description += other_models[om]["description"]+"\n"
+                except:
+                    description += "\n"
+    except:
+        pass
 
     script += f"""
 
@@ -201,9 +290,6 @@ for i, var in enumerate(variables.keys()):
 """
 
     script += f"""
-
-<details>
-<summary><b><i>Analysis</i></b></summary>
 
 <details>
 <summary><i>Postprocess settings</i></summary>
