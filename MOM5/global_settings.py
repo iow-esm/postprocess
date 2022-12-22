@@ -1,3 +1,17 @@
+name = "compare_to_era5"
+#name = "compare_to_copernicus"
+
+if name == "compare_to_era5":
+    import compare_to_era5 as ref
+else:
+    import compare_to_copernicus as ref
+    
+reference = ref.reference
+
+report_description = """
+This is an example for the post-processing configuration.
+"""
+
 ##########################################################################
 # STEP 1: Configure what will be plotted on a map (2D time averages)     #
 ##########################################################################
@@ -5,11 +19,11 @@
 # Define seasons for which time averages will be calculated.
 # Note, the values in the dictionary must be valid input for the cdo operator "-selmon".
 seasons = {
- #   "MAM" : "3,4,5",
- #   "JJA" : "6,7,8",
- #   "SON" : "9,10,11",
- #   "DJF" : "12,1,2",
-    "mean": "" # mean over full time interval
+    "MAM" : "3,4,5",
+    "JJA" : "6,7,8",
+    "SON" : "9,10,11",
+    "DJF" : "12,1,2",
+    "year": "" # mean over full time interval
 }
 
 # Percentiles are not supproted currently, leave empty!
@@ -23,39 +37,42 @@ percentiles = []
 # Note, longitudes and latitudes can be in decimal format or in degrees, minutes and seconds separated by a colon.
 # Leave empty if no stations are desired.
 stations = { 
-        "BY5" : {"lat" : "55.25", "lon" : "15.98", "alternative-names" : ["BornholmdeepBY5"]},
-        "F9" : {"lat" : "64.71", "lon" : "22.07", "alternative-names" : ["BothnianBayF9"]},
-        "SR5" : {"lat" : "61.08", "lon" : "19.58", "alternative-names" : ["BothnianSeaSR5"]},
-        "BY31" : {"lat" : "58.58", "lon" : "18.23", "alternative-names" : ["LandsortDeepBY31"]}        
+    "BY5" : {"lat" : "55.25", "lon" : "15.98", "alternative-names" : ["BornholmdeepBY5"]},
+    "F9" : {"lat" : "64.71", "lon" : "22.07", "alternative-names" : ["BothnianBayF9"]},
+    "SR5" : {"lat" : "61.08", "lon" : "19.58", "alternative-names" : ["BothnianSeaSR5"]},
+    "BY31" : {"lat" : "58.58", "lon" : "18.23", "alternative-names" : ["LandsortDeepBY31"]},
+    "BY15" : {"lat" : "57.3333", "lon" : "20.05", "alternative-names" : ["GotlanddeepBY15"]},
+    "LL7" : {"lat" : "59.8465", "lon" : "24.8378", "alternative-names" : ["GulfFinlandLL7"]},
 }
 
 # Define regions over which a spatial average will be performed.
 # Note, longitudes and latitudes can be in decimal format or in degrees, minutes and seconds separated by a colon.
 # Leave empty if no regions are desired.
+root = "/silod8/karsten"
+
 regions = { 
-    "BALTIC_SEA" : {"lat-min" : "52.0", "lat-max" : "67.0", "lon-min" : "8.0", "lon-max" : "32.0"},
-    "BOTHNIAN_GULF" : {"lat-min" : "60.6", "lat-max" : "66.0", "lon-min" : "16.0", "lon-max" : "26.0"},
-    "BALTIC_PROPER" : {"lat-min" : "53.0", "lat-max" : "60.6", "lon-min" : "14.0", "lon-max" : "23.0"},
-    "BELTS" : {"lat-min" : "53.0", "lat-max" : "60.6", "lon-min" : "8.0", "lon-max" : "14.0"},
-    "RIGA_FINLAND" : {"lat-min" : "56.5", "lat-max" : "60.6", "lon-min" : "23.0", "lon-max" : "31.5"},
-	}
+    "BALTIC_SEA" : {"maskfile" : root+"/masks/Baltic/BALTIC_SEA.nc"},
+    "BOTHNIAN_GULF" : {"maskfile" : root+"/masks/Baltic/BOTHNIAN_GULF.nc"},
+    "BALTIC_PROPER" : {"maskfile" : root+"/masks/Baltic/BALTIC_PROPER.nc"},
+    "BELTS" : {"maskfile" : root+"/masks/Baltic/BELTS.nc"},
+    "RIGA_FINLAND" : {"maskfile" : root+"/masks/Baltic/RIGA_FINLAND.nc"},
+    "test" : {"lat-min" : "55.0", "lat-max" : "56.0", "lon-min" : "19.0", "lon-max" : "20.0"}, 
+}
 
 # Define cdo operators which will be applied to the time series.
-time_series_operators = [""]
+time_series_operators = ["-monmean", "-yearmean", "-ymonmean"]
 #time_series_operators = ["-monmean", "-seasmean", "-ymonmean", "-yseasmean"]
 
+other_models = {
+    "uncoupled" : { 
+        "root" : root+"/examples/IOW_ESM/postprocess/MOM5", 
+        "output-name" : name+"_uncoupled_MOM5_MOM5_Baltic",
+        #"output-dir" : root+"/examples/IOW_ESM/output/uncoupled_MOM5/MOM5_Baltic"
+    },
+}
 
-##########################################################################
-# STEP 3: Auxiliary steps (optional)                                     #
-##########################################################################
+#other_models = {}
 
-# To customize the plotting you can import the PlotConfig class, see below for usage examples.
-# If you leave that out, the plots will have gneric color maps and values ranges.
-import sys
-sys.path.append('../../auxiliary') # is executed in postprocess/MOM5/<task_name>
-from plot_config import PlotConfig
-
-    
 ##########################################################################
 # STEP 4: Define the variables for which the postprocessing is performed #
 ##########################################################################
@@ -69,47 +86,132 @@ from plot_config import PlotConfig
 # "time-series-operators" :             a list as given above
 # "plot-config" :                       a PlotConfig instance as given below (optional)
 
-# "reference-file-pattern" :            a string containing the path pattern to reference files (optional), see commented examples below
-# "reference-variable-name" :           a string containing the name of the variable in the refrence files, this variable will be renamed to the key of the dictionary entry 
-#                                       (if "reference-file-pattern" is set this must be set as well)
-# "reference-additional-operators" :    a string containing additional cdo operators applied to the reference files, e.g. commented examples below
-#                                       (if "reference-file-pattern" is set this must be set as well)
-# "plot-config-anomaly" :               a PlotConfig instance for plotting the difference between data and reference as given below (optional)
+import sys
+sys.path.append('../../auxiliary')
+from plot_config import PlotConfig
 
 variables = {
-    "SST" : {      "seasons" : seasons,
-                   "percentiles" : percentiles, 
-                   "stations" : stations,
-                   "regions" : regions,
-                   "time-series-operators" : time_series_operators,
-                   "plot-config" : PlotConfig("SST", lon_name = "xt", lat_name = "yt", width = 1500000, height = 1800000, min_value = 0.0, max_value = 15.0, delta_value = 1.0, contour = True, color_map = 'YlOrRd'),
-                   #"reference-file-pattern" : "/scratch/usr/mvkkarst/obs/Copernicus/*-Baltic-ESACCI-L4_GHRSST-SSTdepth-OSTIA-GLOB_CDR2.0-v02.0-fv01.0.nc",
-                   #"reference-variable-name" : "analysed_sst",
-                   #"reference-additional-operators" : "-chname,lon,xt -chname,lat,yt -setattribute,analysed_sst@units=Celsius -subc,273.15",
-                   #"plot-config-anomaly" : PlotConfig("SST", lon_name = "xt", lat_name = "yt", width = 1500000, height = 1800000, min_value = -6.5, max_value = 6.5, delta_value = 1.0, contour = True, color_map = 'seismic'),
-             },
-    "FI" : {        "seasons" : seasons,
-                    "percentiles" : percentiles,
-                    "stations" : stations,
-                    "regions" : regions,
-                    "time-series-operators" : time_series_operators,
-                    "plot-config" : PlotConfig("FI", lon_name = "xt", lat_name = "yt", width = 1500000, height = 1800000, min_value = 0.0, max_value = 1.0, delta_value = 0.1, contour = True, color_map = 'Blues_r'),
-                 },  
-    "SSH" : {      "seasons" : seasons,
-                   "percentiles" : percentiles,
-                   "stations" : stations,
-                   "regions" : regions, 
-                   "time-series-operators" : time_series_operators,
-                   "plot-config" : PlotConfig("SSH", lon_name = "xt", lat_name = "yt", width = 1500000, height = 1800000, min_value = -0.6, max_value = 0.6, delta_value = 0.05, contour = True, color_map = 'PiYG'),
-             },
-    "SSS" : {       "seasons" : seasons,
-                    "percentiles" : percentiles,
-                    "stations" : stations,
-                    "regions" : regions,                  
-                    "time-series-operators" : time_series_operators,
-                    "plot-config" : PlotConfig("SSS", lon_name = "xt", lat_name = "yt", width = 1500000, height = 1800000, min_value = 0.0, max_value = 10.0, delta_value = 1.25, contour = True, color_map = 'RdPu'),
-                 },
-
+    "SST" : {      
+        "seasons" : seasons,
+        "percentiles" : percentiles, 
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        "plot-config" : {"min_value" : 0.0, "max_value" : 15.0, "delta_value" : 1.0, "contour" : True, "color_map" : 'rainbow'},
+        **reference["SST"],
+        "other-models" : other_models,
+        "long-name" : "sea surface temperature",
+        "description" : "This parameter is the temperature of sea water near the surface measured in degrees Celsius. The corresponding model output variable is called SST."
+    },
+    "FI" : {        
+        "seasons" : seasons,
+        "percentiles" : percentiles,
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        #"plot-config" : PlotConfig(min_value = 0.0, max_value = 1.0, delta_value = 0.1, contour = True, color_map = 'Blues_r'),
+        "plot-config" : {"min_value" : 0.0, "max_value" : 1.0, "delta_value" : 0.1, "contour" : True, "color_map" : 'Blues_r'},
+        **reference["FI"],
+        "other-models" : other_models,
+        "long-name" : "fraction of ice",
+        "description" : "This parameter is the ice coverage of the grid cells, where 0 for no ice and 1 means that the cell completely covered. The corresponding model output has been calculated from a sum of sea ice concentrations (model variable `CN`) from all ice layers categorized by thickness."        
+    },     
+    "salt" : {     
+        "seasons" : seasons,
+        "percentiles" : percentiles,
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        "dimension" : 4,
+        "plot-config" : PlotConfig(min_value = 0, max_value = 24.0),
+        **reference["salt"],
+        "other-models" : other_models,
+        "long-name" : "salinity",
+        "description" : "This parameter is the four-dimensional ($x,y,z,t$) practical salinity field."
+    },
+    "temp" : {      
+        "seasons" : seasons,
+        "percentiles" : percentiles,
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        "dimension" : 4,
+        "plot-config" : {"min_value" : 0, "max_value" : 20.0},
+        **reference["temp"],
+        "other-models" : other_models,
+        "long-name" : "Temperature",
+        "description" : "This parameter is the four-dimensional ($x,y,z,t$) conservative temperature field."
+    },
+    "EVAP" : {        
+        "seasons" : seasons,
+        "percentiles" : percentiles,
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        "plot-config" : PlotConfig(min_value = 0.0, max_value = 5.0e-5, delta_value = 0.5e-5, contour = True, color_map = 'BrBG_r'),
+        **reference["EVAP"],
+        "other-models" : other_models,
+        "long-name" : "Evaporation",
+        "description" : "This parameter is the evaporation from the ocean at the surface to the atmosphere, i.e. it is measured in positive upward direction."
+    },  
+    "tau_x" : {        
+        "seasons" : seasons,
+        "percentiles" : percentiles,
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        "plot-config" : PlotConfig(min_value = 0.0, max_value = 0.03, delta_value = 0.003, contour = True, color_map = 'Spectral'),
+        **reference["tau_x"],
+        "other-models" : other_models
+    },     
+    "tau_y" : {
+        "seasons" : seasons,
+        "percentiles" : percentiles,
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        "plot-config" : PlotConfig(min_value = -0.02, max_value = 0.02, delta_value = 0.004, contour = True, color_map = 'Spectral'),
+        **reference["tau_y"],
+        "other-models" : other_models
+    },          
+    "swdn" : {
+        "seasons" : {"year" : "", "Jan" : "1", "Feb" : "2", "Mar" : "3", "Apr" : "4", "May" : "5", "Jun" : "6", "Jul" : "7", "Aug" : "8", "Sep" : "9", "Oct" : "10", "Nov" : "11", "Dec" : "12" },
+        "percentiles" : percentiles,
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        "plot-config" : PlotConfig(min_value = 0.0, max_value = 250.0, delta_value = 20.0, contour = True, color_map = 'magma'),
+        **reference["swdn"],
+        "other-models" : other_models
+    },
+    "lwdn" : {
+        "seasons" : seasons,
+        "percentiles" : percentiles,
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        "plot-config" : PlotConfig(min_value = 200.0, max_value = 350.0, delta_value = 10.0, contour = True, color_map = 'magma'),
+        **reference["lwdn"],
+        "other-models" : other_models
+         },    
+    "LH" : {        
+        "seasons" : seasons,
+        "percentiles" : percentiles,
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        "plot-config" : PlotConfig(min_value = 0.0, max_value = 150.0, delta_value = 15.0, contour = True, color_map = 'BrBG_r'),
+        **reference["LH"],
+        "other-models" : other_models
+    }, 
+    "SH" : {
+        "seasons" : seasons,
+        "percentiles" : percentiles,
+        "stations" : stations,
+        "regions" : regions,
+        "time-series-operators" : time_series_operators,
+        "plot-config" : PlotConfig(min_value = 0.0, max_value = 50.0, delta_value = 5.0, contour = True, color_map = 'Spectral'),
+        **reference["SH"],
+        "other-models" : other_models
+    }  
 }
-         
-
