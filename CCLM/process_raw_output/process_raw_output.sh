@@ -5,7 +5,7 @@ fi
 source ./config.sh
 
 if [ -z $max_jobs ]; then	
-	max_jobs = 1
+	max_jobs=1
 fi
 
 dirs=("$@")
@@ -48,7 +48,7 @@ for d in ${dirs[@]}; do
 			if [ -f ${o}_${s}.nc ]; then
 				for var in `cdo -showname ${o}_${s}.nc  2> /dev/null | grep -v "showname:"`; do  # skip last line showing info
 					while [ `jobs | wc -l` -ge ${max_jobs} ]; do sleep 1; done
-					cdo -selname,$var ${o}_${s}.nc ${var}_${s}.nc &
+					cdo -chname,${var},${var}_${s} -selname,$var ${o}_${s}.nc ${var}_${s}.nc &
 				done
 				wait
 				rm ${o}_${s}.nc
