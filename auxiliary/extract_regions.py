@@ -21,17 +21,15 @@ dirs = get_all_dirs_from_to.get_all_dirs_from_to(out_dir, from_date, to_date)
 import create_results_dir
 results_dir = create_results_dir.create_results_dir(out_dir, from_date, to_date)
 
-def convert_to_decimal(value):
-    if ":" not in value:
-        return value
-    
-    tmp = value.split(":")
-    decimal_value = float(tmp[0]) + float(tmp[1])/60.0 + float(tmp[2])/3600.0
-    
-    return str(decimal_value)
+from helpers import convert_to_decimal
 
 # go over all variables from where we extract (as defined in the local config)
 for var in variables.keys():
+
+    stations = variables[var]["regions"]
+
+    if not stations:
+        continue
 
     try:
         files = glob.glob(variables[var]["path"] + "/" + variables[var]["file"])
@@ -41,25 +39,49 @@ for var in variables.keys():
         except:
             files = [dir + "/" + var + ".nc" for dir in dirs]
             
-    files = " ".join(files)
+    if files == []:
+        print("No netcdf files found for variable "+var)
+        continue
+
+    cat_file = results_dir + "/" + var + ".nc"
+    if len(files) > 1:       
+        files = " ".join(files)
+        os.system("cdo  -cat \'" + files + "\' " + cat_file)
+    else:
+        os.system("cp "+files[0]+" "+cat_file)
     
     try:
         operators = variables[var]["operators"]
     except:
         operators = []
     
-    stations = variables[var]["regions"]
+
     for station in stations.keys():
-        lonlatbox = convert_to_decimal(stations[station]["lon-min"]) + "," + convert_to_decimal(stations[station]["lon-max"]) + "," + convert_to_decimal(stations[station]["lat-min"]) + "," + convert_to_decimal(stations[station]["lat-max"])
-        command = "cdo -fldmean -sellonlatbox," + lonlatbox + " -cat \'" + files + "\' " + results_dir + "/" + var + "-" + station + ".nc"
-        os.system(command)
+
+        try:
+            maskfile = stations[station]["maskfile"]
+        except:
+            maskfile = None
+
+        if maskfile is None:
+            lonlatbox = convert_to_decimal(stations[station]["lon-min"]) + "," + convert_to_decimal(stations[station]["lon-max"]) + "," + convert_to_decimal(stations[station]["lat-min"]) + "," + convert_to_decimal(stations[station]["lat-max"])
+            command = "cdo -fldmean -sellonlatbox," + lonlatbox + " " + cat_file + " " + results_dir + "/" + var + "-" + station + ".nc"
+            os.system(command)
+        else:
+            command = "cp "+cat_file+" "+cat_file+"2; "
+            command += "cdo -fldmean -div " + cat_file + " -remapnn,"+cat_file+"2 "+maskfile + " " + results_dir + "/" + var + "-" + station + ".nc"
+            command += "; rm "+cat_file+"2"
+            os.system(command)
         
         for operator in operators:
             if operator == "":
                 continue
             command = "cdo " + operator + " " + results_dir + "/" + var + "-" + station + ".nc" + " " + results_dir + "/" + var + "-" + station + operator + ".nc"
             os.system(command)
-            
+
+    os.system("rm " + cat_file)
+
+    # add standard deviation for mean operators
     for station in stations.keys():
         for operator in operators:
             if operator[-4:] == "mean":
@@ -72,10 +94,10 @@ for var in variables.keys():
                 os.system(command)
                 
                 command = "for var in `cdo showname " + std_file + " 2> /dev/null | grep -v \"showname:\"`; do "
-                command += "cdo chname,$var,${var}_STD " + std_file + " tmp.nc; mv tmp.nc " + std_file + "; done"
+                command += "cdo chname,$var,${var}_STD " + std_file + " "+results_dir+"/tmp.nc; mv "+results_dir+"/tmp.nc " + std_file + "; done"
                 os.system(command)
                 
-                command = "cdo merge " + std_file + " " + mean_file + " tmp.nc; mv tmp.nc " + mean_file    
+                command = "cdo merge " + std_file + " " + mean_file + " "+results_dir+"/tmp.nc; mv "+results_dir+"/tmp.nc " + mean_file    
                 os.system(command)
                 
                 command = "rm " + std_file

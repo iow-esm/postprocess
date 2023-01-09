@@ -3,10 +3,11 @@
 This is the repository for basic postprocess tasks for the individual models. 
 The goal is to provide scripts for
  * processing the raw model output into the format "1 file per variable"
- * creating basic plots of seansonal means and time series for 
+ * creating basic plots of seasonal means and time series for 
    * stations (specific coordinates)
-   * regions (rectangles)
+   * regions (rectangles or defined by mask files)
    * compare to given reference data
+   * compare to other models
  * performing model specific tasks as
    * preparing ocean model's output for Hagen Radtke's validator, 
      see https://openresearchsoftware.metajnl.com/articles/10.5334/jors.259/ 
@@ -24,47 +25,47 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
 
 # Versions
 
-## 1.02.00 (in preparation)
+## 1.02.00 (latest release)
 
 | date        | author(s)   | link                                                                            |
 |---          |---          |---                                                                              |
-| 2022-07-08  | SK          | XXX |   
+| 2022-12-22  | SK          | [1.02.00](https://git.io-warnemuende.de/iow_esm/postprocess/src/branch/1.02.00) |   
 
 <details>
 
 ### changes
+* main task is now create_validation_report
+  * validation report is Jupyter notebook containing figures 
+    and links to other notebooks that create these figures
+* obsolete tasks plot, plot_time_series, test have been removed
+* result directories can have prefix that is defined as "name" in global_settings.py
+* fixed bug with empty stations and regions
+* regions can be specified by giving mask files
+  * mask should contain one variable "mask" that is one in the specific region and undefined elsewhere 
+* ice extent is calculated during processing of raw output
 * plotting of seasonally averaged vertical profiles has been added
   * variable must be a 4D (3 space + 1 time) variable
   * dimension must be marked in global_settings.py as dicitonary entry "dimension" 
     with integer value, e.g 3 or 4 for 3- or 4-dimensional field, respectively
   * default dimension is assumed to be 3 (backward compatible)
 * seasonal means provide now standard deviation variables
+* added Taylor diagrams
+* other model data can be added to plots (work in progress)
+
     
 ### dependencies
 * python environment as anaconda3 or miniconda3
-* cdo, nco, (texlive), see load module scripts for your target
+* cdo, nco, see load module scripts for your target
   
 ### known issues
-* plotting on HLRN Berlin not yet possible due to missing python module basemap
-  * can be circumvented by creating own conda environment via
-  ``` bash
-  module load anaconda3/2019.10
-  conda init bash
-  conda create --name plotting
-  conda activate plotting
-  conda install basemap
-  conda install netCDF4
-  conda install xarray
-  ```
-  and adding `conda activate plotting` to your local `load_modules.sh` on blogin
-* plotting time series sporadically fails due to yet unknown reason
+* None
 
 ### tested with
-* intensively tested on Berlin's (with workaround) and on Göttingen's HLRN machine on MOM5 and CCLM output
+* intensively tested on IOW servers, Berlin's and on Göttingen's HLRN machine on MOM5 and CCLM output
   
 </details>
 
-## 1.01.02 (latest release)
+## 1.01.02 
 
 | date        | author(s)   | link                                                                            |
 |---          |---          |---                                                                              |
