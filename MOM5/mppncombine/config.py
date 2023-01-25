@@ -2,7 +2,7 @@
 dependencies = []
 
 # prefixes of raw files that should be processed
-files_to_process = ["ocean_day2d", "ocean_day3d", "ice_day", "ocean_trps", "ergom_flux3d", "ergom_flux_surf", "ergom_flux_sed", "atmos_day", "gridinfo"]
+files_to_process = ["ocean_day2d", "ocean_day3d", "rregion_ocean_day3d", "ice_day", "ocean_trps", "ergom_flux3d", "ergom_flux_surf", "ergom_flux_sed", "atmos_day", "gridinfo"]
 
 # pattern to get _all_ station data files you want to keep
 station_pattern = "rregion_*"
