@@ -97,17 +97,17 @@ for var in variables.keys():
                 plot_config = None
 
             data_plot_cfg, cbar_params, ctr_plot_cfg = process_plot_config(plot_config, ds_var)
+
+            try:
+                units = ds_var.units
+            except:
+                units = "a.u."               
              
             if j == len(seasons)-1:
                 cbar_params = {{"add_colorbar" : True, **cbar_params}}
                 cbar_params["cbar_kwargs"]["label"] = r'$\Delta$'+ds_var.name+" ["+units+"]"
             else:
                 cbar_params = {{"add_colorbar" : False}}
-
-            try:
-                units = ds_var.units
-            except:
-                units = "a.u."       
 
             ds_var.plot(ax=axs[i,j], **cbar_params, **data_plot_cfg)
             

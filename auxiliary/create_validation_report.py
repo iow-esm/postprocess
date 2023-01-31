@@ -136,7 +136,13 @@ try:
 except:
     name = "|||"
 
-
+try:
+    user = os.getlogin()
+except:
+    try:
+        user = os.environ.get("USER")
+    except:
+        user = "unknown"
 
 script = f"""# Validation report 
 
@@ -149,7 +155,7 @@ script = f"""# Validation report
 |Created for output directory:  |`{out_dir}`|
 |Start date:                    |`{from_date}`|
 |End date:                      |`{to_date}`|
-|Author:                        |`{os.getlogin()}`|
+|Author:                        |`{user}`|
 
 
 """

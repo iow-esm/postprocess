@@ -10,4 +10,6 @@ cd ../analyze
 #----------------------------------------------------
 
 cd ../create_validation_report
-./postprocess.sh ${out_dir} ${from_date} ${to_date} &
+./postprocess.sh ${out_dir} ${from_date} ${to_date}
+
+wait
