@@ -71,7 +71,7 @@ other_models = {
     },
 }
 
-#other_models = {}
+other_models = {}
 
 ##########################################################################
 # STEP 4: Define the variables for which the postprocessing is performed #

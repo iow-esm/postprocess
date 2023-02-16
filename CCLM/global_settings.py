@@ -102,7 +102,7 @@ other_models = {
     },
 }
 
-#other_models = {}
+other_models = {}
 
 import sys
 sys.path.append('../../auxiliary')
