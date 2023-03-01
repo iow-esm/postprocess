@@ -103,9 +103,9 @@ tasks = {
          ),
         "caption-template" : 
         ("<b> Cost functions $c$ for variable {var_name}. </b>"
-         r"The colors refer to the magnitude of the cost function: green means very good ($ 0 \leq c < 1 $),"
-         r"yellow stands for satisfactory ($ 1 < c < 2 $) and red shows bad quality ($ c \geq 2 $)."
-         "**Bold** numbers correspond to the best performing model, whereas _italic_ number refer to the worst performing model for that particular station/region and kind of time series."
+         r"The colors refer to the magnitude of the cost function: green means very good $( 0 \leq c < 1 )$,"
+         r"yellow stands for satisfactory $( 1 < c < 2 )$ and red shows bad quality $( c \geq 2 )$."
+         "<b>Bold</b> numbers correspond to the best performing model, whereas <i>italic</i> number refer to the worst performing model for that particular station/region and kind of time series."
          "The rows correspond to the different regions and stations whereas the columns are related to the different temporal means and models."
         ),
     },
@@ -144,7 +144,38 @@ except:
     except:
         user = "unknown"
 
-script = f"""# Validation report 
+out_dir_parts = [""]
+max_column_length = 45
+if len(out_dir) > max_column_length:
+    parts = out_dir.split("/")
+    for part in parts:
+        if part == "":
+            continue
+        if len(out_dir_parts[-1]+"/"+part) < max_column_length:
+            out_dir_parts[-1] += "/"+part
+        else:
+            if len(part) > max_column_length:
+                sub_parts = part.split("_")
+                try:
+                    sub_parts.remove("")
+                except:
+                    pass
+            else:
+                sub_parts = [part]
+            
+            out_dir_parts.append("/")
+            for i, sub in enumerate(sub_parts):
+                if len(out_dir_parts[-1]+sub) < max_column_length:
+                    out_dir_parts[-1] += sub
+                else:
+                    out_dir_parts.append(sub)
+                if i != len(sub_parts)-1:
+                    out_dir_parts[-1] += "_"
+else:
+    out_dir_parts = [out_dir]
+
+model_name = out_dir_parts[-1].split("/")[-1]
+script = f"""# Validation report for '`{model_name}`'
 
 ## General information
 
@@ -152,10 +183,15 @@ script = f"""# Validation report
 |---|---|
 {name}
 |Created at:                    |`{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}`|
-|Created for output directory:  |`{out_dir}`|
-|Start date:                    |`{from_date}`|
+|Created for output directory:  |`{out_dir_parts[0]}`|
+"""
+
+for i in range(1, len(out_dir_parts)):
+    script += f"|                               |`{out_dir_parts[i]}`|\n"
+
+script += f"""|Start date:                    |`{from_date}`|
 |End date:                      |`{to_date}`|
-|Author:                        |`{user}`|
+|User:                          |`{user}`|
 
 
 """
@@ -183,21 +219,21 @@ try:
     
     script += fr"""
 
-### Experiment description
+### Model description
 
-***
+<hr style="border:1px solid gray">
 
-<h4 style="background-color: rgba{int_colors};"><b>{this_model}</b></h4>
+<h4 style="background-color: rgba{int_colors};"><b>`{this_model}`</b></h4>
 
 """
 except:
     script += fr"""
 
-### Experiment description
+### Model description
 
-***
+<hr style="border:1px solid gray">
 
-<h4 style="background-color: rgba{int_colors};"><b>model1</b></h4>
+<h4 style="background-color: rgba{int_colors};"><b>`model1`</b></h4>
 
 """
 
@@ -215,7 +251,7 @@ script += """
 
 ### Performed tasks
 
-***
+<hr style="border:1px solid gray">
 
 
 """
@@ -272,7 +308,7 @@ for i, var in enumerate(variables.keys()):
     try:
         other_models = variables[var]["other-models"]
         if other_models != {}:
-            description += "\n\n#### **Comparison to other models**\n\n"
+            description += "\n\n#### **Comparison to other models**\n\n  $\\vphantom{M}$ \n\n"
             RGB_tuples = get_n_colors(len(other_models.keys())+1)
             for i, om in enumerate(other_models.keys()):
                 float_colors = RGB_tuples[i+1]
@@ -281,7 +317,7 @@ for i, var in enumerate(variables.keys()):
                     int_colors.append(int(255*float_colors[i]))
                 int_colors.append(0.5*float_colors[3])
                 int_colors = tuple(int_colors)
-                description += f"""\n<h5 style="background-color: rgba{int_colors};"><b>{om}</b></h5>\n\n"""
+                description += f"""\n<h5 style="background-color: rgba{int_colors};"><b>`{om}`</b></h5>\n\n"""
                 try:
                     description += other_models[om]["description"]+"\n"
                 except:
@@ -298,7 +334,7 @@ for i, var in enumerate(variables.keys()):
     script += f"""
 
 <details>
-<summary><i>Postprocess settings</i></summary>
+<summary><i> Postprocess settings for variable {var_name} </i></summary>
 
 [**Go to settings ->**](../../../global_settings.py)
 
@@ -307,7 +343,7 @@ for i, var in enumerate(variables.keys()):
     for a in variables[var].keys():
         script += "##### "+a+"\n"
         script += "`"+str(variables[var][a])+"`\n"
-        script += "\n---\n"
+        script += "\n"+r'<hr style="border:1px solid gray">'+"\n\n"
     script += "\n"
 
     script += """
@@ -336,8 +372,10 @@ for i, var in enumerate(variables.keys()):
 
                 figures += f"""
 
+ $\\vphantom{{M}}$
+
+![](./figures/{task}/{fig.split("/")[-1]})
 <figure>
-<img src="./figures/{task}/{fig.split("/")[-1]}">
     <figcaption align = "center"> <b> Fig. {fig_counter}: </b> {caption} </figcaption>
 </figure>  
 
@@ -348,7 +386,7 @@ for i, var in enumerate(variables.keys()):
             script += f"""
 #### **{tasks[task]["name"]}**
 
-***
+<hr style="border:1px solid gray">
 
 <details>
 <summary><b><i>Figures</b></i></summary>
