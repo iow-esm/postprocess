@@ -92,12 +92,19 @@ for kind in kinds:
                     try:
                         ds = xr.open_dataset(ref_dir+"/"+var+"-"+station+"-"+season+".nc")
                         std = np.squeeze(ds[var+"_STD"].data)
-                        np.squeeze(ds[var]).plot(y=ds[var].squeeze().dims[0], ax=axs[i,j], color="grey", linewidth=3, label = "BED", marker = "o")
+                        depth_name = ds[var].squeeze().dims[0]
+                        unsorted_depths = ds[depth_name].data
+                        values = np.squeeze(ds[var]).data
+                        depths, values = zip(*sorted(zip(unsorted_depths, values)))
+                        _, std = zip(*sorted(zip(unsorted_depths, std)))
+                        depths, values, std = np.array(depths), np.array(values), np.array(std)
+                        #np.squeeze(ds[var]).plot(y=depth_name, ax=axs[i,j], color="grey", linewidth=3, label = "BED", marker = "o")
+                        axs[i,j].plot(values, depths, color="grey", linewidth=3, label = "BED", marker = "o")
                         
-                        axs[i,j].fill_betweenx(ds[ds[var].squeeze().dims[0]].data, ds[var].squeeze().data - 2.0*std, ds[var].squeeze().data + 2.0*std, alpha=0.3, color="grey") 
+                        axs[i,j].fill_betweenx(depths, values - 2.0*std, values + 2.0*std, alpha=0.3, color="grey") 
                         ds.close()
-                    except:
-                        print("BED reference is configured but could not find or plot data.")
+                    except Exception as e:
+                        print("BED reference is configured but could not find or plot data. Due to exception: ", e)
 
                 if ref:
                     try:
