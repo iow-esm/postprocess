@@ -46,16 +46,16 @@ for var in variables.keys():
     
         output_file = results_dir + "/" + var + "-" + names + ".nc"
         if numbers != "":
-            os.system("cdo -timmean -selmon," + numbers + " " + cat_file + " " + output_file)
+            os.system("cdo -timmean -yearmean -selmon," + numbers + " " + cat_file + " " + output_file)
         else:
-            os.system("cdo -timmean " + cat_file + " " + output_file)
+            os.system("cdo -timmean -yearmean " + cat_file + " " + output_file)
 
         # add standard deviation to seasonal mean
         cmd = "for var in `cdo -showname "+output_file+"  2> /dev/null | grep -v \"showname:\"`; do "
         if numbers != "":
-            cmd += "cdo -chname,$var,${var}_STD -timstd -selmon," + numbers + " " + cat_file + " " + output_file+"_STD; "
+            cmd += "cdo -chname,$var,${var}_STD -timstd -yearmean -selmon," + numbers + " " + cat_file + " " + output_file+"_STD; "
         else:
-            cmd += "cdo -chname,$var,${var}_STD -timstd " + cat_file + " " + output_file+"_STD; "
+            cmd += "cdo -chname,$var,${var}_STD -timstd -yearmean " + cat_file + " " + output_file+"_STD; "
         cmd += "cdo merge "+output_file+" "+output_file+"_STD "+results_dir+"/tmp.nc; rm "+output_file+"_STD; mv "+results_dir+"/tmp.nc "+output_file+"; done"
         os.system(cmd)
 
