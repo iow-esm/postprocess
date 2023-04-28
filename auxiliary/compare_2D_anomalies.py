@@ -245,6 +245,87 @@ for var in variables.keys():
     plt.subplots_adjust(wspace=0, hspace=0)
     fig.savefig(var+"-compare.png", dpi=100)
     plt.close()
+
+    fig, axs = plt.subplots(n_comparisons, len(seasons), figsize=(4*len(seasons), 4*n_comparisons), sharex='col', sharey='row', squeeze=0, gridspec_kw={{"width_ratios": (len(seasons)-1)*[1] + [1.25]}})
+
+    for model in model_directories.keys():
+        for i, other_model in enumerate(other_models):
+            for j, season in enumerate(seasons):
+                
+                model_file = model_directories[model]+"/../../../seasonal_mean/{results_dir}/"+var+"-"+season+".nc"
+                other_model_file = other_model_directories[other_model]+"/"+var+"-"+season+".nc"
+
+                remapped_file = "tmp-remapped.nc"
+                difference_file = "tmp-difference.nc"
+                cmd = "source ../../../../load_modules.sh; cdo remapbil,"+model_file+" "+other_model_file+" "+remapped_file+"; "
+                cmd += "cdo sub "+model_file+" "+remapped_file+" "+difference_file
+                os.system(cmd)
+
+                #model_file = model_directories[model]+"/../../../deseasonalize/{results_dir}/"+var+"-"+season+".nc"
+                #other_model_file = other_model_directories[other_model]+"/../../../deseasonalize/{results_dir}/"+var+"-"+season+".nc"  
+         
+                remapped_file = "tmp-remapped.nc"
+                common_file = "tmp-common.nc"
+                significance_file = "tmp-significance.nc"
+                cmd = "source ../../../../load_modules.sh; cdo remapbil,"+model_file+" "+other_model_file+" "+remapped_file+"; "
+                cmd += "cdo -selvar,"+var+"_STD"+" -mulc,0.5 -sqrt -add -sqr "+model_file+" -sqr "+remapped_file+" "+common_file+"; "
+                cmd += "cdo -div -selvar,"+var+" "+difference_file+" "+common_file+" "+significance_file
+                os.system(cmd)
+
+                #cmd = "cp "+significance_file+" "+var+"-"+season+"-significance.nc"
+                #os.system(cmd)
+
+                ds = load_dataset(significance_file)
+                ds_var = ds.data_vars[var]   
+
+                plot_config = {{"color_map" : "seismic", "contour" : True, "delta_value" : 0.2, "min_value" : -1.0, "max_value": 1.0}}
+
+                data_plot_cfg, cbar_params, ctr_plot_cfg = process_plot_config(plot_config, ds_var)
+
+                try:
+                    units = ds_var.units
+                except:
+                    units = "a.u."               
+                
+                if j == len(seasons)-1:
+                    cbar_pars = {{"add_colorbar" : True, **cbar_params}}
+                    cbar_pars["cbar_kwargs"]["label"] = r'$\Delta$'+ds_var.name+r'/$\bar\sigma$ [1]'
+                else:
+                    cbar_pars = {{"add_colorbar" : False}}
+
+                np.squeeze(ds_var).plot(ax=axs[i,j], **cbar_pars, **data_plot_cfg)
+                
+                if ctr_plot_cfg != {{}}:
+                    np.squeeze(ds_var).plot.contour(ax=axs[i,j], **ctr_plot_cfg)
+
+                plot_coast(axs[i,j])
+                
+                if i == 0:
+                    axs[i,j].set_title(season, fontweight='bold')
+                else:
+                    axs[i,j].set_title("")
+
+                if j != 0:
+                    axs[i,j].set_ylabel("")
+                else:
+                    ylabel = axs[i,j].get_ylabel()
+                    axs[i,j].set_ylabel(r"$\bf{{"+model+"-"+other_model+"}}$"+"\n"+ylabel)
+                    axs[i,j].yaxis.label.set_color(RGB_tuples[i])
+                    
+                if i != len(models)-1:
+                    axs[i,j].set_xlabel("")
+
+                axs[i,j].grid(linestyle='--', alpha=0.6)     
+
+                unload_dataset(ds)
+                 
+                cmd = "rm "+remapped_file+" "+difference_file+" "+common_file+" "+significance_file
+                os.system(cmd)  
+
+    fig.tight_layout()  
+    plt.subplots_adjust(wspace=0, hspace=0)
+    fig.savefig(var+"-significance.png", dpi=100)
+    plt.close()    
         
     fig, axs = plt.subplots(1, len(seasons), figsize=(3*len(seasons), 3), squeeze=0, sharey=True)
     
