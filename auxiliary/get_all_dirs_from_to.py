@@ -6,8 +6,8 @@ def get_all_dirs_from_to(out_dir, from_date, to_date):
 
     for dir in glob.glob(out_dir + "/*"):
         date = dir.split("/")[-1]
-        if ".tar.gz" in date:
-            date = date.split(".")[0]
+        #if ".tar.gz" in date:
+        #    date = date.split(".")[0]
 
         if not date.isnumeric() or len(date) != 8:
             continue

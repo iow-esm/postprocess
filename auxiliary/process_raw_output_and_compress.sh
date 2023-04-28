@@ -1,3 +1,5 @@
+#!/bin/bash
+
 out_dir=$1
 from=$2
 to=$3
@@ -12,26 +14,43 @@ fi
 
 process_dir () {
     dir=$1
-    # split path into array of strings
-    IFS='/' read -r -a array <<< "$dir"
-    new_dir=""
-    for i in ${!array[@]}; do 
-        if [ "${array[$i]}" == "" ]; then 
-            continue
-        fi 
-        new_dir=$new_dir"/"${array[$i]}
-        if [ $i == $((${#array[@]}-3)) ]; then 
-            new_dir=${new_dir}"_monthly"
-        fi 
-    done
-    mkdir -p "${new_dir}"
-    cd ${dir}
-    for f in *.nc; do
-        cdo monmean $f "${new_dir}"/$f
-    done
-    cd -
 
-    tar cfvz ${dir}.tar.gz ${dir} && rm -r ${dir}
+    lock_file="${dir}/pp_active.txt"
+
+    (
+        flock -n 9 || exit 1
+
+        # split path into array of strings
+        IFS='/' read -r -a array <<< "$dir"
+        new_dir=""
+        for i in ${!array[@]}; do 
+            if [ "${array[$i]}" == "" ]; then 
+                continue
+            fi 
+            new_dir=$new_dir"/"${array[$i]}
+            if [ $i == $((${#array[@]}-3)) ]; then 
+                new_dir=${new_dir}"_monthly"
+            fi 
+        done
+        mkdir -p "${new_dir}"
+        cd ${dir}
+        for f in *.nc; do
+            cdo monmean $f "${new_dir}"/$f
+        done
+        cd -
+
+        tar cfvz ${dir}.tar.gz ${dir}
+    
+		exit 0
+
+    )9>"${lock_file}"
+
+	if [ $? != 0 ]; then
+        echo "${d} is locked. Continue."
+        return
+    fi
+
+    rm -r ${dir}	
 }
 
 dirs=("${dirs}")

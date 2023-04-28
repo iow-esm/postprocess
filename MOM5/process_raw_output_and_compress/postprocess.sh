@@ -1,9 +1,11 @@
+#!/bin/bash
+
 out_dir=$1
 from=$2
 to=$3
 
 cd ../process_raw_output/
-./postprocess.sh ${out_dir} $from $to
+source ./postprocess.sh ${out_dir} $from $to
 cd -
 
 source ./config.sh

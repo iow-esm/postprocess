@@ -18,11 +18,19 @@ except:
 # get all dirs to be processed
 sys.path.append('../../auxiliary')
 import get_all_dirs_from_to
+from create_locked_file import CreateLockedFile
 
 dirs = get_all_dirs_from_to.get_all_dirs_from_to(out_dir, from_date, to_date)
 
 # go over all desired directories
 for dir in dirs:
+
+    lock_file_name = dir+"/pp_active.txt"
+
+    try:
+        lock_file = CreateLockedFile(lock_file_name)
+    except:
+        continue
     
     print(dir)
     
@@ -81,3 +89,4 @@ for dir in dirs:
         command += "cdo -setattribute,ice_extent@long_name=\"ice extent\" -setattribute,ice_extent@standard_name=\"ice extent\" -setattribute,ice_extent@units=\"km^2\"  -mulc,0.000001 -chname,cell_area,ice_extent -fldsum -mul -gridarea FI.nc tmp.nc ice_extent.nc; rm tmp.nc" # multiply filtered ice coverage with grid area and sumover area fractions
         os.system(command)
 
+    del lock_file

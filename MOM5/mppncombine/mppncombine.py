@@ -19,11 +19,20 @@ except:
 # get all dirs to be processed
 sys.path.append('../../auxiliary')
 import get_all_dirs_from_to
+from create_locked_file import CreateLockedFile
 
 dirs = get_all_dirs_from_to.get_all_dirs_from_to(out_dir, from_date, to_date)
 
 # go over all desired directories
 for dir in dirs:
+
+    
+    lock_file_name = dir+"/pp_active.txt"
+
+    try:
+        lock_file = CreateLockedFile(lock_file_name)
+    except:
+        continue
     
     # if there is no out_raw, there is nothing left to do
     if glob.glob(dir + "/out_raw") == []:
@@ -92,3 +101,5 @@ for dir in dirs:
     
     # check if any real files (no links) are left in raw output, if not remove
     os.system("if [ `find " + dir + "/out_raw/ -mindepth 1 ! -type l | wc -l` -eq 0 ]; then  rm -r " + dir + "/out_raw; fi")
+
+    del lock_file
