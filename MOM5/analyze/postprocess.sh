@@ -23,7 +23,11 @@ wait
 #----------------------------------------------------
 
 cd ../seasonal_mean
+./postprocess.sh ${out_dir} ${from_date} ${to_date} &
+
+cd ../seasonal_percentile
 ./postprocess.sh ${out_dir} ${from_date} ${to_date}
+wait
 
 #----------------------------------------------------
 

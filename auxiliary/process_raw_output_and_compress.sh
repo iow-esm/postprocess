@@ -53,10 +53,12 @@ process_dir () {
     rm -r ${dir}	
 }
 
+let i=0
 dirs=("${dirs}")
 for dir in ${dirs[@]}; do
-    while [ `jobs | wc -l` -ge ${max_jobs} ]; do sleep 1; done
     process_dir $dir &
+    let i=i+1
+    if [ $(($i % ${max_jobs})) -eq 0 ]; then wait; let i=0; fi
 done
 wait
     

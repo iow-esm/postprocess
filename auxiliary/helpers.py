@@ -158,7 +158,7 @@ def process_plot_config(plot_config, data_array):
         levels = np.arange(vmin,vmax+d,d)
         levels = levels[np.abs(levels)>1.0e-15].tolist()
         s = len(levels)//14 + 1
-        ticks = list(set(sorted(levels[::s]+[0])))
+        ticks = list(set(sorted(levels[::s])))
         cmap = cm.get_cmap(plot_config.color_map, 256)
         color_values = ((np.array(levels)-min(levels))/(max(levels)-min(levels))).tolist()
         

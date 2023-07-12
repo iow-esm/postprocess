@@ -9,7 +9,54 @@ pwd = str(sys.argv[4])
 
 sys.path.append(pwd)
 import config
-variables = config.variables
+variables = {}
+
+for var in config.variables.keys():
+    variables[var] = {
+                "seasons" : config.variables[var]["seasons"],
+                }
+                
+    for station in config.variables[var]["stations"].keys():
+        variables[var + "-" + station] = {
+                        "seasons" : config.variables[var]["seasons"],
+                        "task" : "extract_stations",
+                        "file" : var + "-" + station + ".nc"
+                        }    
+
+    for region in config.variables[var]["regions"].keys():
+        variables[var + "-" + region] = {
+                        "seasons" : config.variables[var]["seasons"],
+                        "task" : "extract_regions",
+                        "file" : var + "-" + region + ".nc"
+                        }                                     
+                
+    try: 
+        config.variables[var]["reference-file-pattern"]
+    except:
+        print("No reference is given for " + var)
+        continue
+    
+        
+    variables[var + "-reference"] = {
+                            "seasons" : config.variables[var]["seasons"],
+                            "task" : "process_reference",
+                            "file" : var + ".nc",
+                            "remapping-file" : "grid_" + var + ".txt",
+                         }
+
+    for station in config.variables[var]["stations"].keys():
+        variables[var + "-reference-" + station] = {
+                        "seasons" : config.variables[var]["seasons"],
+                        "task" : "extract_stations",
+                        "file" : var + "-reference-" + station + ".nc"
+                        }                           
+
+    for region in config.variables[var]["regions"].keys():
+        variables[var + "-reference-" + region] = {
+                        "seasons" : config.variables[var]["seasons"],
+                        "task" : "extract_regions",
+                        "file" : var + "-reference-" + region + ".nc"
+                        }                          
 
 import get_all_dirs_from_to
 

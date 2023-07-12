@@ -40,8 +40,6 @@ try:
 except:
     this_model = "model"
     
-model_directories = {{this_model : pwd+"/../seasonal_mean/{results_dir}"}}
-
 for var in variables.keys():
 
     try:
@@ -49,82 +47,114 @@ for var in variables.keys():
             continue
     except:
         pass
-
-    model_dirs = {{**model_directories, **find_other_models(variables[var], "seasonal_mean", {from_date}, {to_date})}}
-
+        
+    percentiles = [""]
     try:
-        variables[var]['reference-file-pattern']
-        model_dirs["reference"] = pwd+"/../seasonal_mean/{results_dir}"
+       percentiles += variables[var]["percentiles"]
     except:
+        pass
+        
+    for p in percentiles:
+    
+        if p == "":
+            model_directories = {{this_model : pwd+"/../seasonal_mean/{results_dir}"}}
+            model_dirs = {{**model_directories, **find_other_models(variables[var], "seasonal_mean", {from_date}, {to_date})}}
+        else:
+            model_directories = {{this_model : pwd+"/../seasonal_percentile/{results_dir}"}}
+            model_dirs = {{**model_directories, **find_other_models(variables[var], "seasonal_percentile", {from_date}, {to_date})}}
+
         try:
-            del model_dirs["reference"]
+            variables[var]['reference-file-pattern']
+            if p == "":
+                model_dirs["reference"] = pwd+"/../seasonal_mean/{results_dir}"
+            else:
+                model_dirs["reference"] = pwd+"/../seasonal_percentile/{results_dir}"
         except:
-            pass
-
-    models = list(model_dirs.keys())
-
-    RGB_tuples = get_n_colors(len(models))   
-
-    seasons = list(variables[var]["seasons"].keys())
-
-    fig, axs = plt.subplots(len(models), len(seasons), figsize=(4*len(seasons), 4*len(models)), sharex='col', sharey='row', squeeze=0, gridspec_kw={{"width_ratios": (len(seasons)-1)*[1] + [1.25]}})
-
-    for i, model in enumerate(models):
-
-        for j, season in enumerate(seasons):
-
-            if model == "reference":
-                nc_file = model_dirs[model]+"/"+var+"-reference-"+season+"-remapped.nc"
-                color = "black"
-            else:
-                nc_file = model_dirs[model]+"/"+var+"-"+season+".nc"
-                color = RGB_tuples[i]
-                
-            ds = load_dataset(nc_file)
-
-            ds_var = ds.data_vars[var]
-            
             try:
-                plot_config = variables[var]["plot-config"]
+                del model_dirs["reference"]
             except:
-                plot_config = None
+                pass
 
-            data_plot_cfg, cbar_params, ctr_plot_cfg = process_plot_config(plot_config, ds_var)
-             
-            if j == len(seasons)-1:
-                cbar_params = {{"add_colorbar" : True, **cbar_params}}
-            else:
-                cbar_params = {{"add_colorbar" : False}}                
+        models = list(model_dirs.keys())
 
-            plot_coast(axs[i,j])
+        RGB_tuples = get_n_colors(len(models))   
 
-            ds_var.plot(ax=axs[i,j], **cbar_params, **data_plot_cfg)
-            
-            if ctr_plot_cfg != {{}}:
-                np.squeeze(ds_var).plot.contour(ax=axs[i,j], **ctr_plot_cfg)
+        seasons = list(variables[var]["seasons"].keys())
 
-            if i == 0:
-                axs[i,j].set_title(season, fontweight='bold')
-            else:
-                axs[i,j].set_title("")
 
-            if j != 0:
-                axs[i,j].set_ylabel("")
-            else:
-                ylabel = axs[i,j].get_ylabel()
-                axs[i,j].set_ylabel(r"$\bf{{"+model+"}}$"+"\n"+ylabel)
-                axs[i,j].yaxis.label.set_color(color)
+
+        fig, axs = plt.subplots(len(models), len(seasons), figsize=(4*len(seasons), 4*len(models)), sharex='col', sharey='row', squeeze=0, gridspec_kw={{"width_ratios": (len(seasons)-1)*[1] + [1.25]}})
+
+        for i, model in enumerate(models):
+
+            for j, season in enumerate(seasons):
+
+                if model == "reference":
+                    if p == "":
+                        nc_file = model_dirs[model]+"/"+var+"-reference-"+season+"-remapped.nc"
+                    else:
+                        nc_file = model_dirs[model]+"/"+var+"-reference-"+season+"-PCTL_"+p+"-remapped.nc"
+                    color = "black"
+                else:
+                    if p == "":
+                        nc_file = model_dirs[model]+"/"+var+"-"+season+".nc"
+                    else:
+                        nc_file = model_dirs[model]+"/"+var+"-"+season+"-PCTL_"+p+".nc"
+                    color = RGB_tuples[i]
+                    
+                ds = load_dataset(nc_file)
+
+                ds_var = ds.data_vars[var]
                 
-            if i != len(models)-1:
-                axs[i,j].set_xlabel("")
+                try:
+                    plot_config = variables[var]["plot-config"]
+                except:
+                    plot_config = None
 
-            axs[i,j].grid(linestyle='--', alpha=0.6)
+                data_plot_cfg, cbar_params, ctr_plot_cfg = process_plot_config(plot_config, ds_var)
+                
+                if j == len(seasons)-1:
+                    cbar_params = {{"add_colorbar" : True, **cbar_params}}
+                else:
+                    cbar_params = {{"add_colorbar" : False}}                
 
-            unload_dataset(ds)
+                plot_coast(axs[i,j])
 
-    fig.tight_layout()  
-    plt.subplots_adjust(wspace=0, hspace=0)
-    fig.savefig(var+".png", dpi=100)
+                ds_var.plot(ax=axs[i,j], **cbar_params, **data_plot_cfg)
+                
+                if ctr_plot_cfg != {{}}:
+                    np.squeeze(ds_var).plot.contour(ax=axs[i,j], **ctr_plot_cfg)
+
+                if i == 0:
+                    axs[i,j].set_title(season, fontweight='bold')
+                else:
+                    axs[i,j].set_title("")
+
+                if j != 0:
+                    axs[i,j].set_ylabel("")
+                else:
+                    ylabel = axs[i,j].get_ylabel()
+                    axs[i,j].set_ylabel(r"$\bf{{"+model+"}}$"+"\n"+ylabel)
+                    axs[i,j].yaxis.label.set_color(color)
+                    
+                if i != len(models)-1:
+                    axs[i,j].set_xlabel("")
+
+                axs[i,j].grid(linestyle='--', alpha=0.6)
+
+                unload_dataset(ds)
+
+        if p != "":
+            fig.suptitle("Percentile: "+str(p), fontsize=16, fontweight='bold')
+
+        fig.tight_layout()  
+        
+        if p != "":
+            plt.subplots_adjust(wspace=0, hspace=0, top=0.95)
+            fig.savefig(var+"-PCTL_"+str(p)+".png", dpi=100)
+        else:
+            plt.subplots_adjust(wspace=0, hspace=0)
+            fig.savefig(var+".png", dpi=100)
 
 
 """
