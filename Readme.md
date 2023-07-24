@@ -25,7 +25,39 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
 
 # Versions
 
-## 1.02.00 (latest release)
+## 1.03.00 (latest release)
+
+| date        | author(s)   | link                                                                            |
+|---          |---          |---                                                                              |
+| 2023-07-24  | SK          | [1.03.00](https://git.io-warnemuende.de/iow_esm/postprocess/src/branch/1.03.00) |   
+
+<details>
+
+### changes
+* reactivated `seasonal_percentile` task
+* added `process_raw_output_and_compress` task
+  * this task creates monthly means for the output and compresses the raw (postprocessed) data into a `.tar.gz` archive
+* a lot of polishing of the created plots and reports 
+* added `load_modules_target.sh` template
+
+    
+### dependencies
+* python environment as anaconda3 or miniconda3
+* cdo, nco, see load module scripts for your target
+  
+### known issues
+* None
+
+### tested with
+* intensively tested on IOW servers, Berlin's and on Göttingen's HLRN machine on MOM5 and CCLM output
+  
+</details>
+
+
+<details>
+<summary><b><i>older versions</i></b></summary>
+
+## 1.02.00
 
 | date        | author(s)   | link                                                                            |
 |---          |---          |---                                                                              |
@@ -204,5 +236,7 @@ https://sven-karsten.github.io/iow_esm/usage/create_postprocess_task.html.
 
 ### tested with
 * intensively tested on Göttingen's HLRN machine on MOM5 and CCLM output
+
+</details>
 
 </details>
